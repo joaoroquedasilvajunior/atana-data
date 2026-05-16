@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+venv/
+.env
+
+# DuckDB local databases (we use MotherDuck cloud)
+*.duckdb
+*.duckdb.wal
+*.duckdb.tmp
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
+
+# Secrets — NEVER commit tokens
+.motherduck_token
+secrets.json
+*.token
+
+# Intermediate ETL output
+etl/_tmp/
+etl/__cache__/
+
+# OS
+Thumbs.db

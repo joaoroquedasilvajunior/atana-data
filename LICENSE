@@ -1,0 +1,29 @@
+Creative Commons Attribution 4.0 International License (CC BY 4.0)
+=================================================================
+
+This work — the datasets in `raw/` and `curated/` of the atana-data repository —
+is licensed under a Creative Commons Attribution 4.0 International License.
+
+To view a copy of this license, visit:
+    https://creativecommons.org/licenses/by/4.0/
+
+You are free to:
+  * Share — copy and redistribute the material in any medium or format
+  * Adapt — remix, transform, and build upon the material for any purpose,
+            even commercially
+
+Under the following terms:
+  * Attribution — You must give appropriate credit, provide a link to the
+    license, and indicate if changes were made. You may do so in any reasonable
+    manner, but not in any way that suggests the licensor endorses you or your use.
+
+Notes:
+  * Source datasets (UNCTAD, IBGE, MinC SALIC, LexML) retain their original
+    public-domain or open-access status. CC BY 4.0 applies to the curation,
+    schema normalization, and integration performed in this repository.
+  * Code (ETL scripts in `etl/`) is separately licensed under the MIT License —
+    see CODE_LICENSE.txt.
+
+Recommended citation:
+  Roquer, J. (2026). atana-data: Open data on creative economies in Latin
+  America. Atana Research. https://github.com/joaoroquer/atana-data
