@@ -28,7 +28,7 @@ brew install duckdb
 # Query a Parquet file directly
 duckdb -c "
 SELECT \"Economy Label\", \"US\$ at current prices in millions\"
-FROM 'https://github.com/joaoroquer/atana-data/raw/main/raw/unctad/services_countries.parquet'
+FROM 'https://github.com/joaoroquedasilvajunior/atana-data/raw/main/raw/unctad/services_countries.parquet'
 WHERE Year=2024 AND Flow='02' AND \"Economy Label\"='Brazil'
 "
 ```
@@ -54,7 +54,7 @@ con = duckdb.connect()
 
 # Option A — read Parquet directly from GitHub
 df = con.execute("""
-    SELECT * FROM 'https://github.com/joaoroquer/atana-data/raw/main/raw/unctad/goods_value.parquet'
+    SELECT * FROM 'https://github.com/joaoroquedasilvajunior/atana-data/raw/main/raw/unctad/goods_value.parquet'
     WHERE Year=2024 AND Product='CER024'
 """).df()
 
@@ -97,7 +97,7 @@ Code (ETL scripts) is licensed under MIT.
 
 If you use these datasets in a publication, cite:
 
-> Roquer, J. (2026). *atana-data: Open data on creative economies in Latin America*. Atana Research. https://github.com/joaoroquer/atana-data
+> Roquer, J. (2026). *atana-data: Open data on creative economies in Latin America*. Atana Research. https://github.com/joaoroquedasilvajunior/atana-data
 
 The original sources should also be cited individually. See [`docs/citations.md`](docs/citations.md) for boilerplate citation strings for each source.
 

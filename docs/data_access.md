@@ -6,7 +6,7 @@ All Parquet files in `raw/` and `curated/` are queryable directly from the GitHu
 
 ```bash
 duckdb -c "
-SELECT * FROM 'https://github.com/joaoroquer/atana-data/raw/main/raw/unctad/services_countries.parquet'
+SELECT * FROM 'https://github.com/joaoroquedasilvajunior/atana-data/raw/main/raw/unctad/services_countries.parquet'
 WHERE Year=2024 LIMIT 10
 "
 ```
@@ -43,7 +43,7 @@ If you want a fully local setup that mirrors the cloud database:
 
 ```bash
 # Clone the repo
-git clone https://github.com/joaoroquer/atana-data.git
+git clone https://github.com/joaoroquedasilvajunior/atana-data.git
 cd atana-data
 
 # Create a local DuckDB from the Parquet files

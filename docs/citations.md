@@ -4,7 +4,7 @@ Use these strings to cite the source data and this repository in publications.
 
 ## This repository
 
-> Roquer, J. (2026). *atana-data: Open data on creative economies in Latin America* (Version YYYY-MM). Atana Research. https://github.com/joaoroquer/atana-data
+> Roquer, J. (2026). *atana-data: Open data on creative economies in Latin America* (Version YYYY-MM). Atana Research. https://github.com/joaoroquedasilvajunior/atana-data
 
 BibTeX:
 
@@ -13,7 +13,7 @@ BibTeX:
   author = {Roquer, João},
   title  = {atana-data: Open data on creative economies in Latin America},
   year   = {2026},
-  url    = {https://github.com/joaoroquer/atana-data}
+  url    = {https://github.com/joaoroquedasilvajunior/atana-data}
 }
 ```
 

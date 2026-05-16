@@ -75,71 +75,82 @@ Same as `services_countries` but at regional aggregate level (LATAM, OECD, etc.)
 
 ---
 
-## `atana.ibge_pnadc` — IBGE PNADC Cultural Sector  *(Phase 2, planned)*
+## `atana.ibge_pnadc` — IBGE PNADC Cultural Sector ✅ Live
 
 Source: IBGE *Informações Culturais* (SIIC) 2013–2024.
 
-Planned tables (one per IBGE Tabela 6.x):
+| Table | Rows | Format | Description |
+|---|---:|---|---|
+| `tab_6_1a` | 12,166 | long | Trab. culturais por região (geografia em colunas) |
+| `tab_6_1b` | 3,047 | long | Trab. culturais por região × raça |
+| `tab_6_2` | 10,582 | long | Distribuição etária (geografia em colunas) |
+| `tab_6_3` | 671 | wide | Escolaridade no setor cultural |
+| `tab_6_4` | 671 | wide | Formalidade por região |
+| `tab_6_5` | 693 | wide | Composição racial |
+| `tab_6_6` | 704 | wide | Renda média por sexo × raça |
+| `tab_6_7` | 671 | wide | Horas trabalhadas por região |
+| `tab_6_8` | 671 | wide | Distribuição de horas trabalhadas |
+| `tab_6_9` | 1,067 | long | Detalhamento horas (geografia em colunas) |
+| `tab_6_10` | 165 | wide | Posição na ocupação |
+| `tab_6_11` | 2,475 | long | Idade × posição (geografia em colunas) |
+| `tab_6_12` | 363 | wide | Formalidade detalhada |
+| `tab_6_13` | 55 | wide | Top 30 atividades culturais |
+| `tab_6_14`–`6_17` | 55 + 55 + 55 + 1,430 | wide | Detalhamento de ocupações |
 
-| Table | Description |
-|---|---|
-| `tab_6_1a`, `tab_6_1b` | Trabalhadores culturais por região (sex/race) |
-| `tab_6_3` | Trabalhadores culturais por escolaridade |
-| `tab_6_4` | Trabalhadores culturais por sexo × idade |
-| `tab_6_5` | Trabalhadores culturais por sexo × raça |
-| `tab_6_6` | Renda média no setor cultural por sexo × raça |
-| `tab_6_7` | Horas trabalhadas no setor cultural |
-| `tab_6_8` | Horas trabalhadas — distribuição |
-| `tab_6_10` | Posição na ocupação no setor cultural |
-| `tab_6_12` | Formalidade no setor cultural |
-| `tab_6_13` | Top 30 atividades culturais |
-| `tab_6_14`, `tab_6_15`, `tab_6_16`, `tab_6_17` | Detalhamento de ocupações |
+**Format types:**
+- **wide**: one row per (year, region), columns `c02, c04, c06...` are values; `c03, c05...` are CVs. Refer to `.claude/skills/ibge-pnadc-cultural/references/column_maps.md` for column meaning per table.
+- **long**: one row per (year, row_label, col_index, value). Used for tables 6.1a, 6.1b, 6.2, 6.9, 6.11 where geography is in columns rather than rows.
 
-All tables will be reshaped to **long format** (one row per country × year × dimension × value) for easy aggregation. CV columns will be preserved as a separate column.
-
-ETL: `etl/ibge_pnadc_xlsx_to_parquet.py`
-
----
-
-## `atana.ibge_comex` — IBGE Comércio Exterior Cultural  *(Phase 2, planned)*
-
-Source: IBGE *Informações Culturais*, capítulo 10.
-
-| Table | Description |
-|---|---|
-| `tab_10_1` | Importação/exportação de bens culturais por capítulo NCM (R$ FOB, 2014–2024) |
-| `tab_10_2` | % de participação por capítulo no total cultural |
-| `tab_10_3` | Top 20 países parceiros (cultural vs total) |
-| `tab_10_4` | Balança de serviços audiovisuais (BCB/BoP, R$) |
-
-ETL: `etl/ibge_comex_xlsx_to_parquet.py`
+ETL: `etl/ibge_pnadc__xlsx_to_parquet.py`
 
 ---
 
-## `atana.salic` — Lei Rouanet (MinC)  *(Phase 2, planned)*
+## `atana.ibge_comex` — IBGE Comércio Exterior Cultural ✅ Live
+
+Source: IBGE *Informações Culturais*, capítulo 10 (SECEX/MDIC for goods, BCB for services).
+
+| Table | Rows | Description |
+|---|---:|---|
+| `tab_10_1` | 209 | Imp/exp de bens culturais por capítulo NCM × ano (R$ mi FOB) |
+| `tab_10_2` | 198 | % de participação por capítulo no total cultural |
+| `tab_10_3` | 880 | Top 20 países parceiros × ano × 4 fluxos |
+| `tab_10_4` | 11 | Balança de serviços audiovisuais 2014–2024 (BCB/BoP) |
+
+Schema highlights:
+- `tab_10_1`: columns include `year, capitulo_ncm, capitulo_label, imp_cultural_brl_mi, exp_cultural_brl_mi, is_pure_cultural` (flag for capítulos 37/46/49/92/97 that are 100% cultural)
+- `tab_10_3`: long format with `year, flow, rank, country, share_pct` — easy to filter by flow
+
+ETL: `etl/ibge_comex__xlsx_to_parquet.py`
+
+---
+
+## `atana.salic` — Lei Rouanet (MinC) ✅ Live
 
 Source: API SALIC `api.salic.cultura.gov.br/api/v1`.
 
-| Table | Description |
-|---|---|
-| `projetos` | 26.203 projetos coletados (2019–2026), com metadados completos |
-| `incentivadores_edges` | Grafo de incentivadores (8.504 edges PRONAC → incentivador) |
+| Table | Rows | Description |
+|---|---:|---|
+| `projetos` | 26,203 | Projetos coletados (2019–2026), com metadados completos |
+| `edges_incentivador` | 8,504 | Grafo de incentivadores (PRONAC → incentivador) |
+| `propostas_recentes` | 3,000 | Propostas recentes |
 
-ETL: `etl/salic_jsonl_to_parquet.py`
+ETL: `etl/salic__jsonl_to_parquet.py`
 
 ---
 
-## `atana.lexml` — Genealogia Legislativa  *(Phase 2, planned)*
+## `atana.lexml` — Genealogia Legislativa ✅ Live
 
 Source: LexML (Senado Federal) + complementos.
 
-| Table | Description |
-|---|---|
-| `corpus_completo` | 269 atos legislativos (creative economy vocabulary) |
-| `corpus_legal` | 237 atos com força normativa identificável |
-| `corpus_biblio` | 32 atos administrativos / programáticos |
+| Table | Rows | Description |
+|---|---:|---|
+| `corpus` | 269 | Atos legislativos da economia criativa (corpus completo) |
+| `legal` | 237 | Atos com força normativa identificável |
+| `biblio` | 32 | Atos administrativos / programáticos |
+| `classified` | 217 | Atos com metadados subnacionais |
+| `with_ementas` | 217 | Atos com ementas completas |
 
-ETL: `etl/lexml_jsonl_to_parquet.py`
+ETL: `etl/lexml__jsonl_to_parquet.py`
 
 ---
 
@@ -162,4 +173,4 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | Date | Change |
 |---|---|
 | 2026-05-16 | Phase 1: schemas created in `md:atana`; 4 UNCTAD tables migrated |
-| — | Phase 2: planned for next session — IBGE PNADC + ibge_comex + SALIC + LexML to Parquet |
+| 2026-05-16 | Phase 2: 18 PNADC + 4 IBGE Comex + 3 SALIC + 5 LexML tables loaded as Parquet and synced to MotherDuck. `gen_latam_fig3_fig9.py` migrated to read from `atana.unctad.*`. |

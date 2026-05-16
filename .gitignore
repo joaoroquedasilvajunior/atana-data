@@ -27,3 +27,10 @@ etl/__cache__/
 
 # OS
 Thumbs.db
+
+# sed backups
+*.bak
+
+# Single big files replaced by partitioned subdirs (cleanup after sandbox couldn't remove)
+raw/unctad/goods_value.parquet
+raw/unctad/_placeholder.md
