@@ -154,7 +154,7 @@ ETL: `etl/lexml__jsonl_to_parquet.py`
 
 ---
 
-## `atana.inegi` — INEGI Cuenta Satélite de la Cultura de México ✅ Live (raw/Parquet; MotherDuck sync pending)
+## `atana.inegi` — INEGI Cuenta Satélite de la Cultura de México ✅ Live (GitHub + MotherDuck)
 
 Source: INEGI *Cuenta Satélite de la Cultura de México* (CSCM), base year 2018. Phase 3a of the LATAM expansion — the first non-Brazilian national source in the corpus.
 
@@ -171,7 +171,7 @@ ETL: `etl/inegi__csc_xlsx_to_parquet.py` · Methodology: `docs/methodology/inegi
 
 ---
 
-## `atana.dane` — DANE Cuenta Satélite de Economía Cultural y Creativa ✅ Live (raw/Parquet; MotherDuck sync pending)
+## `atana.dane` — DANE Cuenta Satélite de Economía Cultural y Creativa ✅ Live (GitHub + MotherDuck)
 
 Source: DANE *Cuenta Satélite de Economía Cultural y Creativa* (CSECC), release 2022–2024pr. Phase 3b of the LATAM expansion — second non-Brazilian national source.
 
@@ -209,4 +209,5 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | 2026-05-16 | Phase 1: schemas created in `md:atana`; 4 UNCTAD tables migrated |
 | 2026-05-16 | Phase 2: 18 PNADC + 4 IBGE Comex + 3 SALIC + 5 LexML tables loaded as Parquet and synced to MotherDuck. `gen_latam_fig3_fig9.py` migrated to read from `atana.unctad.*`. |
 | 2026-05-22 | Phase 3a: `atana.inegi` schema added — first non-Brazilian national source. `csc_comercio` (5,984 rows) + `fx_mxn_usd_annual` (17 rows) written as Parquet to `raw/inegi/` and synced to MotherDuck. |
-| 2026-05-22 | Phase 3b: `atana.dane` schema added — Colombia CSECC. `csecc_comercio` (484 rows) + `fx_cop_usd_annual` (11 rows) written as Parquet to `raw/dane/`. MotherDuck sync pending (not yet pushed). |
+| 2026-05-22 | Phase 3b: `atana.dane` schema added — Colombia CSECC. `csecc_comercio` (484 rows) + `fx_cop_usd_annual` (11 rows) written as Parquet to `raw/dane/`, pushed to GitHub (`617ff7d`) and synced to MotherDuck. |
+| 2026-05-22 | ETL hardening: `inegi__*` and `dane__*` now read the MotherDuck token from a gitignored `.motherduck_token` file and validate it is a JWT before connecting. |

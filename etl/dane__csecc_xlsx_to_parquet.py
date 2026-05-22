@@ -210,11 +210,22 @@ def write_meta(out_path: Path, source_files: list, description: str,
 
 
 def maybe_push(df: pd.DataFrame, schema: str, table: str) -> None:
-    """Push to MotherDuck ONLY if MOTHERDUCK_TOKEN is set. Off by default."""
-    token = os.environ.get("MOTHERDUCK_TOKEN")
+    """Push to MotherDuck if a valid token is available. The token is read from
+    the MOTHERDUCK_TOKEN env var, or from a gitignored `.motherduck_token` file
+    in the repo root. A MotherDuck token is a JWT — it starts with 'eyJ' and has
+    exactly two dots; anything else (placeholders, stray command text) is
+    rejected so it fails fast with a clear message. Off by default."""
+    def _jwt(t) -> str:
+        t = (t or "").strip()
+        return t if (t.startswith("eyJ") and t.count(".") == 2) else ""
+    token = _jwt(os.environ.get("MOTHERDUCK_TOKEN"))
     if not token:
-        print(f"  · MotherDuck push skipped for atana.{schema}.{table} "
-              f"(MOTHERDUCK_TOKEN not set)")
+        tf = REPO_ROOT / ".motherduck_token"
+        token = _jwt(tf.read_text()) if tf.exists() else ""
+    if not token:
+        print(f"  · MotherDuck push skipped for atana.{schema}.{table} — no valid "
+              f"token. Put a real MotherDuck token (a JWT: starts 'eyJ', two dots) "
+              f"in {REPO_ROOT}/.motherduck_token, then re-run.")
         return
     con = duckdb.connect(f"md:atana?motherduck_token={token}")
     con.execute(f"CREATE SCHEMA IF NOT EXISTS atana.{schema}")
