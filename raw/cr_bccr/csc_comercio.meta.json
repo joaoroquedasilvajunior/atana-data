@@ -1,0 +1,19 @@
+{
+  "table": "csc_comercio",
+  "description": "Costa Rica cultural foreign trade — exports and imports of 4 cultural sectors (Editorial, Publicidad, Audiovisual, Música), 2010–2024, in millions of colones (CRC). USD column ETL-derived.",
+  "source": "Cuenta Satélite de Cultura de Costa Rica (CSCCR) — CICSC (MCJ + BCCR + INEC + PEN + CONARE); data hosted by the Banco Central de Costa Rica",
+  "source_url": "https://www.bccr.fi.cr/indicadores-economicos/cuentas-tematicas/cuenta-satelite-de-cultura",
+  "source_files": [
+    {
+      "file": "Resumen de indicadores.xlsx",
+      "sha256": "341359730cd4479421ce34f44cffcbfbbd7ef31597af5476b05abfd056b2239f"
+    }
+  ],
+  "fetch_date": "2026-05-22",
+  "etl_script": "etl/cr_bccr__csc_to_parquet.py",
+  "etl_run_date": "2026-05-22",
+  "licence": "open data — Costa Rican official statistics (BCCR / MCJ)",
+  "grain": "year × sector × flow",
+  "currency": "CRC million (value_crc_million); USD million is derived, see fx_crc_usd_annual",
+  "coverage_break": "Full 4-sector coverage 2010–2021 only; 2022–2024 is Editorial-only (other sectors n.d.) and the year totals collapse to Editorial. See full_sector_coverage."
+}

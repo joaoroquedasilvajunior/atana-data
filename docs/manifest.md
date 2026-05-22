@@ -8,7 +8,7 @@ Canonical catalog of every table available in this repository and in `md:atana`.
 
 ## Conventions
 
-- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `inegi`, `dane`, `sinca`, `canonical`
+- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `inegi`, `dane`, `sinca`, `cr_bccr`, `canonical`
 - **Table names** are snake_case, prefixed by the table number when applicable: `tab_6_10`, `tab_10_1`
 - **Curated tables** live in the `canonical` schema and represent ready-to-consume snapshots used in published analyses
 - **Currency**: each table documents its native currency (R$ corrente, R$ FOB, US$ corrente, etc.) — never mixed in one column
@@ -188,7 +188,7 @@ ETL: `etl/dane__csecc_xlsx_to_parquet.py` · Methodology: `docs/methodology/dane
 
 ---
 
-## `atana.sinca` — Argentina Cuenta Satélite de Cultura ✅ Live (raw/Parquet; MotherDuck sync pending)
+## `atana.sinca` — Argentina Cuenta Satélite de Cultura ✅ Live (GitHub + MotherDuck)
 
 Source: SInCA (Sistema de Información Cultural de la Argentina) + INDEC — *Cuenta Satélite de Cultura*, foreign-trade module. Phase 3c of the LATAM expansion — third non-Brazilian national source.
 
@@ -203,6 +203,23 @@ Schema highlights:
 - Segment-level only (no product/sector breakdown); series ends 2022. Never mix with `inegi`, `dane`, `unctad` or `ibge_comex` without explicit reconciliation.
 
 ETL: `etl/sinca__csc_to_parquet.py` · Methodology: `docs/methodology/sinca_csc.md`
+
+---
+
+## `atana.cr_bccr` — Cuenta Satélite de Cultura de Costa Rica ✅ Live (raw/Parquet; MotherDuck sync pending)
+
+Source: *Cuenta Satélite de Cultura de Costa Rica* (CSCCR) — CICSC consortium (MCJ + BCCR + INEC + PEN + CONARE), hosted by the Banco Central de Costa Rica. Phase 3d of the LATAM expansion — fourth non-Brazilian national source.
+
+| Table | Rows | Description |
+|---|---:|---|
+| `csc_comercio` | 150 | Cultural exports/imports of 4 sectors (Editorial, Publicidad, Audiovisual, Música), 2010–2024, CRC million (current prices) |
+| `fx_crc_usd_annual` | 15 | Reference — annual-average CRC/USD exchange rate, used to derive the USD column |
+
+Schema highlights:
+- `csc_comercio`: grain `year × sector × flow`. `sector` ∈ {`Editorial`, `Publicidad`, `Audiovisual`, `Música`, `Total`}; `flow` ∈ {`exportacion`, `importacion`}. `value_usd_million` is ETL-derived.
+- ⚠️ **Coverage break:** full 4-sector coverage 2010–2021 only; **2022–2024 is Editorial-only** (other sectors `n.d.`) and the year totals collapse to Editorial. The `full_sector_coverage` boolean flags it. Unlike `inegi`/`dane`, the CSCCR publishes a *dedicated* consolidated trade table. Never mix with other schemas without explicit reconciliation.
+
+ETL: `etl/cr_bccr__csc_to_parquet.py` · Methodology: `docs/methodology/cr_bccr_csc.md`
 
 ---
 
@@ -229,4 +246,5 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | 2026-05-22 | Phase 3a: `atana.inegi` schema added — first non-Brazilian national source. `csc_comercio` (5,984 rows) + `fx_mxn_usd_annual` (17 rows) written as Parquet to `raw/inegi/` and synced to MotherDuck. |
 | 2026-05-22 | Phase 3b: `atana.dane` schema added — Colombia CSECC. `csecc_comercio` (484 rows) + `fx_cop_usd_annual` (11 rows) written as Parquet to `raw/dane/`, pushed to GitHub (`617ff7d`) and synced to MotherDuck. |
 | 2026-05-22 | ETL hardening: `inegi__*` and `dane__*` now read the MotherDuck token from a gitignored `.motherduck_token` file and validate it is a JWT before connecting. |
-| 2026-05-22 | Phase 3c: `atana.sinca` schema added — Argentina CSC. `csc_comercio` (228 rows) + `csc_participacion` (76 rows) written as Parquet to `raw/sinca/`. MotherDuck sync pending (not yet pushed). |
+| 2026-05-22 | Phase 3c: `atana.sinca` schema added — Argentina CSC. `csc_comercio` (228 rows) + `csc_participacion` (76 rows) written as Parquet to `raw/sinca/`, pushed to GitHub (`d137218`) and synced to MotherDuck. |
+| 2026-05-22 | Phase 3d: `atana.cr_bccr` schema added — Costa Rica CSCCR. `csc_comercio` (150 rows) + `fx_crc_usd_annual` (15 rows) written as Parquet to `raw/cr_bccr/`. MotherDuck sync + GitHub push pending. |

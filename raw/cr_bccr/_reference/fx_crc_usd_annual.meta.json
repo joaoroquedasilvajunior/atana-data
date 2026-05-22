@@ -1,0 +1,16 @@
+{
+  "table": "fx_crc_usd_annual",
+  "description": "Annual-average CRC/USD exchange rate, used to derive the USD column of cr_bccr.csc_comercio. 2010–2021 from the CSCCR 'TC' sheet (BCCR); 2022–2024 supplemented from World Bank / CEIC.",
+  "source": "CSCCR 'TC' sheet — Banco Central de Costa Rica, annual average; CEIC / World Bank PA.NUS.FCRF annual average — transcribed 2026-05-22 (2023 approximate); re-verify",
+  "source_url": "https://www.bccr.fi.cr/indicadores-economicos/cuentas-tematicas/cuenta-satelite-de-cultura",
+  "source_files": [
+    {
+      "file": "Resumen de indicadores.xlsx",
+      "sha256": "341359730cd4479421ce34f44cffcbfbbd7ef31597af5476b05abfd056b2239f"
+    }
+  ],
+  "fetch_date": "2026-05-22",
+  "etl_script": "etl/cr_bccr__csc_to_parquet.py",
+  "etl_run_date": "2026-05-22",
+  "licence": "open data — Costa Rican official statistics (BCCR / MCJ)"
+}
