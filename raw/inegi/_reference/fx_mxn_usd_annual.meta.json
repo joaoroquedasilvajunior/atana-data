@@ -1,0 +1,11 @@
+{
+  "table": "fx_mxn_usd_annual",
+  "description": "Annual-average MXN/USD exchange rate, used to derive the USD column of inegi.csc_comercio. NOT an INEGI figure — a documented convenience series.",
+  "source": "World Bank Open Data PA.NUS.FCRF (Official exchange rate, LCU per US$, period average; IMF IFS) — transcribed 2026-05-22, re-verify before publication use",
+  "source_url": "https://datos.bancomundial.org/indicador/PA.NUS.FCRF?locations=MX",
+  "source_files": [],
+  "fetch_date": "2026-05-22",
+  "etl_script": "etl/inegi__csc_xlsx_to_parquet.py",
+  "etl_run_date": "2026-05-22",
+  "licence": "INEGI — Términos de Libre Uso de la Información del INEGI"
+}

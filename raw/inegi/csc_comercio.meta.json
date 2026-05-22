@@ -1,0 +1,23 @@
+{
+  "table": "csc_comercio",
+  "description": "Cultural goods+services imports (Importaciones C.I.F.) and exports (Exportaciones) from the CSCM Cuadros de Oferta y Utilización, by functional area, 2008–2024, in million MXN (current and constant-2018 prices). USD column is ETL-derived.",
+  "source": "INEGI — Cuenta Satélite de la Cultura de México (CSCM), Sistema de Cuentas Nacionales de México, año base 2018",
+  "source_url": "https://www.inegi.org.mx/programas/cultura/2018/",
+  "source_files": [
+    {
+      "file": "CSCM_31.xlsx",
+      "sha256": "123d9e23bc71159dcd34a4b4ab309b596d491e7f15a75d1a7717585a6758fe5b"
+    },
+    {
+      "file": "CSCM_75.xlsx",
+      "sha256": "f20ea7f452d96a2de84cbb58d952ec23cf1e3e3fa03fba0f5ad40ef88d4fc31a"
+    }
+  ],
+  "fetch_date": "2026-05-22",
+  "etl_script": "etl/inegi__csc_xlsx_to_parquet.py",
+  "etl_run_date": "2026-05-22",
+  "licence": "INEGI — Términos de Libre Uso de la Información del INEGI",
+  "grain": "year × area × flow × price_basis",
+  "currency": "MXN million (value_mxn_million); USD million is derived, see fx_mxn_usd_annual",
+  "note_no_bop_module": "The CSCM has no balance-of-payments module; these figures are the import/export columns of the supply-use tables (CSCM_31 corriente, CSCM_75 constante 2018). No bilateral partner detail exists."
+}

@@ -2,13 +2,13 @@
 
 Canonical catalog of every table available in this repository and in `md:atana`. Keep this file synchronized when adding or modifying datasets.
 
-**Last updated:** 2026-05-16
+**Last updated:** 2026-05-22
 
 ---
 
 ## Conventions
 
-- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `canonical`
+- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `inegi`, `canonical`
 - **Table names** are snake_case, prefixed by the table number when applicable: `tab_6_10`, `tab_10_1`
 - **Curated tables** live in the `canonical` schema and represent ready-to-consume snapshots used in published analyses
 - **Currency**: each table documents its native currency (R$ corrente, R$ FOB, US$ corrente, etc.) — never mixed in one column
@@ -154,6 +154,23 @@ ETL: `etl/lexml__jsonl_to_parquet.py`
 
 ---
 
+## `atana.inegi` — INEGI Cuenta Satélite de la Cultura de México ✅ Live (raw/Parquet; MotherDuck sync pending)
+
+Source: INEGI *Cuenta Satélite de la Cultura de México* (CSCM), base year 2018. Phase 3a of the LATAM expansion — the first non-Brazilian national source in the corpus.
+
+| Table | Rows | Description |
+|---|---:|---|
+| `csc_comercio` | 5,984 | Cultural imports/exports from the CSCM Cuadros de Oferta y Utilización, by functional area × year × flow × price basis, 2008–2024, MXN million (current + constant 2018) |
+| `fx_mxn_usd_annual` | 17 | Reference — annual-average MXN/USD exchange rate (World Bank PA.NUS.FCRF), used to derive the USD column of `csc_comercio` |
+
+Schema highlights:
+- `csc_comercio`: grain is `year × area_level × area_general × area_especifica × flow × price_basis`. `area_level` ∈ {`total`, `area_general` (10), `area_especifica` (77)}. `flow` ∈ {`importacion`, `exportacion`}. `price_basis` ∈ {`corriente`, `constante_2018`}. `value_usd_million` is ETL-derived (current-price rows only).
+- ⚠️ The CSCM has **no balance-of-payments module**; `csc_comercio` is the import/export columns of the supply-use tables — no bilateral partner detail. Never mix with `unctad` or `ibge_comex` without explicit reconciliation (different methodologies).
+
+ETL: `etl/inegi__csc_xlsx_to_parquet.py` · Methodology: `docs/methodology/inegi_csc.md`
+
+---
+
 ## `atana.canonical` — Curated analytical snapshots
 
 Read-only views and tables that power published analyses. **Do not modify directly** — regenerate via build scripts and versioned datasets.
@@ -174,3 +191,4 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 |---|---|
 | 2026-05-16 | Phase 1: schemas created in `md:atana`; 4 UNCTAD tables migrated |
 | 2026-05-16 | Phase 2: 18 PNADC + 4 IBGE Comex + 3 SALIC + 5 LexML tables loaded as Parquet and synced to MotherDuck. `gen_latam_fig3_fig9.py` migrated to read from `atana.unctad.*`. |
+| 2026-05-22 | Phase 3a: `atana.inegi` schema added — first non-Brazilian national source. `csc_comercio` (5,984 rows) + `fx_mxn_usd_annual` (17 rows) written as Parquet to `raw/inegi/`. MotherDuck sync pending (not yet pushed). |
