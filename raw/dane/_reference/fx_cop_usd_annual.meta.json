@@ -1,0 +1,11 @@
+{
+  "table": "fx_cop_usd_annual",
+  "description": "Annual-average COP/USD exchange rate, used to derive the USD column of dane.csecc_comercio. NOT a DANE figure — a documented convenience series.",
+  "source": "World Bank Open Data PA.NUS.FCRF (Official exchange rate, LCU per US$, period average; IMF IFS) — transcribed 2026-05-22, re-verify before publication use",
+  "source_url": "https://datos.bancomundial.org/indicador/PA.NUS.FCRF?locations=CO",
+  "source_files": [],
+  "fetch_date": "2026-05-22",
+  "etl_script": "etl/dane__csecc_xlsx_to_parquet.py",
+  "etl_run_date": "2026-05-22",
+  "licence": "DANE — open data (Colombian official statistics)"
+}

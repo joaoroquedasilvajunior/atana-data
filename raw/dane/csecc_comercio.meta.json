@@ -1,0 +1,19 @@
+{
+  "table": "csecc_comercio",
+  "description": "Cultural imports (Importaciones) and exports (Exportaciones) from the DANE CSECC product-level supply-use balances, by product × area × year, 2014–2024, in million COP (current prices). USD column is ETL-derived.",
+  "source": "DANE — Cuenta Satélite de Economía Cultural y Creativa (CSECC), release 2022–2024pr",
+  "source_url": "https://www.dane.gov.co/index.php/estadisticas-por-tema/cuentas-nacionales/cuentas-satelite/cuenta-satelite-de-cultura-en-colombia",
+  "source_files": [
+    {
+      "file": "anex-CSECC-balanceOferUtilizacion-2024pr.xlsx",
+      "sha256": "d0a70069dc6fa39da29a690853f865088ebddc94be3d8e0bdccb526045e28d7b"
+    }
+  ],
+  "fetch_date": "2026-05-22",
+  "etl_script": "etl/dane__csecc_xlsx_to_parquet.py",
+  "etl_run_date": "2026-05-22",
+  "licence": "DANE — open data (Colombian official statistics)",
+  "grain": "year × cuadro(product) × flow",
+  "currency": "COP million (value_cop_million); USD million is derived, see fx_cop_usd_annual",
+  "note_no_bop_module": "The CSECC has no balance-of-payments module; these figures are the import/export rows of the product-level supply-use balances. No bilateral partner detail. Imports valued CIF / precios básicos, exports a precio comprador (see source_concept column)."
+}

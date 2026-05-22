@@ -8,7 +8,7 @@ Canonical catalog of every table available in this repository and in `md:atana`.
 
 ## Conventions
 
-- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `inegi`, `canonical`
+- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `inegi`, `dane`, `canonical`
 - **Table names** are snake_case, prefixed by the table number when applicable: `tab_6_10`, `tab_10_1`
 - **Curated tables** live in the `canonical` schema and represent ready-to-consume snapshots used in published analyses
 - **Currency**: each table documents its native currency (R$ corrente, R$ FOB, US$ corrente, etc.) — never mixed in one column
@@ -171,6 +171,23 @@ ETL: `etl/inegi__csc_xlsx_to_parquet.py` · Methodology: `docs/methodology/inegi
 
 ---
 
+## `atana.dane` — DANE Cuenta Satélite de Economía Cultural y Creativa ✅ Live (raw/Parquet; MotherDuck sync pending)
+
+Source: DANE *Cuenta Satélite de Economía Cultural y Creativa* (CSECC), release 2022–2024pr. Phase 3b of the LATAM expansion — second non-Brazilian national source.
+
+| Table | Rows | Description |
+|---|---:|---|
+| `csecc_comercio` | 484 | Cultural imports/exports from the CSECC product-level supply-use balances, by product × area × year × flow, 2014–2024, COP million (current prices) |
+| `fx_cop_usd_annual` | 11 | Reference — annual-average COP/USD exchange rate (World Bank PA.NUS.FCRF), used to derive the USD column of `csecc_comercio` |
+
+Schema highlights:
+- `csecc_comercio`: grain is `year × cuadro_num(product) × flow`. `area` ∈ {`Artes y patrimonio`, `Industrias culturales`, `Creaciones funcionales`}. `flow` ∈ {`importacion`, `exportacion`}. 22 of the 35 CSECC product cuadros carry trade; `value_usd_million` is ETL-derived. `source_concept` preserves DANE's verbatim valuation label (imports CIF/precios básicos, exports a precio comprador).
+- ⚠️ The CSECC has **no balance-of-payments module** and no bilateral partner detail — same posture as `atana.inegi`. Never mix `dane`, `inegi`, `unctad` or `ibge_comex` in a query without explicit reconciliation (different classifications, valuations, currencies).
+
+ETL: `etl/dane__csecc_xlsx_to_parquet.py` · Methodology: `docs/methodology/dane_csecc.md`
+
+---
+
 ## `atana.canonical` — Curated analytical snapshots
 
 Read-only views and tables that power published analyses. **Do not modify directly** — regenerate via build scripts and versioned datasets.
@@ -191,4 +208,5 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 |---|---|
 | 2026-05-16 | Phase 1: schemas created in `md:atana`; 4 UNCTAD tables migrated |
 | 2026-05-16 | Phase 2: 18 PNADC + 4 IBGE Comex + 3 SALIC + 5 LexML tables loaded as Parquet and synced to MotherDuck. `gen_latam_fig3_fig9.py` migrated to read from `atana.unctad.*`. |
-| 2026-05-22 | Phase 3a: `atana.inegi` schema added — first non-Brazilian national source. `csc_comercio` (5,984 rows) + `fx_mxn_usd_annual` (17 rows) written as Parquet to `raw/inegi/`. MotherDuck sync pending (not yet pushed). |
+| 2026-05-22 | Phase 3a: `atana.inegi` schema added — first non-Brazilian national source. `csc_comercio` (5,984 rows) + `fx_mxn_usd_annual` (17 rows) written as Parquet to `raw/inegi/` and synced to MotherDuck. |
+| 2026-05-22 | Phase 3b: `atana.dane` schema added — Colombia CSECC. `csecc_comercio` (484 rows) + `fx_cop_usd_annual` (11 rows) written as Parquet to `raw/dane/`. MotherDuck sync pending (not yet pushed). |
