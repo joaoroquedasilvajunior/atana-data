@@ -1,0 +1,29 @@
+{
+  "table": "csc_participacion",
+  "description": "Argentine cultural trade as a share of total trade and of cultural gross output (VBP), 2004–2022. Ratios (0–1).",
+  "source": "SInCA (Sistema de Información Cultural de la Argentina, Ministerio de Cultura) + INDEC — Cuenta Satélite de Cultura",
+  "source_url": "https://datos.cultura.gob.ar/dataset/cuenta-satelite-de-cultura-comercio-exterior",
+  "source_files": [
+    {
+      "file": "csc23-participacion-expo-culturales-total-expo-k.csv",
+      "sha256": "c2daedde1a2253e70dda7e8c1940b1120a936c4b9fec58816aefc6e86d987fae"
+    },
+    {
+      "file": "csc24-participacion-impo-culturales-total-impo-k.csv",
+      "sha256": "ddf195f2a0a62a0de22169f92b1fc73236a92219a93a1f58f8f3e521ac2ff76b"
+    },
+    {
+      "file": "csc25-participacion-expo-cult_vbp_cult_pesos_c.csv",
+      "sha256": "8c33a72f4997161d4eaf7ec0cc99dbdb50a51459f5590bf71724703d6cd09402"
+    },
+    {
+      "file": "csc26-participacion-expo-cult-vbp-cult-pesos-k.csv",
+      "sha256": "adb482f03507be46d9cdad0e12de8287978a88ad0591f97acf1dd3dbc045a183"
+    }
+  ],
+  "fetch_date": "2026-05-22",
+  "etl_script": "etl/sinca__csc_to_parquet.py",
+  "etl_run_date": "2026-05-22",
+  "licence": "Creative Commons Attribution 4.0 (datos.cultura.gob.ar)",
+  "grain": "year × indicator"
+}

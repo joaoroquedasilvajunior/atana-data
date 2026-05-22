@@ -1,0 +1,27 @@
+{
+  "table": "csc_comercio",
+  "description": "Argentine cultural foreign trade — exports, imports and trade balance of cultural goods and services, 2004–2022, in thousands of pesos (current and constant-2004 prices). Goods (bienes) for the constant series are derived as (goods+services) − services.",
+  "source": "SInCA (Sistema de Información Cultural de la Argentina, Ministerio de Cultura) + INDEC — Cuenta Satélite de Cultura",
+  "source_url": "https://datos.cultura.gob.ar/dataset/cuenta-satelite-de-cultura-comercio-exterior",
+  "source_files": [
+    {
+      "file": "csc20-expo-impo-servicios-cult-pesos-k.csv",
+      "sha256": "ac4eceeb85a1285e1c435b16a7f7731c073e2b7f8b32ba7437ee0915aa37039a"
+    },
+    {
+      "file": "csc21-expo-impo-bienes-servicios-cult-pesos-c.csv",
+      "sha256": "e2cc890eb84a410dd93a736f68b7a433efab63b99a0a10fbffcdc9dd20100ce6"
+    },
+    {
+      "file": "csc22-expo-impo-bienes-servicios-cult-pesos-k.csv",
+      "sha256": "72fb63c5036cffc4d465643026dfacbd75bfe48a78e4a85e65b37bb1e7f3f0e3"
+    }
+  ],
+  "fetch_date": "2026-05-22",
+  "etl_script": "etl/sinca__csc_to_parquet.py",
+  "etl_run_date": "2026-05-22",
+  "licence": "Creative Commons Attribution 4.0 (datos.cultura.gob.ar)",
+  "grain": "year × segment × price_basis × flow",
+  "currency": "thousands of Argentine pesos (miles de pesos); no USD column — see currency caveat",
+  "currency_caveat": "Current-peso series is not comparable across years (high inflation); use constante_2004. No ARS/USD conversion is provided — the official rate diverged from real value under the multiple-exchange-rate regime."
+}

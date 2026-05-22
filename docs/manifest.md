@@ -8,7 +8,7 @@ Canonical catalog of every table available in this repository and in `md:atana`.
 
 ## Conventions
 
-- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `inegi`, `dane`, `canonical`
+- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `inegi`, `dane`, `sinca`, `canonical`
 - **Table names** are snake_case, prefixed by the table number when applicable: `tab_6_10`, `tab_10_1`
 - **Curated tables** live in the `canonical` schema and represent ready-to-consume snapshots used in published analyses
 - **Currency**: each table documents its native currency (R$ corrente, R$ FOB, US$ corrente, etc.) — never mixed in one column
@@ -188,6 +188,24 @@ ETL: `etl/dane__csecc_xlsx_to_parquet.py` · Methodology: `docs/methodology/dane
 
 ---
 
+## `atana.sinca` — Argentina Cuenta Satélite de Cultura ✅ Live (raw/Parquet; MotherDuck sync pending)
+
+Source: SInCA (Sistema de Información Cultural de la Argentina) + INDEC — *Cuenta Satélite de Cultura*, foreign-trade module. Phase 3c of the LATAM expansion — third non-Brazilian national source.
+
+| Table | Rows | Description |
+|---|---:|---|
+| `csc_comercio` | 228 | Cultural goods/services exports, imports and trade balance, 2004–2022, thousands of ARS (current and constant-2004 prices) |
+| `csc_participacion` | 76 | Cultural trade as a share of total trade and of cultural gross output, 2004–2022 (ratios) |
+
+Schema highlights:
+- `csc_comercio`: grain `year × segment × price_basis × flow`. `segment` ∈ {`servicios_culturales`, `bienes_culturales`, `bienes_y_servicios_culturales`}; `bienes_culturales` is **derived** (`total − services`) and exists for `constante_2004` only. `price_basis` ∈ {`corriente`, `constante_2004`}. `flow` ∈ {`exportacion`, `importacion`, `saldo`}.
+- ⚠️ **No `value_usd_million` column** — unlike `atana.inegi`/`atana.dane`. Argentina's multiple-exchange-rate regime makes any ARS→USD conversion misleading; the series is held in pesos and the constant-2004 basis is the time-comparable one. See methodology §4.
+- Segment-level only (no product/sector breakdown); series ends 2022. Never mix with `inegi`, `dane`, `unctad` or `ibge_comex` without explicit reconciliation.
+
+ETL: `etl/sinca__csc_to_parquet.py` · Methodology: `docs/methodology/sinca_csc.md`
+
+---
+
 ## `atana.canonical` — Curated analytical snapshots
 
 Read-only views and tables that power published analyses. **Do not modify directly** — regenerate via build scripts and versioned datasets.
@@ -211,3 +229,4 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | 2026-05-22 | Phase 3a: `atana.inegi` schema added — first non-Brazilian national source. `csc_comercio` (5,984 rows) + `fx_mxn_usd_annual` (17 rows) written as Parquet to `raw/inegi/` and synced to MotherDuck. |
 | 2026-05-22 | Phase 3b: `atana.dane` schema added — Colombia CSECC. `csecc_comercio` (484 rows) + `fx_cop_usd_annual` (11 rows) written as Parquet to `raw/dane/`, pushed to GitHub (`617ff7d`) and synced to MotherDuck. |
 | 2026-05-22 | ETL hardening: `inegi__*` and `dane__*` now read the MotherDuck token from a gitignored `.motherduck_token` file and validate it is a JWT before connecting. |
+| 2026-05-22 | Phase 3c: `atana.sinca` schema added — Argentina CSC. `csc_comercio` (228 rows) + `csc_participacion` (76 rows) written as Parquet to `raw/sinca/`. MotherDuck sync pending (not yet pushed). |
