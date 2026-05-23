@@ -2,7 +2,7 @@
 
 Canonical catalog of every table available in this repository and in `md:atana`. Keep this file synchronized when adding or modifying datasets.
 
-**Last updated:** 2026-05-22
+**Last updated:** 2026-05-23
 
 ---
 
@@ -206,7 +206,7 @@ ETL: `etl/sinca__csc_to_parquet.py` · Methodology: `docs/methodology/sinca_csc.
 
 ---
 
-## `atana.cr_bccr` — Cuenta Satélite de Cultura de Costa Rica ✅ Live (raw/Parquet; MotherDuck sync pending)
+## `atana.cr_bccr` — Cuenta Satélite de Cultura de Costa Rica ✅ Live (GitHub + MotherDuck)
 
 Source: *Cuenta Satélite de Cultura de Costa Rica* (CSCCR) — CICSC consortium (MCJ + BCCR + INEC + PEN + CONARE), hosted by the Banco Central de Costa Rica. Phase 3d of the LATAM expansion — fourth non-Brazilian national source.
 
@@ -226,6 +226,27 @@ ETL: `etl/cr_bccr__csc_to_parquet.py` · Methodology: `docs/methodology/cr_bccr_
 ## `atana.canonical` — Curated analytical snapshots
 
 Read-only views and tables that power published analyses. **Do not modify directly** — regenerate via build scripts and versioned datasets.
+
+### `canonical.domain_crosswalk` ✅ Live (Phase 3)
+
+The Atana harmonisation crosswalk — maps every cultural-statistics classification in the corpus onto one common spine. **72 rows**, one per classification code.
+
+| Column | Type | Description |
+|---|---|---|
+| `source_schema` | VARCHAR | `fcs2025` / `inegi` / `dane` / `sinca` / `cr_bccr` / `unctad` / `ibge_comex` |
+| `source_system` | VARCHAR | Human-readable classification name |
+| `source_code` | VARCHAR | Code within that classification |
+| `source_label` | VARCHAR | Label within that classification |
+| `fcs2025_domain` | VARCHAR | The spine — a 2025 UNESCO FCS domain, a bundle, or NULL |
+| `fcs2025_domain_type` | VARCHAR | `cultural` / `transversal` (or a verbatim bundle / NULL) |
+| `unctad_cer` | VARCHAR | Nearest UNCTAD CER / service code; NULL if none |
+| `ibge_ncm_chapter` | VARCHAR | Nearest IBGE NCM chapter(s); NULL if not a traded good |
+| `mapping_confidence` | VARCHAR | `exact` / `good` / `approximate` / `no-equivalent` |
+| `notes` | VARCHAR | The definitional gap, stated explicitly (`★` flags a finding) |
+
+Row composition: `fcs2025` 14 (the spine — 7 cultural + 7 transversal) · `inegi` 10 · `dane` 22 · `sinca` 2 · `cr_bccr` 4 · `unctad` 15 · `ibge_comex` 5. It turns the four isolated national schemas (`inegi`, `dane`, `sinca`, `cr_bccr`) into a cross-queryable layer — a query joins any national CSC to the FCS spine, or to UNCTAD/IBGE, through this one table. Definitional gaps are kept visible (`mapping_confidence`, `notes`), never silently reconciled. Stored un-timestamped — a living reference table, not a versioned snapshot.
+
+ETL: `etl/canonical__build_domain_crosswalk.py` · Methodology: `docs/methodology/canonical_domain_crosswalk.md`
 
 ### `canonical.latam_creative_2024`  *(Phase 2)*
 The dataset behind Análise 4 / Análise 6 / Atana Index Vol. 1 — 15 LATAM countries × HHI, exposure index, total exports.
@@ -247,4 +268,5 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | 2026-05-22 | Phase 3b: `atana.dane` schema added — Colombia CSECC. `csecc_comercio` (484 rows) + `fx_cop_usd_annual` (11 rows) written as Parquet to `raw/dane/`, pushed to GitHub (`617ff7d`) and synced to MotherDuck. |
 | 2026-05-22 | ETL hardening: `inegi__*` and `dane__*` now read the MotherDuck token from a gitignored `.motherduck_token` file and validate it is a JWT before connecting. |
 | 2026-05-22 | Phase 3c: `atana.sinca` schema added — Argentina CSC. `csc_comercio` (228 rows) + `csc_participacion` (76 rows) written as Parquet to `raw/sinca/`, pushed to GitHub (`d137218`) and synced to MotherDuck. |
-| 2026-05-22 | Phase 3d: `atana.cr_bccr` schema added — Costa Rica CSCCR. `csc_comercio` (150 rows) + `fx_crc_usd_annual` (15 rows) written as Parquet to `raw/cr_bccr/`. MotherDuck sync + GitHub push pending. |
+| 2026-05-22 | Phase 3d: `atana.cr_bccr` schema added — Costa Rica CSCCR. `csc_comercio` (150 rows) + `fx_crc_usd_annual` (15 rows) written as Parquet to `raw/cr_bccr/`, pushed to GitHub (`3d9d3e7`) and synced to MotherDuck. The LATAM ingest order (Mexico → Colombia → Argentina → Costa Rica) is complete. |
+| 2026-05-23 | Phase 3 (Part C): `canonical.domain_crosswalk` materialised — the harmonisation table (72 rows) mapping all six corpus classifications onto the 2025 UNESCO FCS spine. Written to `curated/domain_crosswalk.parquet`. Build script `etl/canonical__build_domain_crosswalk.py`; methodology `docs/methodology/canonical_domain_crosswalk.md`. Pending GitHub push + MotherDuck sync. |
