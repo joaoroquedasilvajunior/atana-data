@@ -8,7 +8,12 @@
     "docs/methodology/dane_csecc.md",
     "docs/methodology/sinca_csc.md",
     "docs/methodology/cr_bccr_csc.md",
-    "_atana_intel/phase3_schema_design.md"
+    "docs/methodology/ibge_estruturais_siic_ch2.md",
+    "docs/methodology/ibge_cempre_siic_ch1.md",
+    "docs/methodology/ibge_tic_siic_ch7.md",
+    "docs/methodology/ibge_turismo_siic_ch9.md",
+    "_atana_intel/phase3_schema_design.md",
+    "_atana_intel/phase4_scoping.md"
   ],
   "build_script": "etl/canonical__build_domain_crosswalk.py",
   "build_date": "2026-05-23",
@@ -18,6 +23,7 @@
     "unctad": 15,
     "fcs2025": 14,
     "inegi": 10,
+    "ibge_siic": 10,
     "ibge_comex": 5,
     "cr_bccr": 4,
     "sinca": 2

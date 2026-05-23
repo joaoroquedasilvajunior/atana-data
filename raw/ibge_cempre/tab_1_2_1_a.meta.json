@@ -1,0 +1,19 @@
+{
+  "table": "tab_1_2_1_a",
+  "description": "SIIC chapter 1, sheet 1.2.1.a — CEMPRE / company-demography table. Faithful wide image of the IBGE sheet (cells kept as c01…); see the methodology note for column meaning.",
+  "source": "IBGE — Sistema de Informações e Indicadores Culturais (SIIC), 'Informações Culturais' 2024 edition, chapter 1 'Atividades formalmente constituídas' (CEMPRE + company demography + public-register statistics)",
+  "source_url": "https://www.ibge.gov.br/estatisticas/sociais/cultura.html",
+  "source_files": [
+    {
+      "file": "1_atividades_formalmente_constituidas.xlsx",
+      "sha256": "0c4af91114877f7e20585f6be17f5a37d9c7c23c943600f1cc4225b0cd39fb30"
+    }
+  ],
+  "fetch_date": "2026-05-23",
+  "etl_script": "etl/ibge_cempre__siic_ch1_to_parquet.py",
+  "etl_run_date": "2026-05-23",
+  "licence": "open data — IBGE official statistics",
+  "grain": "one row per source spreadsheet row (row_index preserves order)",
+  "used_columns": 3,
+  "notes": "Faithful preservation: header rows and data rows are both kept (row_index disambiguates). Column 1 (c01) is a year in some tables and a label in others — see the methodology note."
+}

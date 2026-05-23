@@ -27,11 +27,14 @@ schema / `curated/` folder, un-timestamped: it is a living reference table, not
 a versioned analytical snapshot.
 
 SOURCES OF THE MAPPINGS (authoritative — the inline data is transcribed from):
-    docs/methodology/inegi_csc.md        §5   — 10 CSCM áreas generales
-    docs/methodology/dane_csecc.md       §4   — 22 trade-bearing CSECC cuadros
-    docs/methodology/sinca_csc.md        §5   — 2 SInCA CSC segments
-    docs/methodology/cr_bccr_csc.md      §5   — 4 CSCCR sectors
-    _atana_intel/phase3_schema_design.md §C.4 — table design + the FCS spine
+    docs/methodology/inegi_csc.md             §5   — 10 CSCM áreas generales
+    docs/methodology/dane_csecc.md            §4   — 22 CSECC trade cuadros
+    docs/methodology/sinca_csc.md             §5   — 2 SInCA CSC segments
+    docs/methodology/cr_bccr_csc.md           §5   — 4 CSCCR sectors
+    docs/methodology/ibge_estruturais_siic_ch2.md  — SIIC cultural domains (Phase 4)
+    docs/methodology/ibge_tic_siic_ch7.md          — SIIC participation proxy (Phase 4)
+    _atana_intel/phase3_schema_design.md      §C.4 — table design + the FCS spine
+    _atana_intel/phase4_scoping.md            §E   — the Phase 4 crosswalk extension
 
 Output:
     curated/domain_crosswalk.parquet     (+ .meta.json)
@@ -425,10 +428,80 @@ def ibge_ncm_rows() -> list[dict]:
     return rows
 
 
+# ── Brazil — IBGE SIIC cultural-domain classification (Phase 4) ──────────────
+# The domínios culturais used across SIIC chapters 1, 2, 7 and 9 — ingested in
+# Phase 4 as schemas ibge_cempre / ibge_estruturais / ibge_tic / ibge_turismo.
+# Rows marked ★ are the Phase 4 domain-closers: the SIIC reaches two FCS
+# transversal domains a foreign-trade module cannot — Cultural and creative
+# goods manufacturing (4a) and Social participation (4b, as a proxy).
+SIIC = [
+    ("B", "B. Apresentações artísticas e celebrações",
+     "Music; Performing arts", "cultural", "CER040", "92", "approximate",
+     "SIIC domain B bundles live performing arts and music (its sub-rows "
+     "include music recording, instrument retail and manufacture) — two FCS "
+     "cultural domains, not separable at the domain header."),
+    ("C", "C. Artes visuais e artesanato", "Visual arts and crafts",
+     "cultural", "CER020", "46, 97", "good",
+     "Clean match — the FCS, like the SIIC, merges fine art and craft into "
+     "one domain."),
+    ("D", "D. Livros e imprensa", "Books and press", "cultural",
+     "CER030", "49", "good", "Clean match."),
+    ("E", "E. Mídias audiovisuais e interativas", "Audiovisual", "cultural",
+     "CER010 + CER060", "37", "approximate",
+     "SIIC domain E bundles broadcast audiovisual with interactive / internet "
+     "media; 'interativas' also touches the transversal ICT and digital "
+     "infrastructure domain."),
+    ("F", "F. Design e serviços criativos", "Design", "cultural",
+     "CER050-adjacent / SAMA", None, "approximate",
+     "SIIC domain F bundles design with architecture and advertising — FCS "
+     "Design covers them only partly. The usual approximate case."),
+    ("H", "H. Esportes e recreação", None, None, None, None, "no-equivalent",
+     "SIIC domain H (sports and recreation) has no FCS cultural-domain "
+     "equivalent — the FCS does not treat sport as a cultural domain. Carried "
+     "so the row is not silently dropped."),
+    ("PERIF-MANUF", "Atividades culturais periféricas — fabricação de bens",
+     "Cultural and creative goods manufacturing", "transversal",
+     "CER000", "37, 46, 49, 92, 97", "good",
+     "★ Phase 4a closes this transversal blind spot. The 'Fabricação de …' "
+     "rows within SIIC 'atividades culturais periféricas' (chapter 2 "
+     "structural surveys — PIA) are the domestic manufacture of cultural and "
+     "creative goods; chapter 2 measures their value added and gross output — "
+     "what a trade module, seeing only the cross-border fraction, cannot."),
+    ("PERIF-TIC",
+     "Atividades culturais periféricas — TIC, telecomunicações e software",
+     "ICT and digital infrastructure", "transversal", "CER060", None, "good",
+     "The telecom, software and electronics rows within SIIC 'atividades "
+     "culturais periféricas' map to the transversal ICT and digital "
+     "infrastructure domain."),
+    ("CH7-TIC",
+     "Suplemento PNADC TIC — acesso à internet e à televisão (cap. 7)",
+     "Social participation", "transversal", None, None, "approximate",
+     "★ Phase 4b reaches this transversal domain as a PROXY. The PNADC ICT "
+     "supplement measures cultural access (internet, devices, paid "
+     "streaming) — an approximate proxy for FCS Social participation. Brazil "
+     "has no continuous cultural-practices survey; the proxy is explicit."),
+    ("CH9-TUR",
+     "Suplemento PNADC turismo de lazer, cultura e natureza (cap. 9)",
+     "Social participation", "transversal", None, None, "approximate",
+     "★ Phase 4b — PROXY. The PNADC leisure-tourism supplement records "
+     "leisure travel by type, incl. 'Cultura e gastronomia' — an approximate "
+     "proxy for FCS Social participation. See CH7-TIC."),
+]
+
+
+def siic_rows() -> list[dict]:
+    rows = []
+    for code, label, dom, dtype, cer, ncm, conf, note in SIIC:
+        rows.append(dict(zip(COLUMNS, (
+            "ibge_siic", "IBGE SIIC cultural domain", code, label,
+            dom, dtype, cer, ncm, conf, note))))
+    return rows
+
+
 def build() -> pd.DataFrame:
     rows = (spine_rows() + inegi_rows() + dane_rows() + sinca_rows()
             + cr_bccr_rows() + unctad_goods_rows() + unctad_services_rows()
-            + ibge_ncm_rows())
+            + ibge_ncm_rows() + siic_rows())
     return pd.DataFrame(rows, columns=COLUMNS)
 
 
@@ -436,13 +509,14 @@ def validate(df: pd.DataFrame) -> None:
     """Self-check the crosswalk before it is written."""
     print("Validating...")
     expect = {"fcs2025": 14, "inegi": 10, "dane": 22, "sinca": 2,
-              "cr_bccr": 4, "unctad": 15, "ibge_comex": 5}
+              "cr_bccr": 4, "unctad": 15, "ibge_comex": 5, "ibge_siic": 10}
     got = df["source_schema"].value_counts().to_dict()
     for schema, n in expect.items():
         assert got.get(schema) == n, (
             f"{schema}: expected {n} rows, got {got.get(schema)}")
-    assert len(df) == sum(expect.values()) == 72, f"total rows {len(df)} != 72"
-    print(f"  ✓ 72 rows — " + ", ".join(f"{k} {v}" for k, v in expect.items()))
+    total = sum(expect.values())
+    assert len(df) == total == 82, f"total rows {len(df)} != 82"
+    print(f"  ✓ {len(df)} rows — " + ", ".join(f"{k} {v}" for k, v in expect.items()))
 
     bad = set(df["mapping_confidence"]) - CONFIDENCE_VALUES
     assert not bad, f"unexpected mapping_confidence values: {bad}"
@@ -469,9 +543,12 @@ def validate(df: pd.DataFrame) -> None:
     print(f"  ✓ NULL fcs2025_domain ⇔ mapping_confidence = 'no-equivalent' "
           f"({int(ne.sum())} rows)")
 
-    # Coverage: which FCS spine domains are reached by at least one national
-    # source row (inegi/dane/sinca/cr_bccr)?
-    nat = df[df["source_schema"].isin(["inegi", "dane", "sinca", "cr_bccr"])]
+    # Coverage: which FCS spine domains are reached by at least one corpus
+    # cultural-statistics source row — the LATAM national CSC schemas plus, from
+    # Phase 4, the IBGE SIIC cultural-domain classification. This is the live
+    # 'N/14 domains reached' progress meter for the transversal-blind-spot work.
+    nat = df[df["source_schema"].isin(
+        ["inegi", "dane", "sinca", "cr_bccr", "ibge_siic"])]
     reached = set()
     for d in nat["fcs2025_domain"].dropna():
         for part in str(d).replace(";", "/").split("/"):
@@ -479,8 +556,8 @@ def validate(df: pd.DataFrame) -> None:
             if p in FCS_DOMAIN_LABELS:
                 reached.add(p)
     unreached = sorted(FCS_DOMAIN_LABELS - reached)
-    print(f"  · {len(reached)}/14 FCS domains reached by a national CSC row; "
-          f"not reached: {unreached or '—'}")
+    print(f"  · {len(reached)}/14 FCS domains reached by a national CSC or "
+          f"IBGE SIIC row; not reached: {unreached or '—'}")
     conf = df["mapping_confidence"].value_counts().to_dict()
     print(f"  · confidence mix: " + ", ".join(
         f"{k} {conf.get(k, 0)}" for k in
@@ -505,7 +582,12 @@ def write_meta(out_path: Path, df: pd.DataFrame) -> None:
         "docs/methodology/dane_csecc.md",
         "docs/methodology/sinca_csc.md",
         "docs/methodology/cr_bccr_csc.md",
+        "docs/methodology/ibge_estruturais_siic_ch2.md",
+        "docs/methodology/ibge_cempre_siic_ch1.md",
+        "docs/methodology/ibge_tic_siic_ch7.md",
+        "docs/methodology/ibge_turismo_siic_ch9.md",
         "_atana_intel/phase3_schema_design.md",
+        "_atana_intel/phase4_scoping.md",
     ]
     composition = df["source_schema"].value_counts().to_dict()
     meta = {
@@ -542,7 +624,15 @@ def write_meta(out_path: Path, df: pd.DataFrame) -> None:
 
 def maybe_push(df: pd.DataFrame, schema: str, table: str) -> None:
     """Push to MotherDuck if a valid token is available (MOTHERDUCK_TOKEN env
-    var or a gitignored .motherduck_token file; must be a JWT). Off by default."""
+    var or a gitignored .motherduck_token file; must be a JWT). Off by default.
+
+    Skipped entirely when ATANA_ETL_SKIP_PUSH is set — for build-only / sandbox
+    runs where the Parquet is produced but the sync stays with João.
+    """
+    if os.environ.get("ATANA_ETL_SKIP_PUSH"):
+        print(f"  · push skipped for atana.{schema}.{table} (ATANA_ETL_SKIP_PUSH)")
+        return
+
     def _jwt(t) -> str:
         t = (t or "").strip()
         return t if (t.startswith("eyJ") and t.count(".") == 2) else ""

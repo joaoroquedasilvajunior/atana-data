@@ -1,0 +1,28 @@
+{
+  "table": "tab_7_1",
+  "description": "SIIC chapter 7, table 7.1 — PNAD Contínua ICT supplement (internet/TV/streaming access), cultural participation proxy. Year + CV sheets stacked; IBGE column structure preserved as c02, c03, ….",
+  "source": "IBGE — Sistema de Informações e Indicadores Culturais (SIIC), 'Informações Culturais' 2024 edition, chapter 7 'Acesso à Internet e à televisão'",
+  "source_url": "https://www.ibge.gov.br/estatisticas/sociais/cultura.html",
+  "source_files": [
+    {
+      "file": "Tabela 7.1.xlsx",
+      "sha256": "6523a36ab02099152ed94c3d3979d079c0980feaedb9d5e35cf6cee5958a0319"
+    }
+  ],
+  "fetch_date": "2026-05-23",
+  "etl_script": "etl/ibge_tic__siic_ch7_to_parquet.py",
+  "etl_run_date": "2026-05-23",
+  "licence": "open data — IBGE official statistics",
+  "grain": "table_id × year × is_cv × row_label",
+  "years": [
+    2016,
+    2017,
+    2018,
+    2019,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "notes": "is_cv = TRUE rows hold IBGE CV reliability codes (A best .. E suppress) mirroring the data sheet. Multi-row IBGE headers are not captured as rows — see the methodology note for the c02… column meanings. PROXY domain: this is digital-access data, an approximate proxy for FCS 'Social participation'."
+}

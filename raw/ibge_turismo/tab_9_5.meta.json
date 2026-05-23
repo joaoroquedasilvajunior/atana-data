@@ -1,0 +1,23 @@
+{
+  "table": "tab_9_5",
+  "description": "SIIC chapter 9, table 9.5 — PNAD Contínua leisure-tourism supplement (leisure travel by type, incl. 'Cultura e gastronomia'), cultural-participation proxy. Year + CV sheets stacked; IBGE column structure preserved as c02, c03, ….",
+  "source": "IBGE — Sistema de Informações e Indicadores Culturais (SIIC), 'Informações Culturais' 2024 edition, chapter 9 'Turismo de lazer, cultura e natureza'",
+  "source_url": "https://www.ibge.gov.br/estatisticas/sociais/cultura.html",
+  "source_files": [
+    {
+      "file": "Tabela 9.5.xlsx",
+      "sha256": "a150029abadb91ef74a034d3816bc2a704e8973a01680e18cc2fc58f43a7b105"
+    }
+  ],
+  "fetch_date": "2026-05-23",
+  "etl_script": "etl/ibge_turismo__siic_ch9_to_parquet.py",
+  "etl_run_date": "2026-05-23",
+  "licence": "open data — IBGE official statistics",
+  "grain": "table_id × year × is_cv × row_label",
+  "years": [
+    2021,
+    2023,
+    2024
+  ],
+  "notes": "is_cv = TRUE rows hold IBGE CV reliability codes (A best .. E suppress) mirroring the data sheet. Multi-row IBGE headers are not captured as rows — see the methodology note for the c02… column meanings. PROXY domain: leisure-travel data, an approximate proxy for FCS 'Social participation'."
+}

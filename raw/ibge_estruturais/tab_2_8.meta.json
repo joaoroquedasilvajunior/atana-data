@@ -1,0 +1,18 @@
+{
+  "table": "tab_2_8",
+  "description": "SIIC chapter 2, table 2.8 — Valor adicionado (R$1000). IBGE structural business surveys (PIA/PAS/PAC), total economy and cultural sector by cultural domain and activity, 2013 + 2019-2023, long format with CV codes.",
+  "source": "IBGE — Sistema de Informações e Indicadores Culturais (SIIC), 'Informações Culturais' 2024 edition, chapter 2 'Pesquisas estruturais em empresas'",
+  "source_url": "https://www.ibge.gov.br/estatisticas/sociais/cultura.html",
+  "source_files": [
+    {
+      "file": "2_pesquisas_estruturais_em_empresas.xlsx",
+      "sha256": "54fdbbc23a62bab8760a21e85c8c0de8bc80da7da6b82f9c0f312402dc7066cc"
+    }
+  ],
+  "fetch_date": "2026-05-23",
+  "etl_script": "etl/ibge_estruturais__siic_ch2_to_parquet.py",
+  "etl_run_date": "2026-05-23",
+  "licence": "open data — IBGE official statistics",
+  "grain": "table_id × variable × row_label × year",
+  "notes": "CV = IBGE coefficient-of-variation reliability code (A best .. E suppress; Z = value rounds to zero). value is in the unit named in 'variable' (e.g. R$1000 for monetary tables). row_label carries IBGE's cultural-domain hierarchy (A.-G. domain headers + CNAE activity rows)."
+}

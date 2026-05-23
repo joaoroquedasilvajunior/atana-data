@@ -8,7 +8,7 @@ Canonical catalog of every table available in this repository and in `md:atana`.
 
 ## Conventions
 
-- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `inegi`, `dane`, `sinca`, `cr_bccr`, `canonical`
+- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `inegi`, `dane`, `sinca`, `cr_bccr`, `ibge_estruturais`, `ibge_cempre`, `ibge_tic`, `ibge_turismo`, `canonical`
 - **Table names** are snake_case, prefixed by the table number when applicable: `tab_6_10`, `tab_10_1`
 - **Curated tables** live in the `canonical` schema and represent ready-to-consume snapshots used in published analyses
 - **Currency**: each table documents its native currency (R$ corrente, R$ FOB, US$ corrente, etc.) — never mixed in one column
@@ -223,17 +223,61 @@ ETL: `etl/cr_bccr__csc_to_parquet.py` · Methodology: `docs/methodology/cr_bccr_
 
 ---
 
+## `atana.ibge_estruturais` — IBGE SIIC ch. 2: structural business surveys 🔜 Built — pending sync
+
+Source: IBGE *Sistema de Informações e Indicadores Culturais* (SIIC), "Informações Culturais" 2024 edition, chapter 2 — structural business surveys (PIA / PAS / PAC). Phase 4a of the Brazil-first transversal-domain expansion — the production-account view that closes the FCS *Cultural and creative goods manufacturing* domain.
+
+| Table | Rows | Description |
+|---|---:|---|
+| `tab_2_1` … `tab_2_8` | 354 each | One structural-survey variable per table — número de empresas, pessoal ocupado, salários, receita líquida, custos, valor bruto da produção, consumo intermediário, valor adicionado — total economy + cultural sector by domain/activity, ref. 2013 + 2019–2023, with IBGE CV codes |
+
+Long format: grain `table_id × variable × row_label × year → value, cv`. ETL: `etl/ibge_estruturais__siic_ch2_to_parquet.py` · Methodology: `docs/methodology/ibge_estruturais_siic_ch2.md`
+
+---
+
+## `atana.ibge_cempre` — IBGE SIIC ch. 1: formally constituted activities 🔜 Built — pending sync
+
+Source: SIIC "Informações Culturais" 2024, chapter 1 — CEMPRE (Cadastro Central de Empresas) + company demography + public-register statistics. Phase 4a — the firm-structure complement to `ibge_estruturais`.
+
+23 tables (`tab_1_1_1` … `tab_1_3_4`), **1,202 rows** total. Faithful wide preservation — one Parquet per source sheet, original cells kept as `c01, c02, …` (the 24-sheet workbook's `Quadro 1.1` legend is not ingested). Families: `1.1.x` CEMPRE, `1.2.x` company demography, `1.3.x` public-register statistics; layouts are heterogeneous — see the methodology note. ETL: `etl/ibge_cempre__siic_ch1_to_parquet.py` · Methodology: `docs/methodology/ibge_cempre_siic_ch1.md`
+
+---
+
+## `atana.ibge_tic` — IBGE SIIC ch. 7: internet & television access 🔜 Built — pending sync
+
+Source: SIIC "Informações Culturais" 2024, chapter 7 — PNAD Contínua ICT supplement. Phase 4b — reaches the FCS *Social participation* transversal domain **as a proxy**.
+
+| Table | Rows | Description |
+|---|---:|---|
+| `tab_7_1` … `tab_7_8` | 5,387 total | Internet / TV / paid-streaming access; year + CV sheets stacked (`is_cv` flag); years vary by table within 2016–2024 |
+
+⚠️ **Proxy domain** — digital-access data, an *approximate* proxy for FCS Social participation; Brazil has no continuous cultural-practices survey. Faithful wide format (`c02…` preserve the IBGE column structure). ETL: `etl/ibge_tic__siic_ch7_to_parquet.py` · Methodology: `docs/methodology/ibge_tic_siic_ch7.md`
+
+---
+
+## `atana.ibge_turismo` — IBGE SIIC ch. 9: leisure, culture & nature tourism 🔜 Built — pending sync
+
+Source: SIIC "Informações Culturais" 2024, chapter 9 — PNAD Contínua leisure-tourism supplement. Phase 4b — reaches FCS *Social participation* **as a proxy**.
+
+| Table | Rows | Description |
+|---|---:|---|
+| `tab_9_1` … `tab_9_5` | 891 total | Leisure travel by type incl. "Cultura e gastronomia"; year + CV sheets stacked; ref. 2021 / 2023 / 2024 |
+
+⚠️ **Proxy domain** — see `ibge_tic`. Faithful wide format. ETL: `etl/ibge_turismo__siic_ch9_to_parquet.py` · Methodology: `docs/methodology/ibge_turismo_siic_ch9.md`
+
+---
+
 ## `atana.canonical` — Curated analytical snapshots
 
 Read-only views and tables that power published analyses. **Do not modify directly** — regenerate via build scripts and versioned datasets.
 
-### `canonical.domain_crosswalk` ✅ Live (Phase 3)
+### `canonical.domain_crosswalk` ✅ Live (Phase 3) · 🔜 extended for Phase 4 — pending re-sync
 
-The Atana harmonisation crosswalk — maps every cultural-statistics classification in the corpus onto one common spine. **72 rows**, one per classification code.
+The Atana harmonisation crosswalk — maps every cultural-statistics classification in the corpus onto one common spine. **82 rows**, one per classification code (Phase 3 built 72; Phase 4 added 10 `ibge_siic` rows).
 
 | Column | Type | Description |
 |---|---|---|
-| `source_schema` | VARCHAR | `fcs2025` / `inegi` / `dane` / `sinca` / `cr_bccr` / `unctad` / `ibge_comex` |
+| `source_schema` | VARCHAR | `fcs2025` / `inegi` / `dane` / `sinca` / `cr_bccr` / `unctad` / `ibge_comex` / `ibge_siic` |
 | `source_system` | VARCHAR | Human-readable classification name |
 | `source_code` | VARCHAR | Code within that classification |
 | `source_label` | VARCHAR | Label within that classification |
@@ -244,7 +288,7 @@ The Atana harmonisation crosswalk — maps every cultural-statistics classificat
 | `mapping_confidence` | VARCHAR | `exact` / `good` / `approximate` / `no-equivalent` |
 | `notes` | VARCHAR | The definitional gap, stated explicitly (`★` flags a finding) |
 
-Row composition: `fcs2025` 14 (the spine — 7 cultural + 7 transversal) · `inegi` 10 · `dane` 22 · `sinca` 2 · `cr_bccr` 4 · `unctad` 15 · `ibge_comex` 5. It turns the four isolated national schemas (`inegi`, `dane`, `sinca`, `cr_bccr`) into a cross-queryable layer — a query joins any national CSC to the FCS spine, or to UNCTAD/IBGE, through this one table. Definitional gaps are kept visible (`mapping_confidence`, `notes`), never silently reconciled. Stored un-timestamped — a living reference table, not a versioned snapshot.
+Row composition: `fcs2025` 14 (the spine — 7 cultural + 7 transversal) · `inegi` 10 · `dane` 22 · `sinca` 2 · `cr_bccr` 4 · `unctad` 15 · `ibge_comex` 5 · `ibge_siic` 10. It turns the isolated national schemas into a cross-queryable layer — a query joins any national CSC, or the IBGE SIIC, to the FCS spine through this one table. Definitional gaps are kept visible (`mapping_confidence`, `notes`), never silently reconciled. The build script's coverage meter now reaches **12/14** FCS domains (Phase 4 added *Cultural and creative goods manufacturing* and, as a proxy, *Social participation*; only *Intellectual property* and *Intangible cultural heritage* remain). Stored un-timestamped — a living reference table, not a versioned snapshot.
 
 ETL: `etl/canonical__build_domain_crosswalk.py` · Methodology: `docs/methodology/canonical_domain_crosswalk.md`
 
@@ -269,4 +313,7 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | 2026-05-22 | ETL hardening: `inegi__*` and `dane__*` now read the MotherDuck token from a gitignored `.motherduck_token` file and validate it is a JWT before connecting. |
 | 2026-05-22 | Phase 3c: `atana.sinca` schema added — Argentina CSC. `csc_comercio` (228 rows) + `csc_participacion` (76 rows) written as Parquet to `raw/sinca/`, pushed to GitHub (`d137218`) and synced to MotherDuck. |
 | 2026-05-22 | Phase 3d: `atana.cr_bccr` schema added — Costa Rica CSCCR. `csc_comercio` (150 rows) + `fx_crc_usd_annual` (15 rows) written as Parquet to `raw/cr_bccr/`, pushed to GitHub (`3d9d3e7`) and synced to MotherDuck. The LATAM ingest order (Mexico → Colombia → Argentina → Costa Rica) is complete. |
-| 2026-05-23 | Phase 3 (Part C): `canonical.domain_crosswalk` materialised — the harmonisation table (72 rows) mapping all six corpus classifications onto the 2025 UNESCO FCS spine. Written to `curated/domain_crosswalk.parquet`. Build script `etl/canonical__build_domain_crosswalk.py`; methodology `docs/methodology/canonical_domain_crosswalk.md`. Pending GitHub push + MotherDuck sync. |
+| 2026-05-23 | Phase 3 (Part C): `canonical.domain_crosswalk` materialised — the harmonisation table (72 rows) mapping all six corpus classifications onto the 2025 UNESCO FCS spine. Written to `curated/domain_crosswalk.parquet`, pushed to GitHub (`94166a2`) and synced to MotherDuck. Build script `etl/canonical__build_domain_crosswalk.py`; methodology `docs/methodology/canonical_domain_crosswalk.md`. |
+| 2026-05-23 | Phase 4a: schemas `atana.ibge_estruturais` (8 tables, 2,832 rows — SIIC ch. 2 structural surveys) and `atana.ibge_cempre` (23 tables, 1,202 rows — SIIC ch. 1 CEMPRE) added. Closes the FCS *Cultural and creative goods manufacturing* transversal domain. Parquet written to `raw/ibge_estruturais/` and `raw/ibge_cempre/`. **Built locally — pending GitHub push + MotherDuck sync (João).** |
+| 2026-05-23 | Phase 4b: schemas `atana.ibge_tic` (8 tables, 5,387 rows — SIIC ch. 7 ICT access) and `atana.ibge_turismo` (5 tables, 891 rows — SIIC ch. 9 leisure tourism) added. Reaches the FCS *Social participation* transversal domain as a proxy. Parquet written to `raw/ibge_tic/` and `raw/ibge_turismo/`. **Built locally — pending GitHub push + MotherDuck sync (João).** |
+| 2026-05-23 | Phase 4 crosswalk extension: `canonical.domain_crosswalk` rebuilt 72 → 82 rows (10 new `ibge_siic` rows — the IBGE SIIC cultural-domain classification). Coverage meter 10/14 → **12/14** FCS domains. **Built locally — pending re-sync (João).** |
