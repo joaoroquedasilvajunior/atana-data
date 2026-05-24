@@ -551,10 +551,37 @@ def inpi_rows() -> list[dict]:
     return rows
 
 
+# ── Brazil — ECAD music-royalty series (Phase 4c.3) ──────────────────────────
+# The cultural-IP *income* lens — music public-performance royalties collected
+# and distributed. Third reach into FCS Intellectual property; meter unchanged.
+ECAD = [
+    ("music-royalties",
+     "ECAD music public-performance royalties — arrecadação / distribuição",
+     "Intellectual property", "transversal", None, None, "good",
+     "★ Phase 4c.3 — cultural-IP *income*: ECAD music public-performance "
+     "royalties actually collected from users and distributed to "
+     "rights-holders — the third IP lens, after the BCB royalty flow and the "
+     "INPI registration stock. ⚠️ Headline series only — ECAD publishes no "
+     "machine-readable data; rounded annual totals 2023-2025, segment splits "
+     "image-only at source. Music copyright specifically. See "
+     "docs/methodology/ecad_headline.md."),
+]
+
+
+def ecad_rows() -> list[dict]:
+    rows = []
+    for code, label, dom, dtype, cer, ncm, conf, note in ECAD:
+        rows.append(dict(zip(COLUMNS, (
+            "ecad", "ECAD royalty series", code, label,
+            dom, dtype, cer, ncm, conf, note))))
+    return rows
+
+
 def build() -> pd.DataFrame:
     rows = (spine_rows() + inegi_rows() + dane_rows() + sinca_rows()
             + cr_bccr_rows() + unctad_goods_rows() + unctad_services_rows()
-            + ibge_ncm_rows() + siic_rows() + bcb_rows() + inpi_rows())
+            + ibge_ncm_rows() + siic_rows() + bcb_rows() + inpi_rows()
+            + ecad_rows())
     return pd.DataFrame(rows, columns=COLUMNS)
 
 
@@ -563,13 +590,13 @@ def validate(df: pd.DataFrame) -> None:
     print("Validating...")
     expect = {"fcs2025": 14, "inegi": 10, "dane": 22, "sinca": 2,
               "cr_bccr": 4, "unctad": 15, "ibge_comex": 5, "ibge_siic": 10,
-              "bcb": 1, "inpi": 1}
+              "bcb": 1, "inpi": 1, "ecad": 1}
     got = df["source_schema"].value_counts().to_dict()
     for schema, n in expect.items():
         assert got.get(schema) == n, (
             f"{schema}: expected {n} rows, got {got.get(schema)}")
     total = sum(expect.values())
-    assert len(df) == total == 84, f"total rows {len(df)} != 84"
+    assert len(df) == total == 85, f"total rows {len(df)} != 85"
     print(f"  ✓ {len(df)} rows — " + ", ".join(f"{k} {v}" for k, v in expect.items()))
 
     bad = set(df["mapping_confidence"]) - CONFIDENCE_VALUES
@@ -602,7 +629,8 @@ def validate(df: pd.DataFrame) -> None:
     # Phase 4, the IBGE SIIC cultural-domain classification. This is the live
     # 'N/14 domains reached' progress meter for the transversal-blind-spot work.
     nat = df[df["source_schema"].isin(
-        ["inegi", "dane", "sinca", "cr_bccr", "ibge_siic", "bcb", "inpi"])]
+        ["inegi", "dane", "sinca", "cr_bccr", "ibge_siic", "bcb", "inpi",
+         "ecad"])]
     reached = set()
     for d in nat["fcs2025_domain"].dropna():
         for part in str(d).replace(";", "/").split("/"):
@@ -611,7 +639,7 @@ def validate(df: pd.DataFrame) -> None:
                 reached.add(p)
     unreached = sorted(FCS_DOMAIN_LABELS - reached)
     print(f"  · {len(reached)}/14 FCS domains reached by a national CSC, "
-          f"IBGE SIIC, BCB or INPI row; not reached: {unreached or '—'}")
+          f"IBGE SIIC, BCB, INPI or ECAD row; not reached: {unreached or '—'}")
     conf = df["mapping_confidence"].value_counts().to_dict()
     print(f"  · confidence mix: " + ", ".join(
         f"{k} {conf.get(k, 0)}" for k in
@@ -642,6 +670,7 @@ def write_meta(out_path: Path, df: pd.DataFrame) -> None:
         "docs/methodology/ibge_turismo_siic_ch9.md",
         "docs/methodology/bcb_sgs_ip_services.md",
         "docs/methodology/inpi_indicadores.md",
+        "docs/methodology/ecad_headline.md",
         "_atana_intel/phase3_schema_design.md",
         "_atana_intel/phase4_scoping.md",
     ]

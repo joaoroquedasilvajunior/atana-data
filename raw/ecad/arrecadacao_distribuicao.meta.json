@@ -1,0 +1,18 @@
+{
+  "table": "arrecadacao_distribuicao",
+  "schema": "ecad",
+  "description": "ECAD music public-performance royalties — headline annual series: total arrecadação and distribuição, 2023-2025. Rounded headline figures transcribed from the ECAD Transparência pages (ECAD publishes no machine-readable dataset). Segment splits are image-only at source and not included.",
+  "source": "ECAD — Escritório Central de Arrecadação e Distribuição, Transparência pages",
+  "source_pages": [
+    "https://www4.ecad.org.br/transparencia-2023/",
+    "https://www4.ecad.org.br/transparencia-2024/",
+    "https://www4.ecad.org.br/transparencia/"
+  ],
+  "fetch_date": "2026-05-23",
+  "etl_script": "etl/ecad__headline_series_to_parquet.py",
+  "etl_run_date": "2026-05-24",
+  "licence": "ECAD published figures — public transparency disclosure",
+  "grain": "one row per reference year",
+  "row_count": 3,
+  "notes": "Values are ECAD's ROUNDED headline figures (R$ X.X billion) as published on the Transparência pages — not precise to the real. Precise figures are in the annual Balanço Patrimonial PDFs. yoy_pct columns are the growth rates ECAD states for each year. digital_services share is NULL for 2023 (not stated as a clean %). See docs/methodology/ecad_headline.md."
+}
