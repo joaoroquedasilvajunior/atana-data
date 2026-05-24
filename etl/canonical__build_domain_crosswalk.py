@@ -524,10 +524,37 @@ def bcb_rows() -> list[dict]:
     return rows
 
 
+# ── Brazil — INPI industrial-property register (Phase 4c.2) ──────────────────
+# The cultural-IP *stock* — registration counts for the four cultural IP types.
+# Complements the BCB IP-services *flow* (4c.1); both reach FCS Intellectual
+# property, which the meter already counts — INPI deepens, does not extend.
+INPI = [
+    ("cultural-ip",
+     "INPI cultural-IP registrations — computer programs, industrial designs, "
+     "geographical indications, trademarks",
+     "Intellectual property", "transversal", None, None, "good",
+     "★ Phase 4c.2 — the cultural-IP *stock*: INPI registration counts for the "
+     "four cultural IP types (programs, designs, GIs, trademarks), complementing "
+     "the BCB IP-services *flow*. ⚠️ Registration ≠ cultural value, and INPI "
+     "carries no creative/non-creative split within an IP type; the cultural "
+     "trademark slice is a Nice-class filter (tight 41+16 / wide +9+28) applied "
+     "downstream. See docs/methodology/inpi_indicadores.md."),
+]
+
+
+def inpi_rows() -> list[dict]:
+    rows = []
+    for code, label, dom, dtype, cer, ncm, conf, note in INPI:
+        rows.append(dict(zip(COLUMNS, (
+            "inpi", "INPI industrial-property register", code, label,
+            dom, dtype, cer, ncm, conf, note))))
+    return rows
+
+
 def build() -> pd.DataFrame:
     rows = (spine_rows() + inegi_rows() + dane_rows() + sinca_rows()
             + cr_bccr_rows() + unctad_goods_rows() + unctad_services_rows()
-            + ibge_ncm_rows() + siic_rows() + bcb_rows())
+            + ibge_ncm_rows() + siic_rows() + bcb_rows() + inpi_rows())
     return pd.DataFrame(rows, columns=COLUMNS)
 
 
@@ -536,13 +563,13 @@ def validate(df: pd.DataFrame) -> None:
     print("Validating...")
     expect = {"fcs2025": 14, "inegi": 10, "dane": 22, "sinca": 2,
               "cr_bccr": 4, "unctad": 15, "ibge_comex": 5, "ibge_siic": 10,
-              "bcb": 1}
+              "bcb": 1, "inpi": 1}
     got = df["source_schema"].value_counts().to_dict()
     for schema, n in expect.items():
         assert got.get(schema) == n, (
             f"{schema}: expected {n} rows, got {got.get(schema)}")
     total = sum(expect.values())
-    assert len(df) == total == 83, f"total rows {len(df)} != 83"
+    assert len(df) == total == 84, f"total rows {len(df)} != 84"
     print(f"  ✓ {len(df)} rows — " + ", ".join(f"{k} {v}" for k, v in expect.items()))
 
     bad = set(df["mapping_confidence"]) - CONFIDENCE_VALUES
@@ -575,7 +602,7 @@ def validate(df: pd.DataFrame) -> None:
     # Phase 4, the IBGE SIIC cultural-domain classification. This is the live
     # 'N/14 domains reached' progress meter for the transversal-blind-spot work.
     nat = df[df["source_schema"].isin(
-        ["inegi", "dane", "sinca", "cr_bccr", "ibge_siic", "bcb"])]
+        ["inegi", "dane", "sinca", "cr_bccr", "ibge_siic", "bcb", "inpi"])]
     reached = set()
     for d in nat["fcs2025_domain"].dropna():
         for part in str(d).replace(";", "/").split("/"):
@@ -584,7 +611,7 @@ def validate(df: pd.DataFrame) -> None:
                 reached.add(p)
     unreached = sorted(FCS_DOMAIN_LABELS - reached)
     print(f"  · {len(reached)}/14 FCS domains reached by a national CSC, "
-          f"IBGE SIIC or BCB row; not reached: {unreached or '—'}")
+          f"IBGE SIIC, BCB or INPI row; not reached: {unreached or '—'}")
     conf = df["mapping_confidence"].value_counts().to_dict()
     print(f"  · confidence mix: " + ", ".join(
         f"{k} {conf.get(k, 0)}" for k in
@@ -614,6 +641,7 @@ def write_meta(out_path: Path, df: pd.DataFrame) -> None:
         "docs/methodology/ibge_tic_siic_ch7.md",
         "docs/methodology/ibge_turismo_siic_ch9.md",
         "docs/methodology/bcb_sgs_ip_services.md",
+        "docs/methodology/inpi_indicadores.md",
         "_atana_intel/phase3_schema_design.md",
         "_atana_intel/phase4_scoping.md",
     ]

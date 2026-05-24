@@ -1,0 +1,22 @@
+{
+  "table": "di_concessao_di_cidade",
+  "schema": "inpi",
+  "ip_type": "di",
+  "description": "INPI Indicadores de PI — DI — sheet 'Concessao_DI_Cidade'. Annual series 2000-2024, anuário edition. Faithful wide image of the source sheet (cells kept as c01…); see docs/methodology/inpi_indicadores.md.",
+  "source": "INPI — Instituto Nacional da Propriedade Industrial, Tabelas Completas dos Indicadores de Propriedade Industrial (Anuário Estatístico), 2024 edition",
+  "source_url": "https://www.gov.br/inpi/pt-br/inpi-data/dados-e-series-temporais/tabelas-completas-dos-indicadores-de-pi",
+  "source_files": [
+    {
+      "file": "indicadores_anuario_2024.zip",
+      "member": "Indicadores_DI_Anuario_2024.xlsx",
+      "sha256": "5818203ac4440ac3f718be9064e88645fc8af7d8dd89c95adfae91e9d0817d95"
+    }
+  ],
+  "fetch_date": "2026-05-23",
+  "etl_script": "etl/inpi__indicadores_to_parquet.py",
+  "etl_run_date": "2026-05-24",
+  "licence": "open data — INPI official statistics",
+  "grain": "faithful wide image — one row per source spreadsheet row",
+  "used_columns": 27,
+  "notes": "Cultural IP cut at the file level (prg/di/ig/mrc only). Trademark cultural slice = Nice classes 41+16 (tight) or +9+28 (wide), applied downstream on the mrc class tables — the class dimension is preserved here, not pre-filtered."
+}

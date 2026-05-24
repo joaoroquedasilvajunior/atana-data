@@ -8,7 +8,7 @@ Canonical catalog of every table available in this repository and in `md:atana`.
 
 ## Conventions
 
-- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `inegi`, `dane`, `sinca`, `cr_bccr`, `ibge_estruturais`, `ibge_cempre`, `ibge_tic`, `ibge_turismo`, `bcb`, `canonical`
+- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `inegi`, `dane`, `sinca`, `cr_bccr`, `ibge_estruturais`, `ibge_cempre`, `ibge_tic`, `ibge_turismo`, `bcb`, `inpi`, `canonical`
 - **Table names** are snake_case, prefixed by the table number when applicable: `tab_6_10`, `tab_10_1`
 - **Curated tables** live in the `canonical` schema and represent ready-to-consume snapshots used in published analyses
 - **Currency**: each table documents its native currency (R$ corrente, R$ FOB, US$ corrente, etc.) — never mixed in one column
@@ -279,17 +279,27 @@ Source: Banco Central do Brasil — SGS series 22777 (receita) / 22778 (despesa)
 
 ---
 
+## `atana.inpi` — INPI industrial-property register (cultural IP) 🔜 Built — pending sync
+
+Source: INPI — *Tabelas Completas dos Indicadores de Propriedade Industrial* (Anuário Estatístico), 2024 edition. Phase 4c.2 — the cultural-IP *stock* (registration counts), deepening the FCS *Intellectual property* domain that BCB (4c.1) reached as a flow.
+
+**68 tables, ~15,321 rows** — one Parquet per source sheet of the four cultural IP-type workbooks: `prg_*` computer programs (7 tables) · `di_*` industrial designs (18) · `ig_*` geographical indications (10) · `mrc_*` trademarks (33). Annual series 2000–2024. Patents, technology-transfer contracts and IC topographies are not ingested — not cultural IP.
+
+Faithful wide preservation — original cells kept as `c01…` (all VARCHAR). The trademark cultural cut is a Nice-class filter — 41+16 (tight) / +9+28 (wide) — applied downstream on the `mrc_*classe*` tables, not in the ETL. ⚠️ The 5 source `.zip` editions sit in `raw/inpi/`; they are large — gitignore them or move to `raw/inpi/_source/` so only the Parquet is committed. ETL: `etl/inpi__indicadores_to_parquet.py` · Methodology: `docs/methodology/inpi_indicadores.md`
+
+---
+
 ## `atana.canonical` — Curated analytical snapshots
 
 Read-only views and tables that power published analyses. **Do not modify directly** — regenerate via build scripts and versioned datasets.
 
-### `canonical.domain_crosswalk` ✅ Live (Phase 3) · 🔜 extended for Phase 4 — pending re-sync
+### `canonical.domain_crosswalk` ✅ Live at 83 rows (`ce72a56`) · 🔜 rebuilt to 84 (Phase 4c.2) — pending re-sync
 
-The Atana harmonisation crosswalk — maps every cultural-statistics classification in the corpus onto one common spine. **83 rows**, one per classification code (Phase 3 built 72; Phase 4 added 10 `ibge_siic` rows and 1 `bcb` row).
+The Atana harmonisation crosswalk — maps every cultural-statistics classification in the corpus onto one common spine. **84 rows**, one per classification code (Phase 3 built 72; Phase 4 added 10 `ibge_siic` rows, 1 `bcb` row and 1 `inpi` row).
 
 | Column | Type | Description |
 |---|---|---|
-| `source_schema` | VARCHAR | `fcs2025` / `inegi` / `dane` / `sinca` / `cr_bccr` / `unctad` / `ibge_comex` / `ibge_siic` / `bcb` |
+| `source_schema` | VARCHAR | `fcs2025` / `inegi` / `dane` / `sinca` / `cr_bccr` / `unctad` / `ibge_comex` / `ibge_siic` / `bcb` / `inpi` |
 | `source_system` | VARCHAR | Human-readable classification name |
 | `source_code` | VARCHAR | Code within that classification |
 | `source_label` | VARCHAR | Label within that classification |
@@ -300,7 +310,7 @@ The Atana harmonisation crosswalk — maps every cultural-statistics classificat
 | `mapping_confidence` | VARCHAR | `exact` / `good` / `approximate` / `no-equivalent` |
 | `notes` | VARCHAR | The definitional gap, stated explicitly (`★` flags a finding) |
 
-Row composition: `fcs2025` 14 (the spine — 7 cultural + 7 transversal) · `inegi` 10 · `dane` 22 · `sinca` 2 · `cr_bccr` 4 · `unctad` 15 · `ibge_comex` 5 · `ibge_siic` 10 · `bcb` 1. It turns the isolated national schemas into a cross-queryable layer — a query joins any national CSC, the IBGE SIIC or the BCB account to the FCS spine through this one table. Definitional gaps are kept visible (`mapping_confidence`, `notes`), never silently reconciled. The build script's coverage meter now reaches **13/14** FCS domains (Phase 4 added *Cultural and creative goods manufacturing*, *Social participation* as a proxy, and *Intellectual property* via the BCB row; only *Intangible cultural heritage* remains, out of scope by decision). Stored un-timestamped — a living reference table, not a versioned snapshot.
+Row composition: `fcs2025` 14 (the spine — 7 cultural + 7 transversal) · `inegi` 10 · `dane` 22 · `sinca` 2 · `cr_bccr` 4 · `unctad` 15 · `ibge_comex` 5 · `ibge_siic` 10 · `bcb` 1 · `inpi` 1. It turns the isolated national schemas into a cross-queryable layer — a query joins any national CSC, the IBGE SIIC, the BCB account or the INPI register to the FCS spine through this one table. Definitional gaps are kept visible (`mapping_confidence`, `notes`), never silently reconciled. The build script's coverage meter now reaches **13/14** FCS domains (Phase 4 added *Cultural and creative goods manufacturing*, *Social participation* as a proxy, and *Intellectual property* via the BCB flow + INPI registration-stock rows; only *Intangible cultural heritage* remains, out of scope by decision). Stored un-timestamped — a living reference table, not a versioned snapshot.
 
 ETL: `etl/canonical__build_domain_crosswalk.py` · Methodology: `docs/methodology/canonical_domain_crosswalk.md`
 
@@ -330,4 +340,6 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | 2026-05-23 | Phase 4b: schemas `atana.ibge_tic` (8 tables, 5,387 rows — SIIC ch. 7 ICT access) and `atana.ibge_turismo` (5 tables, 891 rows — SIIC ch. 9 leisure tourism) added. Reaches the FCS *Social participation* transversal domain as a proxy. Parquet written to `raw/ibge_tic/` and `raw/ibge_turismo/`. **Built locally — pending GitHub push + MotherDuck sync (João).** |
 | 2026-05-23 | Phase 4 crosswalk extension: `canonical.domain_crosswalk` rebuilt 72 → 82 rows (10 new `ibge_siic` rows — the IBGE SIIC cultural-domain classification). Coverage meter 10/14 → **12/14** FCS domains. **Built locally — pending re-sync (João).** |
 | 2026-05-23 | Phase 4c.1: schema `atana.bcb` added — BCB SGS IP-services BoP (series 22777/22778), table `ip_services_bop` (750 rows, monthly 1995–2026). ETL `etl/bcb__sgs_ip_services_to_parquet.py`; João ran the ETL and pushed to GitHub (`e435a1e`). Reaches the FCS Intellectual property domain. Methodology `docs/methodology/bcb_sgs_ip_services.md`. |
-| 2026-05-23 | Phase 4c.1 crosswalk extension: `canonical.domain_crosswalk` rebuilt 82 → 83 rows (1 new `bcb` row). Coverage meter **12/14 → 13/14** FCS domains — only *Intangible cultural heritage* unreached (out of scope by decision). Built locally — **pending re-sync (João).** |
+| 2026-05-23 | Phase 4c.1 crosswalk extension: `canonical.domain_crosswalk` rebuilt 82 → 83 rows (1 new `bcb` row). Coverage meter **12/14 → 13/14** FCS domains — only *Intangible cultural heritage* unreached (out of scope by decision). Synced — GitHub (`ce72a56`) + MotherDuck `atana.canonical.domain_crosswalk` (83 rows). |
+| 2026-05-23 | Phase 4c.2: `atana.inpi` schema added — INPI Tabelas Completas / Anuário 2024, the cultural-IP register. 68 tables (~15,321 rows) from the four cultural IP-type workbooks (computer programs, industrial designs, geographical indications, trademarks), annual series 2000–2024. ETL `etl/inpi__indicadores_to_parquet.py`; methodology `docs/methodology/inpi_indicadores.md`. **Built locally — pending GitHub push + MotherDuck sync (João).** |
+| 2026-05-23 | Phase 4c.2 crosswalk extension: `canonical.domain_crosswalk` rebuilt 83 → 84 rows (1 new `inpi` row). Coverage meter unchanged at **13/14** — INPI deepens *Intellectual property*, already reached by BCB. **Built locally — pending re-sync (João).** |

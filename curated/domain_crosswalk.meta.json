@@ -13,6 +13,7 @@
     "docs/methodology/ibge_tic_siic_ch7.md",
     "docs/methodology/ibge_turismo_siic_ch9.md",
     "docs/methodology/bcb_sgs_ip_services.md",
+    "docs/methodology/inpi_indicadores.md",
     "_atana_intel/phase3_schema_design.md",
     "_atana_intel/phase4_scoping.md"
   ],
@@ -28,7 +29,8 @@
     "ibge_comex": 5,
     "cr_bccr": 4,
     "sinca": 2,
-    "bcb": 1
+    "bcb": 1,
+    "inpi": 1
   },
   "fcs_spine": "2025 UNESCO Framework for Cultural Statistics — 7 cultural + 7 transversal domains",
   "licence": "CC BY 4.0 (Atana) — the underlying classifications retain their own licences",
