@@ -16,7 +16,7 @@ cross-queryable layer.
 A single reference table that maps **every cultural-statistics classification in
 the corpus** onto one common spine.
 
-The corpus holds seven classification systems that do not talk to each other:
+The corpus holds eight classification systems that do not talk to each other:
 
 - **INEGI CSCM** (Mexico) — 10 *áreas generales*
 - **DANE CSECC** (Colombia) — 35 product *cuadros* (22 carry trade)
@@ -26,6 +26,8 @@ The corpus holds seven classification systems that do not talk to each other:
 - **IBGE NCM** (Brazil) — chapter-level (the 5 pure-cultural chapters)
 - **IBGE SIIC** (Brazil) — the *domínios culturais* classification, added in
   Phase 4 (chapters 1 / 2 / 7 / 9)
+- **BCB SGS** (Brazil) — the balance-of-payments IP-services account, added in
+  Phase 4c
 
 The crosswalk maps all of them onto the **14 domains of the 2025 UNESCO
 Framework for Cultural Statistics (FCS)** — 7 cultural + 7 transversal — which
@@ -46,12 +48,12 @@ analytical snapshot.
 
 ## 2. The table
 
-One row per classification code. **82 rows** — Phase 3 built 72; Phase 4 added
-the 10 `ibge_siic` rows.
+One row per classification code. **83 rows** — Phase 3 built 72; Phase 4 added
+10 `ibge_siic` rows and 1 `bcb` row.
 
 | Column | Type | Description |
 |---|---|---|
-| `source_schema` | VARCHAR | `fcs2025` / `inegi` / `dane` / `sinca` / `cr_bccr` / `unctad` / `ibge_comex` / `ibge_siic` |
+| `source_schema` | VARCHAR | `fcs2025` / `inegi` / `dane` / `sinca` / `cr_bccr` / `unctad` / `ibge_comex` / `ibge_siic` / `bcb` |
 | `source_system` | VARCHAR | Human-readable classification name (e.g. `CSCM área general`) |
 | `source_code` | VARCHAR | The code within that classification (`5`, `CER010`, `49`) |
 | `source_label` | VARCHAR | The label within that classification |
@@ -91,7 +93,7 @@ The transversal domains are a 2025-FCS addition (the praxeological lens) — the
 capture cultural activity that cuts across the cultural domains rather than
 sitting inside one.
 
-## 4. Row composition (82 rows)
+## 4. Row composition (83 rows)
 
 | `source_schema` | Rows | What |
 |---|--:|---|
@@ -103,6 +105,7 @@ sitting inside one.
 | `unctad` | 15 | 8 UNCTAD CER creative-goods codes + 7 creative-services codes |
 | `ibge_comex` | 5 | The 5 pure (100%) cultural NCM chapters — 37, 46, 49, 92, 97 |
 | `ibge_siic` | 10 | IBGE SIIC *domínios culturais* — Phase 4 (chapters 1/2/7/9) |
+| `bcb` | 1 | BCB SGS balance-of-payments IP-services account — Phase 4c.1 |
 
 The IBGE rows are deliberately limited to the **five pure-cultural NCM
 chapters** (the `is_pure_cultural` flag in `ibge_comex.tab_10_1`). The
@@ -140,7 +143,7 @@ sees it.
 
 ## 6. The definitional gaps — the findings
 
-Ten rows carry a `★` in `notes`. They are not noise; they are publishable
+Eleven rows carry a `★` in `notes`. They are not noise; they are publishable
 findings, the way Atana Note #03 treated UNCTAD vs IBGE Comex:
 
 - **Mexican artesanías.** Crafts are 18.4% of Mexico's cultural GDP yet mostly
@@ -163,20 +166,21 @@ findings, the way Atana Note #03 treated UNCTAD vs IBGE Comex:
   or Argentina's *Encuesta Nacional de Consumos Culturales*. The
   under-measurement is itself the finding.
 
-**The coverage meter — 12 of 14, after Phase 4.** Phase 3 left a structural
+**The coverage meter — 13 of 14, after Phase 4.** Phase 3 left a structural
 gap: of the 14 FCS domains, only **10 were reached by a national CSC trade
 row** — the four missing ones (*Cultural and creative goods manufacturing*,
 *Intangible cultural heritage*, *Intellectual property*, *Social
 participation*) being exactly the transversal domains a *foreign-trade* module
-cannot see. **Phase 4 (Brazil-first) closes two of them.** The 10 `ibge_siic`
+cannot see. **Phase 4 (Brazil-first) closes three of them.** The 10 `ibge_siic`
 rows add the IBGE SIIC cultural-domain classification: SIIC chapter 2's
 structural surveys reach *Cultural and creative goods manufacturing* (the
 `PERIF-MANUF` row), and the PNADC ICT and leisure-tourism supplements reach
 *Social participation* (`CH7-TIC`, `CH9-TUR`) — the latter as an explicit
-`approximate` **proxy**. The build script's coverage meter now prints
-**12/14**. Only *Intellectual property* (scoped for Phase 4c) and *Intangible
-cultural heritage* (out of scope by decision — registry data only) remain
-unreached.
+`approximate` **proxy**. The `bcb` row (Phase 4c.1) adds the BCB
+balance-of-payments IP-services account, reaching *Intellectual property*. The
+build script's coverage meter now prints **13/14**. Only *Intangible cultural
+heritage* — registry and inventory data only, out of scope by decision —
+remains unreached.
 
 ## 7. Limitations and caveats
 
@@ -186,7 +190,7 @@ unreached.
 - **Argentina is coarse by necessity.** SInCA's trade data is segment-level
   only — two rows, both `Multiple — not separable`. A fine Argentine crosswalk
   is impossible at the trade-module grain (see `sinca_csc.md` §5).
-- **`approximate` dominates** — 44 of 82 rows. That is the honest state of
+- **`approximate` dominates** — 44 of 83 rows. That is the honest state of
   cross-national cultural statistics, not a defect of this table. The source
   systems use distinct classifications, valuation conventions and currencies;
   an `approximate` map is often the *best* map that exists.
@@ -206,8 +210,8 @@ python etl/canonical__build_domain_crosswalk.py
 The build is fully inline-data-driven and idempotent — reruns produce a
 byte-identical Parquet. To revise a mapping, edit the relevant block in the
 build script (`INEGI`, `DANE`, `SINCA`, `CR_BCCR`, `UNCTAD_GOODS`,
-`UNCTAD_SERVICES`, `IBGE_NCM`, `SIIC`, or the `FCS_*` spine) and re-run; the
-script
+`UNCTAD_SERVICES`, `IBGE_NCM`, `SIIC`, `BCB`, or the `FCS_*` spine) and re-run;
+the script
 self-validates row counts, the confidence vocabulary, spine membership and the
 NULL/`no-equivalent` invariant before writing.
 
@@ -221,7 +225,8 @@ NULL/`no-equivalent` invariant before writing.
 ---
 
 *Methodology note for `atana.canonical.domain_crosswalk`. Prepared 2026-05-22;
-extended 2026-05-23 for Phase 4 (the `ibge_siic` rows — coverage 10/14 → 12/14).
+extended 2026-05-23 for Phase 4 (the `ibge_siic` and `bcb` rows — coverage
+10/14 → 13/14).
 Pairs with `inegi_csc.md`, `dane_csecc.md`, `sinca_csc.md`, `cr_bccr_csc.md`,
 the four `ibge_*_siic_ch*.md` notes, `_atana_intel/phase3_schema_design.md` and
 `_atana_intel/phase4_scoping.md`.*

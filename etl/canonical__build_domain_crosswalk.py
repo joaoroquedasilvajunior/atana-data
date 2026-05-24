@@ -498,10 +498,36 @@ def siic_rows() -> list[dict]:
     return rows
 
 
+# ── Brazil — BCB balance-of-payments IP-services account (Phase 4c.1) ────────
+# The cross-border intellectual-property-royalty flow — reaches the FCS
+# transversal domain Intellectual property, which a goods-trade module cannot.
+BCB = [
+    ("ip-services",
+     "Serviços de propriedade intelectual (BoP, BPM6 — SGS 22777/22778)",
+     "Intellectual property", "transversal", None, None, "good",
+     "★ Phase 4c.1 reaches the FCS Intellectual property domain. The BCB "
+     "balance-of-payments account for intellectual-property services (BPM6, "
+     "ex-'Royalties e licenças') is the cross-border IP-royalty flow — a "
+     "goods-trade module cannot see it. ⚠️ All-economy, not a cultural-only "
+     "cut: it spans software, patents, trademarks and franchises across every "
+     "sector. A cultural-specific IP measure needs INPI (registrations) and "
+     "ECAD (music royalties) — Phase 4c.2 / 4c.3."),
+]
+
+
+def bcb_rows() -> list[dict]:
+    rows = []
+    for code, label, dom, dtype, cer, ncm, conf, note in BCB:
+        rows.append(dict(zip(COLUMNS, (
+            "bcb", "BCB SGS balance-of-payments account", code, label,
+            dom, dtype, cer, ncm, conf, note))))
+    return rows
+
+
 def build() -> pd.DataFrame:
     rows = (spine_rows() + inegi_rows() + dane_rows() + sinca_rows()
             + cr_bccr_rows() + unctad_goods_rows() + unctad_services_rows()
-            + ibge_ncm_rows() + siic_rows())
+            + ibge_ncm_rows() + siic_rows() + bcb_rows())
     return pd.DataFrame(rows, columns=COLUMNS)
 
 
@@ -509,13 +535,14 @@ def validate(df: pd.DataFrame) -> None:
     """Self-check the crosswalk before it is written."""
     print("Validating...")
     expect = {"fcs2025": 14, "inegi": 10, "dane": 22, "sinca": 2,
-              "cr_bccr": 4, "unctad": 15, "ibge_comex": 5, "ibge_siic": 10}
+              "cr_bccr": 4, "unctad": 15, "ibge_comex": 5, "ibge_siic": 10,
+              "bcb": 1}
     got = df["source_schema"].value_counts().to_dict()
     for schema, n in expect.items():
         assert got.get(schema) == n, (
             f"{schema}: expected {n} rows, got {got.get(schema)}")
     total = sum(expect.values())
-    assert len(df) == total == 82, f"total rows {len(df)} != 82"
+    assert len(df) == total == 83, f"total rows {len(df)} != 83"
     print(f"  ✓ {len(df)} rows — " + ", ".join(f"{k} {v}" for k, v in expect.items()))
 
     bad = set(df["mapping_confidence"]) - CONFIDENCE_VALUES
@@ -548,7 +575,7 @@ def validate(df: pd.DataFrame) -> None:
     # Phase 4, the IBGE SIIC cultural-domain classification. This is the live
     # 'N/14 domains reached' progress meter for the transversal-blind-spot work.
     nat = df[df["source_schema"].isin(
-        ["inegi", "dane", "sinca", "cr_bccr", "ibge_siic"])]
+        ["inegi", "dane", "sinca", "cr_bccr", "ibge_siic", "bcb"])]
     reached = set()
     for d in nat["fcs2025_domain"].dropna():
         for part in str(d).replace(";", "/").split("/"):
@@ -556,8 +583,8 @@ def validate(df: pd.DataFrame) -> None:
             if p in FCS_DOMAIN_LABELS:
                 reached.add(p)
     unreached = sorted(FCS_DOMAIN_LABELS - reached)
-    print(f"  · {len(reached)}/14 FCS domains reached by a national CSC or "
-          f"IBGE SIIC row; not reached: {unreached or '—'}")
+    print(f"  · {len(reached)}/14 FCS domains reached by a national CSC, "
+          f"IBGE SIIC or BCB row; not reached: {unreached or '—'}")
     conf = df["mapping_confidence"].value_counts().to_dict()
     print(f"  · confidence mix: " + ", ".join(
         f"{k} {conf.get(k, 0)}" for k in
@@ -586,6 +613,7 @@ def write_meta(out_path: Path, df: pd.DataFrame) -> None:
         "docs/methodology/ibge_cempre_siic_ch1.md",
         "docs/methodology/ibge_tic_siic_ch7.md",
         "docs/methodology/ibge_turismo_siic_ch9.md",
+        "docs/methodology/bcb_sgs_ip_services.md",
         "_atana_intel/phase3_schema_design.md",
         "_atana_intel/phase4_scoping.md",
     ]

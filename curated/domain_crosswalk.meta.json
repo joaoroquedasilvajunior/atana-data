@@ -12,11 +12,12 @@
     "docs/methodology/ibge_cempre_siic_ch1.md",
     "docs/methodology/ibge_tic_siic_ch7.md",
     "docs/methodology/ibge_turismo_siic_ch9.md",
+    "docs/methodology/bcb_sgs_ip_services.md",
     "_atana_intel/phase3_schema_design.md",
     "_atana_intel/phase4_scoping.md"
   ],
   "build_script": "etl/canonical__build_domain_crosswalk.py",
-  "build_date": "2026-05-23",
+  "build_date": "2026-05-24",
   "grain": "one row per classification code (source_schema, source_code)",
   "row_composition": {
     "dane": 22,
@@ -26,7 +27,8 @@
     "ibge_siic": 10,
     "ibge_comex": 5,
     "cr_bccr": 4,
-    "sinca": 2
+    "sinca": 2,
+    "bcb": 1
   },
   "fcs_spine": "2025 UNESCO Framework for Cultural Statistics — 7 cultural + 7 transversal domains",
   "licence": "CC BY 4.0 (Atana) — the underlying classifications retain their own licences",

@@ -267,15 +267,15 @@ Source: SIIC "Informações Culturais" 2024, chapter 9 — PNAD Contínua leisur
 
 ---
 
-## `atana.bcb` — BCB intellectual-property-services balance of payments 🔜 ETL written — data pull pending
+## `atana.bcb` — BCB intellectual-property-services balance of payments ✅ Live (GitHub `e435a1e`)
 
 Source: Banco Central do Brasil — SGS series 22777 (receita) / 22778 (despesa), *Serviços de propriedade intelectual* (BPM6). Phase 4c.1 — reaches the FCS *Intellectual property* transversal domain (the cross-border IP-royalty flow).
 
 | Table | Rows | Description |
 |---|---:|---|
-| `ip_services_bop` | *(pending pull)* | IP-services BoP flow, monthly, long format — `series_code × date → value_usd_million`, with `flow` ∈ {receita, despesa} |
+| `ip_services_bop` | 750 | IP-services BoP flow, monthly 1995–2026, long format — `series_code × date → value_usd_million`, `flow` ∈ {receita, despesa} |
 
-⚠️ **All-economy, not cultural-only** — the macro IP-royalty flow; a cultural cut needs INPI (Phase 4c.2) + ECAD (Phase 4c.3). The ETL `etl/bcb__sgs_ip_services_to_parquet.py` pulls the BCB SGS API live and caches the JSON under `raw/bcb/_source/`; **the Atana sandbox cannot reach the API, so the pull is a machine-side step for João.** ETL: `etl/bcb__sgs_ip_services_to_parquet.py` · Methodology: `docs/methodology/bcb_sgs_ip_services.md`
+⚠️ **All-economy, not cultural-only** — the macro IP-royalty flow; a cultural cut needs INPI (Phase 4c.2) + ECAD (Phase 4c.3). The ETL `etl/bcb__sgs_ip_services_to_parquet.py` pulls the BCB SGS API live and caches the JSON under `raw/bcb/_source/` (gitignored); rerun with `--refresh` for a new vintage. ETL: `etl/bcb__sgs_ip_services_to_parquet.py` · Methodology: `docs/methodology/bcb_sgs_ip_services.md`
 
 ---
 
@@ -285,11 +285,11 @@ Read-only views and tables that power published analyses. **Do not modify direct
 
 ### `canonical.domain_crosswalk` ✅ Live (Phase 3) · 🔜 extended for Phase 4 — pending re-sync
 
-The Atana harmonisation crosswalk — maps every cultural-statistics classification in the corpus onto one common spine. **82 rows**, one per classification code (Phase 3 built 72; Phase 4 added 10 `ibge_siic` rows).
+The Atana harmonisation crosswalk — maps every cultural-statistics classification in the corpus onto one common spine. **83 rows**, one per classification code (Phase 3 built 72; Phase 4 added 10 `ibge_siic` rows and 1 `bcb` row).
 
 | Column | Type | Description |
 |---|---|---|
-| `source_schema` | VARCHAR | `fcs2025` / `inegi` / `dane` / `sinca` / `cr_bccr` / `unctad` / `ibge_comex` / `ibge_siic` |
+| `source_schema` | VARCHAR | `fcs2025` / `inegi` / `dane` / `sinca` / `cr_bccr` / `unctad` / `ibge_comex` / `ibge_siic` / `bcb` |
 | `source_system` | VARCHAR | Human-readable classification name |
 | `source_code` | VARCHAR | Code within that classification |
 | `source_label` | VARCHAR | Label within that classification |
@@ -300,7 +300,7 @@ The Atana harmonisation crosswalk — maps every cultural-statistics classificat
 | `mapping_confidence` | VARCHAR | `exact` / `good` / `approximate` / `no-equivalent` |
 | `notes` | VARCHAR | The definitional gap, stated explicitly (`★` flags a finding) |
 
-Row composition: `fcs2025` 14 (the spine — 7 cultural + 7 transversal) · `inegi` 10 · `dane` 22 · `sinca` 2 · `cr_bccr` 4 · `unctad` 15 · `ibge_comex` 5 · `ibge_siic` 10. It turns the isolated national schemas into a cross-queryable layer — a query joins any national CSC, or the IBGE SIIC, to the FCS spine through this one table. Definitional gaps are kept visible (`mapping_confidence`, `notes`), never silently reconciled. The build script's coverage meter now reaches **12/14** FCS domains (Phase 4 added *Cultural and creative goods manufacturing* and, as a proxy, *Social participation*; only *Intellectual property* and *Intangible cultural heritage* remain). Stored un-timestamped — a living reference table, not a versioned snapshot.
+Row composition: `fcs2025` 14 (the spine — 7 cultural + 7 transversal) · `inegi` 10 · `dane` 22 · `sinca` 2 · `cr_bccr` 4 · `unctad` 15 · `ibge_comex` 5 · `ibge_siic` 10 · `bcb` 1. It turns the isolated national schemas into a cross-queryable layer — a query joins any national CSC, the IBGE SIIC or the BCB account to the FCS spine through this one table. Definitional gaps are kept visible (`mapping_confidence`, `notes`), never silently reconciled. The build script's coverage meter now reaches **13/14** FCS domains (Phase 4 added *Cultural and creative goods manufacturing*, *Social participation* as a proxy, and *Intellectual property* via the BCB row; only *Intangible cultural heritage* remains, out of scope by decision). Stored un-timestamped — a living reference table, not a versioned snapshot.
 
 ETL: `etl/canonical__build_domain_crosswalk.py` · Methodology: `docs/methodology/canonical_domain_crosswalk.md`
 
@@ -329,4 +329,5 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | 2026-05-23 | Phase 4a: schemas `atana.ibge_estruturais` (8 tables, 2,832 rows — SIIC ch. 2 structural surveys) and `atana.ibge_cempre` (23 tables, 1,202 rows — SIIC ch. 1 CEMPRE) added. Closes the FCS *Cultural and creative goods manufacturing* transversal domain. Parquet written to `raw/ibge_estruturais/` and `raw/ibge_cempre/`. **Built locally — pending GitHub push + MotherDuck sync (João).** |
 | 2026-05-23 | Phase 4b: schemas `atana.ibge_tic` (8 tables, 5,387 rows — SIIC ch. 7 ICT access) and `atana.ibge_turismo` (5 tables, 891 rows — SIIC ch. 9 leisure tourism) added. Reaches the FCS *Social participation* transversal domain as a proxy. Parquet written to `raw/ibge_tic/` and `raw/ibge_turismo/`. **Built locally — pending GitHub push + MotherDuck sync (João).** |
 | 2026-05-23 | Phase 4 crosswalk extension: `canonical.domain_crosswalk` rebuilt 72 → 82 rows (10 new `ibge_siic` rows — the IBGE SIIC cultural-domain classification). Coverage meter 10/14 → **12/14** FCS domains. **Built locally — pending re-sync (João).** |
-| 2026-05-23 | Phase 4c.1: `etl/bcb__sgs_ip_services_to_parquet.py` written — BCB SGS IP-services BoP (series 22777/22778) → schema `atana.bcb`. **ETL only — data pull pending:** the sandbox cannot reach the BCB API, so João runs the ETL. Methodology `docs/methodology/bcb_sgs_ip_services.md`. The crosswalk extension to 13/14 follows the verified pull. |
+| 2026-05-23 | Phase 4c.1: schema `atana.bcb` added — BCB SGS IP-services BoP (series 22777/22778), table `ip_services_bop` (750 rows, monthly 1995–2026). ETL `etl/bcb__sgs_ip_services_to_parquet.py`; João ran the ETL and pushed to GitHub (`e435a1e`). Reaches the FCS Intellectual property domain. Methodology `docs/methodology/bcb_sgs_ip_services.md`. |
+| 2026-05-23 | Phase 4c.1 crosswalk extension: `canonical.domain_crosswalk` rebuilt 82 → 83 rows (1 new `bcb` row). Coverage meter **12/14 → 13/14** FCS domains — only *Intangible cultural heritage* unreached (out of scope by decision). Built locally — **pending re-sync (João).** |
