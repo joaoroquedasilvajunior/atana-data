@@ -8,7 +8,7 @@ Canonical catalog of every table available in this repository and in `md:atana`.
 
 ## Conventions
 
-- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `inegi`, `dane`, `sinca`, `cr_bccr`, `ibge_estruturais`, `ibge_cempre`, `ibge_tic`, `ibge_turismo`, `canonical`
+- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `inegi`, `dane`, `sinca`, `cr_bccr`, `ibge_estruturais`, `ibge_cempre`, `ibge_tic`, `ibge_turismo`, `bcb`, `canonical`
 - **Table names** are snake_case, prefixed by the table number when applicable: `tab_6_10`, `tab_10_1`
 - **Curated tables** live in the `canonical` schema and represent ready-to-consume snapshots used in published analyses
 - **Currency**: each table documents its native currency (R$ corrente, R$ FOB, US$ corrente, etc.) — never mixed in one column
@@ -267,6 +267,18 @@ Source: SIIC "Informações Culturais" 2024, chapter 9 — PNAD Contínua leisur
 
 ---
 
+## `atana.bcb` — BCB intellectual-property-services balance of payments 🔜 ETL written — data pull pending
+
+Source: Banco Central do Brasil — SGS series 22777 (receita) / 22778 (despesa), *Serviços de propriedade intelectual* (BPM6). Phase 4c.1 — reaches the FCS *Intellectual property* transversal domain (the cross-border IP-royalty flow).
+
+| Table | Rows | Description |
+|---|---:|---|
+| `ip_services_bop` | *(pending pull)* | IP-services BoP flow, monthly, long format — `series_code × date → value_usd_million`, with `flow` ∈ {receita, despesa} |
+
+⚠️ **All-economy, not cultural-only** — the macro IP-royalty flow; a cultural cut needs INPI (Phase 4c.2) + ECAD (Phase 4c.3). The ETL `etl/bcb__sgs_ip_services_to_parquet.py` pulls the BCB SGS API live and caches the JSON under `raw/bcb/_source/`; **the Atana sandbox cannot reach the API, so the pull is a machine-side step for João.** ETL: `etl/bcb__sgs_ip_services_to_parquet.py` · Methodology: `docs/methodology/bcb_sgs_ip_services.md`
+
+---
+
 ## `atana.canonical` — Curated analytical snapshots
 
 Read-only views and tables that power published analyses. **Do not modify directly** — regenerate via build scripts and versioned datasets.
@@ -317,3 +329,4 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | 2026-05-23 | Phase 4a: schemas `atana.ibge_estruturais` (8 tables, 2,832 rows — SIIC ch. 2 structural surveys) and `atana.ibge_cempre` (23 tables, 1,202 rows — SIIC ch. 1 CEMPRE) added. Closes the FCS *Cultural and creative goods manufacturing* transversal domain. Parquet written to `raw/ibge_estruturais/` and `raw/ibge_cempre/`. **Built locally — pending GitHub push + MotherDuck sync (João).** |
 | 2026-05-23 | Phase 4b: schemas `atana.ibge_tic` (8 tables, 5,387 rows — SIIC ch. 7 ICT access) and `atana.ibge_turismo` (5 tables, 891 rows — SIIC ch. 9 leisure tourism) added. Reaches the FCS *Social participation* transversal domain as a proxy. Parquet written to `raw/ibge_tic/` and `raw/ibge_turismo/`. **Built locally — pending GitHub push + MotherDuck sync (João).** |
 | 2026-05-23 | Phase 4 crosswalk extension: `canonical.domain_crosswalk` rebuilt 72 → 82 rows (10 new `ibge_siic` rows — the IBGE SIIC cultural-domain classification). Coverage meter 10/14 → **12/14** FCS domains. **Built locally — pending re-sync (João).** |
+| 2026-05-23 | Phase 4c.1: `etl/bcb__sgs_ip_services_to_parquet.py` written — BCB SGS IP-services BoP (series 22777/22778) → schema `atana.bcb`. **ETL only — data pull pending:** the sandbox cannot reach the BCB API, so João runs the ETL. Methodology `docs/methodology/bcb_sgs_ip_services.md`. The crosswalk extension to 13/14 follows the verified pull. |

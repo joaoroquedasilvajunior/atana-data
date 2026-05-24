@@ -1,0 +1,24 @@
+{
+  "table": "ip_services_bop",
+  "schema": "bcb",
+  "description": "Brazil balance-of-payments — intellectual-property services, BCB SGS series 22777 (receita) and 22778 (despesa), BPM6 basis. Monthly, long format. The cross-border IP-royalty flow — reaches the FCS Intellectual property transversal domain.",
+  "source": "Banco Central do Brasil — Sistema Gerenciador de Séries Temporais (SGS), series 22777 / 22778",
+  "source_url": "https://www3.bcb.gov.br/sgspub/",
+  "source_files": [
+    {
+      "file": "sgs_22777.json",
+      "sha256": "a28dc9baf56165db67becf579da93f07dcfe2bdb6972aab009d50a395761abec"
+    },
+    {
+      "file": "sgs_22778.json",
+      "sha256": "f678b8bf24b821ee3cf8123d08236c1587e02f8d39cffa257250cfc264e4f01c"
+    }
+  ],
+  "fetch_date": "2026-05-24",
+  "etl_script": "etl/bcb__sgs_ip_services_to_parquet.py",
+  "etl_run_date": "2026-05-24",
+  "licence": "open data — Banco Central do Brasil",
+  "grain": "series_code × date (one row per series per month)",
+  "coverage": "1995–2026",
+  "notes": "value_usd_million is the BCB SGS BoP convention (US$ million) — confirm against the SGS series metadata page. This is the all-economy IP-services account, not a cultural-only cut; see docs/methodology/bcb_sgs_ip_services.md."
+}
