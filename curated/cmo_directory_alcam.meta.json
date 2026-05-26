@@ -1,0 +1,27 @@
+{
+  "table": "cmo_directory_alcam",
+  "schema": "canonical",
+  "description": "LATAM music-CMO reference directory — the 13 member societies of ALCAM (Alianza Latinoamericana de Autores y Compositores de Música) across 12 countries, with a linkage pointer to atana.ecad for the Brazilian pair (ABRAMUS, UBC). A join key for any future per-society headline series across LATAM.",
+  "source": "alcammusica.org/sociedades, captured 2026-05-25. The Atana build inlines the 13 rows verbatim from the page; the URL of each society remains the authoritative source for its official name.",
+  "derived_from": [
+    "https://www.alcammusica.org/sociedades",
+    "_atana_intel/scoping_alcammusica_2026-05-25.md",
+    "docs/methodology/cmo_directory_alcam.md"
+  ],
+  "row_count": 13,
+  "column_count": 9,
+  "columns": [
+    "country",
+    "country_iso3",
+    "society_acronym",
+    "society_name",
+    "url",
+    "in_atana_corpus",
+    "linked_atana_schema",
+    "source_url",
+    "as_of"
+  ],
+  "build_date": "2026-05-26",
+  "build_script": "etl/canonical__build_cmo_directory_alcam.py",
+  "sha256_parquet": "420036a5c202eb5da7b59dafeb41a14ea032fc771c80a1b43c803b077d89f56b"
+}

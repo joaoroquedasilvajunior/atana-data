@@ -2,13 +2,13 @@
 
 Canonical catalog of every table available in this repository and in `md:atana`. Keep this file synchronized when adding or modifying datasets.
 
-**Last updated:** 2026-05-23
+**Last updated:** 2026-05-25
 
 ---
 
 ## Conventions
 
-- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `inegi`, `dane`, `sinca`, `cr_bccr`, `ibge_estruturais`, `ibge_cempre`, `ibge_tic`, `ibge_turismo`, `bcb`, `inpi`, `ecad`, `canonical`
+- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `rais`, `inegi`, `dane`, `sinca`, `cr_bccr`, `ibge_estruturais`, `ibge_cempre`, `ibge_tic`, `ibge_turismo`, `bcb`, `inpi`, `ecad`, `canonical`
 - **Table names** are snake_case, prefixed by the table number when applicable: `tab_6_10`, `tab_10_1`
 - **Curated tables** live in the `canonical` schema and represent ready-to-consume snapshots used in published analyses
 - **Currency**: each table documents its native currency (R$ corrente, R$ FOB, US$ corrente, etc.) — never mixed in one column
@@ -151,6 +151,24 @@ Source: LexML (Senado Federal) + complementos.
 | `with_ementas` | 217 | Atos com ementas completas |
 
 ETL: `etl/lexml__jsonl_to_parquet.py`
+
+---
+
+## `atana.rais` — RAIS formal cultural employment ✅ Live (GitHub `8d874f5`)
+
+Source: RAIS/MTE via Base dos Dados (`br_me_rais`, pulled through BigQuery). Sprint 1 of the RAIS phase — the administrative-register view of formal cultural employment, complementary to the survey-based `ibge_pnadc`. Base dos Dados de-identifies RAIS (no CNPJ, no PIS), so this is a three-table labour-market characterisation, not a firm- or worker-level panel.
+
+| Table | Rows | Description |
+|---|---:|---|
+| `vinculos_culturais` | ~14 M | One row per cultural employment relationship (vínculo), Cut A ∪ Cut B; flags `in_cut_a` (cultural CNAE) / `in_cut_b` (cultural CBO family), plus derived `cnae_2_classe`, `cbo_familia`, `siic_dominio`, `vinculo_iniciado_no_ano` |
+| `estabelecimentos_culturais` | ~2.4 M | One row per cultural establishment (cultural CNAE), with active-link counts |
+| `panel_cnae_municipio_ano` | ~120 k | Derived aggregate — Cut A vínculos at `cnae_2_classe × município × ano` grain (median pay, hours, demographic shares) |
+
+**Coverage:** 2014–2023, one `year=YYYY` Parquet partition per table. **Convention:** active links on 31 Dec; the monetary columns of `vinculos_culturais` and `panel_cnae_municipio_ano` carry `_ipca` deflated twins in base-2024 BRL (IPCA from BCB SGS series 433, cached in `raw/rais/_reference/`). **Cuts:** A = cultural-CNAE employer (33 CNAE classes), B = cultural-CBO-family occupation (62 CBO families); A∪B = formal cultural workforce, A∩B = specialised core.
+
+⚠️ **De-identified** — no CNPJ/PIS; firm- and worker-level linkage (Phase 2b) was cancelled because the MTE FTP is also de-identified. The BigQuery pull needs a billed GCP project (`atana-research`) and credentials — it is a local/credentialed step, never a sandbox one (see `etl/RAIS_2024_INGEST_RUNBOOK.md`).
+
+ETL: `etl/rais__bigquery_to_parquet.py` + `rais__deflate_ipca.py` (both `--staging`-aware, skip MotherDuck under `ATANA_ETL_SKIP_PUSH`) + `rais__build_reference_tables.py` · Methodology: `docs/rais_methodology.md` · Runbooks: `etl/RAIS_SPRINT1_RUNBOOK.md`, `etl/RAIS_2024_INGEST_RUNBOOK.md`
 
 ---
 
@@ -326,6 +344,28 @@ Row composition: `fcs2025` 14 (the spine — 7 cultural + 7 transversal) · `ine
 
 ETL: `etl/canonical__build_domain_crosswalk.py` · Methodology: `docs/methodology/canonical_domain_crosswalk.md`
 
+### `canonical.cmo_directory_alcam` ✅ Live locally — pending push + sync
+
+The LATAM music-CMO reference directory. **13 rows**, one per member society of ALCAM (*Alianza Latinoamericana de Autores y Compositores de Música*, alcammusica.org), across 12 countries (Brazil has two: ABRAMUS + UBC).
+
+| Column | Type | Description |
+|---|---|---|
+| `country` | VARCHAR | English country name |
+| `country_iso3` | VARCHAR | ISO 3166-1 alpha-3 |
+| `society_acronym` | VARCHAR | Short name as used by ALCAM (e.g. `SADAIC`, `SCD`) |
+| `society_name` | VARCHAR | Best-known full Spanish/Portuguese form of the society's name; the URL remains authoritative |
+| `url` | VARCHAR | Official society URL |
+| `in_atana_corpus` | BOOLEAN | `true` iff the society's data is reachable via an existing corpus schema |
+| `linked_atana_schema` | VARCHAR | The corpus schema the society is reachable through; `'ecad'` for the Brazilian pair, `NULL` otherwise |
+| `source_url` | VARCHAR | The ALCAM /sociedades page captured |
+| `as_of` | DATE | Capture date (2026-05-25) |
+
+A join key for any future per-society data across the 11 non-Brazilian ALCAM countries. **Not** a classification crosswalk (it is a directory of entities, not codes) — it does not extend `canonical.domain_crosswalk`. The Brazilian pair ABRAMUS + UBC carries `linked_atana_schema = 'ecad'`, tying the creator-side societies to the existing collection-side data; the other 11 carry `NULL` until per-society data is ingested (Tier 2 / Phase 5 candidate; see `_atana_intel/scoping_alcammusica_2026-05-25.md` §4).
+
+⚠️ `society_name` is best-known canonical form, not source-captured — the ALCAM /sociedades page only prints acronyms + country names. The URL of each society is the authoritative source for the official name. For `AEI` (Guatemala) the official expansion was not separately verified — see methodology §3.
+
+ETL: `etl/canonical__build_cmo_directory_alcam.py` (inline data → DuckDB COPY → Parquet, idempotent, byte-identical reruns) · Methodology: `docs/methodology/cmo_directory_alcam.md`
+
 ### `canonical.latam_creative_2024`  *(Phase 2)*
 The dataset behind Análise 4 / Análise 6 / Atana Index Vol. 1 — 15 LATAM countries × HHI, exposure index, total exports.
 
@@ -357,3 +397,6 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | 2026-05-23 | Phase 4c.2 crosswalk extension: `canonical.domain_crosswalk` rebuilt 83 → 84 rows (1 new `inpi` row). Coverage meter unchanged at **13/14** — INPI deepens *Intellectual property*, already reached by BCB. **Built locally — pending re-sync (João).** |
 | 2026-05-23 | Phase 4c.3: `atana.ecad` schema added — ECAD music public-performance royalties, headline series `arrecadacao_distribuicao` (3 rows, 2023–2025). ECAD publishes no machine-readable data — figures transcribed from the Transparência pages. ETL `etl/ecad__headline_series_to_parquet.py`; methodology `docs/methodology/ecad_headline.md`. **Built locally — pending GitHub push + MotherDuck sync (João).** |
 | 2026-05-23 | Phase 4c.3 crosswalk extension: `canonical.domain_crosswalk` rebuilt 84 → 85 rows (1 new `ecad` row). Coverage unchanged at **13/14** — ECAD is the third lens on *Intellectual property*. **Phase 4 complete:** 10/14 → 13/14 FCS domains; only *Intangible cultural heritage* unreached (out of scope by decision). **Built locally — pending re-sync (João).** |
+| 2026-05-25 | Documentation: `atana.rais` section added to this manifest. The schema has been live since Sprint 1 (GitHub `8d874f5`, 3 tables, 2014–2023) but was undocumented here. |
+| 2026-05-25 | ETL hardening: `rais__bigquery_to_parquet.py` and `rais__deflate_ipca.py` gained a `--staging` flag (output → `raw/rais/_staging/`) and an `ATANA_ETL_SKIP_PUSH` guard on the MotherDuck sync; `.gitignore` now excludes `raw/*/_staging/`. Enables the DB-updater to stage a RAIS refresh safely. |
+| 2026-05-25 | `canonical.cmo_directory_alcam` added — Tier 1 of the ALCAM Música scoping. **13 rows** (12 LATAM countries × music creator-side CMO members of ALCAM, Brazil ×2), with a `linked_atana_schema` pointer that ties ABRAMUS/UBC to `atana.ecad`. Build script `etl/canonical__build_cmo_directory_alcam.py`; methodology `docs/methodology/cmo_directory_alcam.md`; output `curated/cmo_directory_alcam.parquet` + `.meta.json`. **Built locally — pending GitHub push + MotherDuck sync (João).** |
