@@ -561,14 +561,16 @@ ECAD = [
      "★ Phase 4c.3 — cultural-IP *income*: ECAD music public-performance "
      "royalties actually collected from users and distributed to "
      "rights-holders — the third IP lens, after the BCB royalty flow and the "
-     "INPI registration stock. v2 expansion (2026-05-28, from the Relatório "
-     "Anual 2025 PDF): 4 tables — `arrecadacao_distribuicao` (8 rows, "
-     "2018-2025), `arrecadacao_por_segmento` (6 rows × 2025), "
-     "`distribuicao_por_segmento` (13 rows × 2025), "
-     "`distribuicao_por_titular_tipo` (10 rows × 2021-2025 × {autoral, "
+     "INPI registration stock. v3 (2026-05-29, from the ECAD Relatórios "
+     "Anuais 2020/2022/2024/2025 + Transparência 2023): 4 tables, 70 rows — "
+     "`arrecadacao_distribuicao` (7 rows, 2019-2025; arrecadação years "
+     "corrected from a v2 markitdown year-scramble), `arrecadacao_por_segmento` "
+     "(30 rows, 2020-2025 ex-2023), `distribuicao_por_segmento` (13 rows × "
+     "2025), `distribuicao_por_titular_tipo` (20 rows × 2016-2025 × {autoral, "
      "conexa}). ⚠️ ECAD publishes no machine-readable dataset; figures are "
-     "hand-transcribed verbatim from the PDF/Transparência pages. Music "
-     "copyright specifically. See docs/methodology/ecad_relatorio_anual.md."),
+     "hand-transcribed verbatim from the PDF/Transparência pages; the 2021/2022 "
+     "distribuição values are flagged as likely-scrambled. Music copyright "
+     "specifically. See docs/methodology/ecad_relatorio_anual.md."),
 ]
 
 

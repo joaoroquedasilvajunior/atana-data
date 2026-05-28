@@ -1,29 +1,37 @@
 """ECAD — arrecadação by segmento → Parquet.
 
-Phase 4c.3 v2 (2026-05-28). Second of the four tables in the expanded
-`atana.ecad` schema. Captures the 2025 segmentation of total arrecadação —
-where the money comes from across the six channels ECAD collects from.
+Phase 4c.3 of the Atana Data expansion. Second of the four `atana.ecad`
+tables: the segmentation of total arrecadação — where the money comes from
+across ECAD's collection channels.
 
-WHAT IT IS
-----------
-For 2025, ECAD reports a six-way split of total arrecadação (R$ 2,105 mi):
-Serviços Digitais, Televisão, Show e Eventos, Usuários Gerais, Rádio,
-Cinema. The Relatório Anual 2025 p.10 publishes this as a single pie chart;
-this ETL captures the six shares and the implied R$ value per segment.
+v3 (2026-05-29): extended from 2025-only (6 rows) to a **2020–2025 series**
+(30 rows; 2023 omitted), sourced from the ECAD Relatórios Anuais 2020 / 2021 /
+2022 / 2024 / 2025. Each report carries its own year's six-way split. This is
+the series behind the "digital headline" Análise 23 was after — the Serviços
+Digitais share runs 18 % (2020) → 23 (2021) → 22.8 (2022) → [~24–25 est. 2023]
+→ 26 (2024, first year as the #1 segment) → 33.6 (2025).
 
-The 2025 digital share (33.6%) is the headline figure that the corpus's
-existing `arrecadacao_distribuicao.digital_services_arrec_share_pct` column
-also carries — they reconcile by design.
+WHY 2023 IS MISSING
+-------------------
+The 2023 arrecadação pie is published only as a JPEG (`Arreacadacao2023.jpeg`)
+on the Transparência page — not text-extractable. Only the digital share is
+estimable (~24–25 %, bracketed by 22.8 % in 2022 and 26 % in 2024; audio
+streaming +57.85 % and video +23.16 % in 2023). 2023 is omitted here rather
+than filled with a partial/estimated column; acquiring the 2023 report or the
+JPEG would close the one-year gap.
+
+2020 UG / RÁDIO CAVEAT
+----------------------
+For 2020 the markitdown reading of the pie does not preserve the label↔value
+pairing with confidence for Usuários Gerais (12 %) and Rádio (20 %). The
+text-confirmed 2020 shares are Televisão 44 %, Shows 5 %, Cinema 1 %, Serviços
+Digitais ~18 %. The 2021 structure (UG 20 %, Rádio 11 %) suggests the pairing
+may be UG ≈ 20 / Rádio ≈ 12 instead. The values are stored AS READ (UG 12 /
+Rádio 20) with the doubt flagged in `notes`; both pairings sum to 100 %.
 
 GRAIN
 -----
-One row per (year, segmento). 2025 only at v2 launch (6 rows). Future
-annual reports can be appended without schema change.
-
-SOURCE
-------
-    ECAD Relatório Anual 2025, p.10 — "Participação dos segmentos na
-    arrecadação de 2025" (pie chart).
+One row per (year, segmento). 5 years × 6 segments = 30 rows.
 
 OUTPUT
 ------
@@ -49,44 +57,65 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 OUT = REPO_ROOT / "raw" / "ecad"
 OUT.mkdir(parents=True, exist_ok=True)
 
-SOURCE_PAGE = "ECAD Relatório Anual 2025 p.10"
+# Corrected per-year total arrecadação (R$ mi) — from the headline series
+# (atana.ecad.arrecadacao_distribuicao, v3 corrected). 2023 omitted.
+TOTALS_BRL_MI = {2020: 905.8, 2021: 1086.0, 2022: 1394.0, 2024: 1831.0, 2025: 2105.0}
 
-# 2025 total arrecadação from atana.ecad.arrecadacao_distribuicao (Relatório p.12).
-TOTAL_2025_BRL_MI = 2105.0
+SRC = {
+    2020: "ECAD Relatório Anual 2020",
+    2021: "ECAD Relatório Anual 2021/2022",
+    2022: "ECAD Relatório Anual 2022",
+    2024: "ECAD Relatório Anual 2024 (versão-mercado)",
+    2025: "ECAD Relatório Anual 2025 p.10",
+}
 
 COLUMNS = [
     "year",
     "segmento",
     "share_pct",
-    "valor_brl_mi",       # derived: TOTAL × share_pct / 100
+    "valor_brl_mi",       # derived: year total × share / 100
+    "notes",
     "source_page",
 ]
 
-# Verbatim from p.10. Order is the pie's clockwise order (digital first),
-# preserved for reading convenience; the ETL sorts deterministically.
-SEGMENTOS_2025 = [
-    ("Serviços Digitais", 33.6),
-    ("Televisão",         20.4),
-    ("Show e Eventos",    19.5),
-    ("Usuários Gerais",   18.1),
-    ("Rádio",              7.1),
-    ("Cinema",             1.3),
-]
+# Shares (%) per (year, segmento), verbatim from each Relatório. Canonical
+# segment names match the rest of the corpus ("Show e Eventos", not "Shows").
+# year -> {segmento: share_pct}
+SHARES = {
+    2020: {"Televisão": 44.0, "Serviços Digitais": 18.0, "Usuários Gerais": 12.0,
+           "Show e Eventos": 5.0, "Rádio": 20.0, "Cinema": 1.0},
+    2021: {"Televisão": 41.0, "Serviços Digitais": 23.0, "Usuários Gerais": 20.0,
+           "Show e Eventos": 4.0, "Rádio": 11.0, "Cinema": 1.0},
+    2022: {"Televisão": 32.5, "Serviços Digitais": 22.8, "Usuários Gerais": 20.5,
+           "Show e Eventos": 13.4, "Rádio": 9.5, "Cinema": 1.3},
+    2024: {"Televisão": 25.0, "Serviços Digitais": 26.0, "Usuários Gerais": 19.0,
+           "Show e Eventos": 20.0, "Rádio": 8.0, "Cinema": 2.0},
+    2025: {"Televisão": 20.4, "Serviços Digitais": 33.6, "Usuários Gerais": 18.1,
+           "Show e Eventos": 19.5, "Rádio": 7.1, "Cinema": 1.3},
+}
+
+UG_RADIO_2020_NOTE = (
+    "2020 markitdown label↔value pairing uncertain for Usuários Gerais / Rádio; "
+    "the 2021 structure (UG 20 / Rádio 11) suggests this may be UG≈20 / "
+    "Rádio≈12. Stored as read; verify against the printed Relatório 2020 pie.")
 
 
 def build() -> pd.DataFrame:
-    rows = [
-        {
-            "year": 2025,
-            "segmento": seg,
-            "share_pct": share,
-            "valor_brl_mi": round(TOTAL_2025_BRL_MI * share / 100.0, 2),
-            "source_page": SOURCE_PAGE,
-        }
-        for seg, share in SEGMENTOS_2025
-    ]
+    rows = []
+    for year, segs in SHARES.items():
+        total = TOTALS_BRL_MI[year]
+        for seg, share in segs.items():
+            note = UG_RADIO_2020_NOTE if (year == 2020 and seg in
+                                          ("Usuários Gerais", "Rádio")) else None
+            rows.append({
+                "year": year,
+                "segmento": seg,
+                "share_pct": share,
+                "valor_brl_mi": round(total * share / 100.0, 2),
+                "notes": note,
+                "source_page": SRC[year],
+            })
     df = pd.DataFrame(rows, columns=COLUMNS)
-    # Deterministic order: share_pct desc, then segmento alpha to break ties.
     df = df.sort_values(["year", "share_pct", "segmento"],
                         ascending=[True, False, True]).reset_index(drop=True)
     df["year"] = df["year"].astype("int32")
@@ -95,34 +124,46 @@ def build() -> pd.DataFrame:
 
 def validate(df: pd.DataFrame) -> None:
     print("Validating...")
-    assert len(df) == 6, f"expected 6 rows, got {len(df)}"
-    print(f"  ✓ 6 rows (2025 × six segments)")
+    assert len(df) == 30, f"expected 30 rows (5 years × 6), got {len(df)}"
+    years = sorted(df["year"].unique().tolist())
+    assert years == [2020, 2021, 2022, 2024, 2025], f"unexpected years: {years}"
+    print(f"  ✓ 30 rows — 2020, 2021, 2022, 2024, 2025 × six segments (2023 omitted, JPEG-only)")
 
-    total = round(df["share_pct"].sum(), 2)
-    assert total == 100.0, f"shares must sum to 100.00, got {total}"
-    print(f"  ✓ shares sum to 100.00 %")
+    for y in years:
+        s = round(df.loc[df["year"] == y, "share_pct"].sum(), 2)
+        assert s == 100.0, f"{y} shares sum to {s}, not 100.00"
+    print(f"  ✓ every year's shares sum to 100.00 %")
 
-    derived_total = round(df["valor_brl_mi"].sum(), 0)
-    # tolerance: rounding adds ≤ 1 R$ mi drift
-    assert abs(derived_total - TOTAL_2025_BRL_MI) <= 1.0, \
-        f"derived total R$ mi {derived_total} differs from " \
-        f"corpus total {TOTAL_2025_BRL_MI} by > 1"
-    print(f"  ✓ derived R$ {derived_total:,.0f} mi reconciles with corpus "
-          f"total R$ {TOTAL_2025_BRL_MI:,.0f} mi")
+    for y in years:
+        derived = round(df.loc[df["year"] == y, "valor_brl_mi"].sum(), 0)
+        total = round(TOTALS_BRL_MI[y], 0)
+        assert abs(derived - total) <= 1.0, \
+            f"{y} derived R$ {derived} mi ≠ total R$ {total} mi"
+    print(f"  ✓ derived valor_brl_mi reconciles with each year's corrected total")
 
-    assert df["segmento"].nunique() == 6, "duplicate segments"
-    print(f"  ✓ 6 distinct segmentos")
+    # digital-share trajectory must read 18 → 23 → 22.8 → 26 → 33.6
+    dig = (df[df["segmento"] == "Serviços Digitais"]
+           .set_index("year")["share_pct"].to_dict())
+    assert dig == {2020: 18.0, 2021: 23.0, 2022: 22.8, 2024: 26.0, 2025: 33.6}, \
+        f"digital trajectory off: {dig}"
+    print(f"  ✓ Serviços Digitais trajectory: 18 → 23 → 22.8 → [2023 gap] → 26 → 33.6")
+
+    # 2020 UG/Rádio caveat present
+    n = int(df[(df["year"] == 2020) & (df["notes"].notna())].shape[0])
+    assert n == 2, f"expected 2 flagged 2020 rows (UG + Rádio), got {n}"
+    print(f"  ✓ 2020 UG/Rádio label-pairing caveat flagged (2 rows)")
+
+    assert (df.groupby(["year", "segmento"]).size() == 1).all(), "duplicate (year, segmento)"
+    print(f"  ✓ (year, segmento) unique")
 
 
 def write_parquet(df: pd.DataFrame) -> Path:
     out_path = OUT / "arrecadacao_por_segmento.parquet"
     con = duckdb.connect()
     con.register("df_data", df)
-    con.execute(
-        f"COPY df_data TO '{out_path}' (FORMAT PARQUET, COMPRESSION ZSTD)")
+    con.execute(f"COPY df_data TO '{out_path}' (FORMAT PARQUET, COMPRESSION ZSTD)")
     size_kb = out_path.stat().st_size / 1024
-    print(f"  ✓ {out_path.relative_to(REPO_ROOT)} — {len(df)} rows, "
-          f"{size_kb:.1f} KB")
+    print(f"  ✓ {out_path.relative_to(REPO_ROOT)} — {len(df)} rows, {size_kb:.1f} KB")
     return out_path
 
 
@@ -130,23 +171,29 @@ def write_meta(out_path: Path, df: pd.DataFrame) -> None:
     meta = {
         "table": out_path.stem,
         "schema": "ecad",
-        "description": "ECAD arrecadação by segmento for 2025 — six-way split "
-                       "(Serviços Digitais, Televisão, Show e Eventos, "
-                       "Usuários Gerais, Rádio, Cinema) of the R$ 2,105 mi "
-                       "total ECAD collected in 2025. share_pct is verbatim "
-                       "from the Relatório pie chart; valor_brl_mi is derived "
-                       "(TOTAL × share / 100). 2025 only at v2 launch.",
-        "source": "ECAD Relatório Anual 2025 (PDF, 32 pp.), p.10 — "
-                  "'Participação dos segmentos na arrecadação de 2025'.",
-        "source_pages": [SOURCE_PAGE],
-        "fetch_date": "2026-05-28",
+        "description": "ECAD arrecadação by segmento, 2020–2025 (2023 omitted — "
+                       "JPEG-only at source). Six-way split per year "
+                       "(Televisão, Serviços Digitais, Usuários Gerais, Show e "
+                       "Eventos, Rádio, Cinema). share_pct verbatim from each "
+                       "Relatório Anual; valor_brl_mi derived from the "
+                       "corrected per-year total. The digital trajectory "
+                       "18→23→22.8→26→33.6 % is the headline series for "
+                       "Análise 23.",
+        "source": "ECAD Relatórios Anuais 2020 / 2021 / 2022 / 2024 / 2025. "
+                  "Hand-transcribed (charts are images at source).",
+        "source_pages": sorted(set(df["source_page"].tolist())),
+        "fetch_date": "2026-05-29",
         "etl_script": "etl/ecad__arrecadacao_por_segmento_to_parquet.py",
         "etl_run_date": str(date.today()),
         "licence": "ECAD published figures — public transparency disclosure",
         "grain": "one row per (year, segmento)",
         "row_count": int(len(df)),
-        "notes": "Digital share 33.6 % matches the headline-series column "
-                 "`digital_services_arrec_share_pct` for 2025 by design.",
+        "notes": "2023 omitted — the 2023 pie is a JPEG at source; only the "
+                 "digital share (~24–25 %, estimated) is recoverable. 2020 UG "
+                 "and Rádio shares flagged (label-pairing uncertainty). "
+                 "Exact 2021/2022 per-segment R$ absolutes (Relatório 2022) "
+                 "reconcile with these shares to within rounding — see "
+                 "docs/methodology/ecad_relatorio_anual.md §4.",
     }
     out_path.with_suffix(".meta.json").write_text(
         json.dumps(meta, indent=2, ensure_ascii=False))
@@ -184,7 +231,7 @@ def maybe_push(df: pd.DataFrame, schema: str, table: str) -> None:
 
 
 def main() -> None:
-    print("Building atana.ecad.arrecadacao_por_segmento...")
+    print("Building atana.ecad.arrecadacao_por_segmento (v3 — 2020–2025)...")
     df = build()
     validate(df)
     out_path = write_parquet(df)

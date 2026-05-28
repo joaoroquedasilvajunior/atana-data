@@ -1,17 +1,20 @@
 {
   "table": "arrecadacao_distribuicao",
   "schema": "ecad",
-  "description": "ECAD music public-performance royalties — headline annual series 2018–2025: arrecadação (R$ mi) and distribuição (R$ exact). v2 (2026-05-28) — extended from 3 rows to 8 using the ECAD 2025 Annual Report. YoY columns are computed from values (not transcribed) because the source PDF labels were scrambled by the markitdown conversion. Segment breakdowns and the national-vs-foreign distribution mix live in three sibling tables.",
-  "source": "ECAD Relatório Anual 2025 (PDF, 32 pp.) — pages 12 (arrec.), 13 (distrib.), 10 (digital share), 18 (custo); Transparência pages for titulares counts.",
+  "description": "ECAD music public-performance royalties — headline annual series 2019–2025. v3 (2026-05-29): arrecadação years corrected (the v2 ingest from the Relatório 2025 chart was year-scrambled 2018–2021; corrected against the contemporary Relatório 2020 and 2022); digital-share, custo operacional and titulares backfilled from the multi-report cross-source. Distribuição values unchanged but 2021/2022 flagged as likely-scrambled (inference; not reordered).",
+  "source": "ECAD Relatório Anual 2020 / 2022 / 2024 / 2025 + Transparência 2023. Hand-transcribed (ECAD publishes no machine-readable data).",
   "source_pages": [
-    "ECAD Relatório Anual 2025 p.12",
-    "ECAD Relatório Anual 2025 pp.12–13"
+    "ECAD Relatório Anual 2020",
+    "ECAD Relatório Anual 2022 / ECAD Relatório Anual 2025",
+    "ECAD Relatório Anual 2024 (versão-mercado)",
+    "ECAD Relatório Anual 2025",
+    "ECAD Transparência 2023 / ECAD Relatório Anual 2025"
   ],
-  "fetch_date": "2026-05-28",
+  "fetch_date": "2026-05-29",
   "etl_script": "etl/ecad__headline_series_to_parquet.py",
   "etl_run_date": "2026-05-28",
   "licence": "ECAD published figures — public transparency disclosure",
   "grain": "one row per reference year",
-  "row_count": 8,
-  "notes": "v2 schema break vs v1: column rename arrecadacao_brl_billion → arrecadacao_brl_mi (R$ mi), distribuicao_brl_billion → distribuicao_brl (R$ exato). 2022 distribuição flagged with a verification caveat in the row's `notes` column — see docs/methodology/ecad_relatorio_anual.md §3 for the two competing explanations and the verification path."
+  "row_count": 7,
+  "notes": "v3 corrects the v2 arrecadação scramble (2018–2021). 2018 dropped (not in any available report). Distribuição 2021/2022 carry a scramble-hypothesis caveat in their `notes`, pending PDF p.13 verification. See docs/methodology/ecad_relatorio_anual.md §3."
 }

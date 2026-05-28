@@ -1,16 +1,20 @@
 {
   "table": "arrecadacao_por_segmento",
   "schema": "ecad",
-  "description": "ECAD arrecadação by segmento for 2025 — six-way split (Serviços Digitais, Televisão, Show e Eventos, Usuários Gerais, Rádio, Cinema) of the R$ 2,105 mi total ECAD collected in 2025. share_pct is verbatim from the Relatório pie chart; valor_brl_mi is derived (TOTAL × share / 100). 2025 only at v2 launch.",
-  "source": "ECAD Relatório Anual 2025 (PDF, 32 pp.), p.10 — 'Participação dos segmentos na arrecadação de 2025'.",
+  "description": "ECAD arrecadação by segmento, 2020–2025 (2023 omitted — JPEG-only at source). Six-way split per year (Televisão, Serviços Digitais, Usuários Gerais, Show e Eventos, Rádio, Cinema). share_pct verbatim from each Relatório Anual; valor_brl_mi derived from the corrected per-year total. The digital trajectory 18→23→22.8→26→33.6 % is the headline series for Análise 23.",
+  "source": "ECAD Relatórios Anuais 2020 / 2021 / 2022 / 2024 / 2025. Hand-transcribed (charts are images at source).",
   "source_pages": [
+    "ECAD Relatório Anual 2020",
+    "ECAD Relatório Anual 2021/2022",
+    "ECAD Relatório Anual 2022",
+    "ECAD Relatório Anual 2024 (versão-mercado)",
     "ECAD Relatório Anual 2025 p.10"
   ],
-  "fetch_date": "2026-05-28",
+  "fetch_date": "2026-05-29",
   "etl_script": "etl/ecad__arrecadacao_por_segmento_to_parquet.py",
   "etl_run_date": "2026-05-28",
   "licence": "ECAD published figures — public transparency disclosure",
   "grain": "one row per (year, segmento)",
-  "row_count": 6,
-  "notes": "Digital share 33.6 % matches the headline-series column `digital_services_arrec_share_pct` for 2025 by design."
+  "row_count": 30,
+  "notes": "2023 omitted — the 2023 pie is a JPEG at source; only the digital share (~24–25 %, estimated) is recoverable. 2020 UG and Rádio shares flagged (label-pairing uncertainty). Exact 2021/2022 per-segment R$ absolutes (Relatório 2022) reconcile with these shares to within rounding — see docs/methodology/ecad_relatorio_anual.md §4."
 }
