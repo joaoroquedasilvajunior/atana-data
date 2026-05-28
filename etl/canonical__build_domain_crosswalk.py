@@ -561,10 +561,14 @@ ECAD = [
      "★ Phase 4c.3 — cultural-IP *income*: ECAD music public-performance "
      "royalties actually collected from users and distributed to "
      "rights-holders — the third IP lens, after the BCB royalty flow and the "
-     "INPI registration stock. ⚠️ Headline series only — ECAD publishes no "
-     "machine-readable data; rounded annual totals 2023-2025, segment splits "
-     "image-only at source. Music copyright specifically. See "
-     "docs/methodology/ecad_headline.md."),
+     "INPI registration stock. v2 expansion (2026-05-28, from the Relatório "
+     "Anual 2025 PDF): 4 tables — `arrecadacao_distribuicao` (8 rows, "
+     "2018-2025), `arrecadacao_por_segmento` (6 rows × 2025), "
+     "`distribuicao_por_segmento` (13 rows × 2025), "
+     "`distribuicao_por_titular_tipo` (10 rows × 2021-2025 × {autoral, "
+     "conexa}). ⚠️ ECAD publishes no machine-readable dataset; figures are "
+     "hand-transcribed verbatim from the PDF/Transparência pages. Music "
+     "copyright specifically. See docs/methodology/ecad_relatorio_anual.md."),
 ]
 
 
@@ -670,7 +674,7 @@ def write_meta(out_path: Path, df: pd.DataFrame) -> None:
         "docs/methodology/ibge_turismo_siic_ch9.md",
         "docs/methodology/bcb_sgs_ip_services.md",
         "docs/methodology/inpi_indicadores.md",
-        "docs/methodology/ecad_headline.md",
+        "docs/methodology/ecad_relatorio_anual.md",
         "_atana_intel/phase3_schema_design.md",
         "_atana_intel/phase4_scoping.md",
     ]

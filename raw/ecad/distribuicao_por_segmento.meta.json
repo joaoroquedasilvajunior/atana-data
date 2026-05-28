@@ -1,0 +1,16 @@
+{
+  "table": "distribuicao_por_segmento",
+  "schema": "ecad",
+  "description": "ECAD distribuição by segmento for 2025 — thirteen-way split of R$ 1,725,497,001 paid out across Rádios+DG, TV aberta+DG, Shows, the two Streamings, TV Fechada, Sonorização Ambiental, etc. share_pct verbatim from the Relatório pie chart; valor_brl derived (TOTAL × share / 100). is_digital marks the three pure-digital channels only (Streaming Vídeo, Streaming Audio, Serviços Digitais); Rádios+DG and TV aberta+DG are MIXED and stay FALSE.",
+  "source": "ECAD Relatório Anual 2025 (PDF, 32 pp.), p.14 — 'Distribuição por segmento'.",
+  "source_pages": [
+    "ECAD Relatório Anual 2025 p.14"
+  ],
+  "fetch_date": "2026-05-28",
+  "etl_script": "etl/ecad__distribuicao_por_segmento_to_parquet.py",
+  "etl_run_date": "2026-05-28",
+  "licence": "ECAD published figures — public transparency disclosure",
+  "grain": "one row per (year, segmento)",
+  "row_count": 13,
+  "notes": "The thirteen named segments sum to 98.75 %; the 1.25 % gap is the documented anomaly — not silently allocated. Methodology §4 carries the explanation. Pure-digital share = 24.13 % (reconciles with CLAUDE.md v30's 24.1 % figure for Atana Note context)."
+}

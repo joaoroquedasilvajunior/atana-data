@@ -14,12 +14,12 @@
     "docs/methodology/ibge_turismo_siic_ch9.md",
     "docs/methodology/bcb_sgs_ip_services.md",
     "docs/methodology/inpi_indicadores.md",
-    "docs/methodology/ecad_headline.md",
+    "docs/methodology/ecad_relatorio_anual.md",
     "_atana_intel/phase3_schema_design.md",
     "_atana_intel/phase4_scoping.md"
   ],
   "build_script": "etl/canonical__build_domain_crosswalk.py",
-  "build_date": "2026-05-24",
+  "build_date": "2026-05-28",
   "grain": "one row per classification code (source_schema, source_code)",
   "row_composition": {
     "dane": 22,

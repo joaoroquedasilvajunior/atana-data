@@ -2,7 +2,7 @@
 
 Canonical catalog of every table available in this repository and in `md:atana`. Keep this file synchronized when adding or modifying datasets.
 
-**Last updated:** 2026-05-25
+**Last updated:** 2026-05-28
 
 ---
 
@@ -307,15 +307,20 @@ Faithful wide preservation — original cells kept as `c01…` (all VARCHAR). Th
 
 ---
 
-## `atana.ecad` — ECAD music public-performance royalties 🔜 Built — pending sync
+## `atana.ecad` — ECAD music public-performance royalties ✅ Live v1 · 🔜 v2 built locally — pending re-sync
 
-Source: ECAD — *Escritório Central de Arrecadação e Distribuição*, Transparência pages. Phase 4c.3 — the cultural-IP *income* lens (music royalties collected and distributed); the third reach into the FCS *Intellectual property* domain.
+Source: ECAD — *Escritório Central de Arrecadação e Distribuição*. Phase 4c.3 — the cultural-IP *income* lens (music royalties collected and distributed); the third reach into the FCS *Intellectual property* domain. **v2 expansion (2026-05-28)** sources the full breakdowns from the *Relatório Anual 2025* (32-page PDF, converted via `markitdown`), going beyond v1's Transparência-page headline series.
 
-| Table | Rows | Description |
-|---|---:|---|
-| `arrecadacao_distribuicao` | 3 | Headline annual series 2023–2025 — total arrecadação + distribuição (R$ billion, rounded), YoY growth, titulares count, digital-services share of collection |
+| Table | Rows | Years | Description |
+|---|---:|---|---|
+| `arrecadacao_distribuicao` | 8 | 2018–2025 | Headline series — arrecadação (R$ mi, p.12 verbatim), distribuição (R$ exact, p.13 verbatim), titulares count, digital-services share, custo operacional, derived YoY |
+| `arrecadacao_por_segmento` | 6 | 2025 | The 2025 arrecadação six-way split — Serviços Digitais 33.6 % → Cinema 1.3 %; sums to 100 % |
+| `distribuicao_por_segmento` | 13 | 2025 | The 2025 distribuição thirteen-channel split with `is_digital` flag; sums to 98.75 % (1.25 % gap is the documented anomaly) |
+| `distribuicao_por_titular_tipo` | 10 | 2021–2025 | Nacional vs estrangeiro split, autoral + conexa parts separately |
 
-⚠️ **Headline series only.** ECAD publishes no machine-readable dataset — figures are transcribed from the Transparência pages; segment splits are image-only at source; values are ECAD's *rounded* headline numbers (precise figures are in the annual Balanço Patrimonial PDFs). ETL: `etl/ecad__headline_series_to_parquet.py` · Methodology: `docs/methodology/ecad_headline.md`
+⚠️ **Hand-transcribed.** ECAD publishes no machine-readable dataset. The v2 ETLs transcribe values verbatim from the *Relatório Anual 2025* PDF and the Transparência pages. Central caveats — readable in `docs/methodology/ecad_relatorio_anual.md` §3 — (1) the structural ≈ 9.5 pp gap between arrecadação digital share (33.6 %) and distribuição pure-digital share (24.13 %), absorbed by 9 % custo operacional + timing lag + deferred allocation; (2) the **2022 distribuição value (R$ 901.6 mi) is flagged as needs-PDF-verification** — it implies −26.8 % YoY versus 2021, but the figure equals the 2020 baseline implied by the 2021 caption, so markitdown may have swapped the 2020 and 2022 labels; (3) the 1.25 % gap in 2025 distribution-by-segment is documented, not allocated; (4) "nacional" is a *cadastral* category — a titular registered in Brazil — and includes Brazilian subsidiaries of foreign majors (Universal/Sony/Warner Music Brasil), so "77 % nacional" ≠ "77 % of royalties go to Brazilian creators". Operational metrics from Relatório §5 (5.8 trillion identified streaming executions, 11,400 IAG obras blocked, etc.) are documented in the methodology and not (yet) tabled.
+
+ETLs: `etl/ecad__headline_series_to_parquet.py` · `etl/ecad__arrecadacao_por_segmento_to_parquet.py` · `etl/ecad__distribuicao_por_segmento_to_parquet.py` · `etl/ecad__distribuicao_por_titular_tipo_to_parquet.py` · Methodology: `docs/methodology/ecad_relatorio_anual.md` (v1's `ecad_headline.md` is a redirect stub)
 
 ---
 
@@ -400,3 +405,5 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | 2026-05-25 | Documentation: `atana.rais` section added to this manifest. The schema has been live since Sprint 1 (GitHub `8d874f5`, 3 tables, 2014–2023) but was undocumented here. |
 | 2026-05-25 | ETL hardening: `rais__bigquery_to_parquet.py` and `rais__deflate_ipca.py` gained a `--staging` flag (output → `raw/rais/_staging/`) and an `ATANA_ETL_SKIP_PUSH` guard on the MotherDuck sync; `.gitignore` now excludes `raw/*/_staging/`. Enables the DB-updater to stage a RAIS refresh safely. |
 | 2026-05-25 | `canonical.cmo_directory_alcam` added — Tier 1 of the ALCAM Música scoping. **13 rows** (12 LATAM countries × music creator-side CMO members of ALCAM, Brazil ×2), with a `linked_atana_schema` pointer that ties ABRAMUS/UBC to `atana.ecad`. Build script `etl/canonical__build_cmo_directory_alcam.py`; methodology `docs/methodology/cmo_directory_alcam.md`; output `curated/cmo_directory_alcam.parquet` + `.meta.json`. **Built locally — pending GitHub push + MotherDuck sync (João).** |
+| 2026-05-28 | `atana.ecad` v2 expansion — 1 table → **4 tables**, sourced from the ECAD *Relatório Anual 2025* PDF (markitdown-converted). `arrecadacao_distribuicao` extended 3 → 8 rows (2018–2025) with schema break (`_brl_billion` → `_brl_mi`/`_brl`); three new sibling tables — `arrecadacao_por_segmento` (6 rows), `distribuicao_por_segmento` (13 rows), `distribuicao_por_titular_tipo` (10 rows). 4 central caveats foregrounded in row `notes` + methodology §3, notably a flagged 2022 distribuição anomaly that needs PDF re-verification. New methodology doc `docs/methodology/ecad_relatorio_anual.md`; v1's `ecad_headline.md` reduced to a redirect stub. **Built locally — pending GitHub push + MotherDuck re-sync (João).** |
+| 2026-05-28 | `canonical.domain_crosswalk` refreshed — descriptive note on the `ecad` row updated to reflect the v2 4-table scope; `derived_from` meta repoints to `ecad_relatorio_anual.md`. Row count unchanged (still 85; coverage 13/14). **Built locally — pending re-sync.** |

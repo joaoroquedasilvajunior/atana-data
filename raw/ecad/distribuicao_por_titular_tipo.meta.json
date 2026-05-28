@@ -1,0 +1,16 @@
+{
+  "table": "distribuicao_por_titular_tipo",
+  "schema": "ecad",
+  "description": "ECAD distribuição by titular type — annual split of distribuição between titulares cadastrados no Brasil ('nacional') and 'estrangeiro', 2021–2025, for the autoral and conexa partes separately. 10 rows = 5 years × 2 partes. Source: Relatório Anual 2025, pp.13–14 (two stacked-bar charts).",
+  "source": "ECAD Relatório Anual 2025 (PDF, 32 pp.), pp.13–14.",
+  "source_pages": [
+    "ECAD Relatório Anual 2025 pp.13–14"
+  ],
+  "fetch_date": "2026-05-28",
+  "etl_script": "etl/ecad__distribuicao_por_titular_tipo_to_parquet.py",
+  "etl_run_date": "2026-05-28",
+  "licence": "ECAD published figures — public transparency disclosure",
+  "grain": "one row per (year, parte)",
+  "row_count": 10,
+  "notes": "'nacional' is a CADASTRAL category — a titular registered in Brazil — and therefore includes editoras/gravadoras that are Brazilian subsidiaries of foreign majors (Universal Music Brasil, Sony Music Brasil, Warner Music Brasil, etc.) which redistribute upstream. The 77 % 'nacional' share is not equivalent to '77 % of royalties go to Brazilian creators'. See Análise 21 for the geography drilldown and methodology §3 for the caveat."
+}
