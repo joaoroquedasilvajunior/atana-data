@@ -15,11 +15,12 @@
     "docs/methodology/bcb_sgs_ip_services.md",
     "docs/methodology/inpi_indicadores.md",
     "docs/methodology/ecad_relatorio_anual.md",
+    "docs/methodology/cisac_gcr.md",
     "_atana_intel/phase3_schema_design.md",
     "_atana_intel/phase4_scoping.md"
   ],
   "build_script": "etl/canonical__build_domain_crosswalk.py",
-  "build_date": "2026-05-28",
+  "build_date": "2026-05-29",
   "grain": "one row per classification code (source_schema, source_code)",
   "row_composition": {
     "dane": 22,
@@ -32,7 +33,8 @@
     "sinca": 2,
     "bcb": 1,
     "inpi": 1,
-    "ecad": 1
+    "ecad": 1,
+    "cisac": 1
   },
   "fcs_spine": "2025 UNESCO Framework for Cultural Statistics — 7 cultural + 7 transversal domains",
   "licence": "CC BY 4.0 (Atana) — the underlying classifications retain their own licences",

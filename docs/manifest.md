@@ -8,7 +8,7 @@ Canonical catalog of every table available in this repository and in `md:atana`.
 
 ## Conventions
 
-- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `rais`, `inegi`, `dane`, `sinca`, `cr_bccr`, `ibge_estruturais`, `ibge_cempre`, `ibge_tic`, `ibge_turismo`, `bcb`, `inpi`, `ecad`, `canonical`
+- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `rais`, `inegi`, `dane`, `sinca`, `cr_bccr`, `ibge_estruturais`, `ibge_cempre`, `ibge_tic`, `ibge_turismo`, `bcb`, `inpi`, `ecad`, `cisac`, `canonical`
 - **Table names** are snake_case, prefixed by the table number when applicable: `tab_6_10`, `tab_10_1`
 - **Curated tables** live in the `canonical` schema and represent ready-to-consume snapshots used in published analyses
 - **Currency**: each table documents its native currency (R$ corrente, R$ FOB, US$ corrente, etc.) — never mixed in one column
@@ -324,6 +324,23 @@ ETLs: `etl/ecad__headline_series_to_parquet.py` · `etl/ecad__arrecadacao_por_se
 
 ---
 
+## `atana.cisac` — CISAC Global Collections Report (global creator-royalty headlines) 🔜 Built locally — pending sync
+
+Source: **CISAC Global Collections Report 2025** (covering 2024 royalty data; published ~November 2025), via the public landing page. Phase 5a of the Atana Data expansion — the global counterpart to `atana.ecad`. CISAC is the global federation of authors' and composers' collective-management societies (228 members across 111 countries; ALCAM is its LATAM bloc — see `canonical.cmo_directory_alcam`).
+
+| Table | Rows | Years | Description |
+|---|---:|---|---|
+| `gcr_2025_global_by_stream` | 4 | 2024 | Headline by income stream — Digital €5.14 bn / Live & background €3.60 bn / Broadcast €3.94 bn / Total €13.97 bn (+6.6 %) |
+| `gcr_2025_global_by_repertoire` | 5 | 2024 | By repertoire — Music €12.59 bn (+7.2 %) · AV €727 mi · Visual arts €219 mi · Drama €208 mi (−3.4 %) · Literature €231 mi |
+| `gcr_2025_global_by_region` | 6 | 2024 | By region — West Europe €7.09 bn · Canada/USA €3.52 bn · Asia-Pacific €1.92 bn · **Latin America €786 mi (−0.6 %)** · East Europe €566 mi · Africa €90 mi |
+| `gcr_2025_leading_smaller_markets_digital_share` | 10 | 2024 | Top-10 by 2024 digital share + 2015–2024 growth — Mali 89.9 % through Ukraine 63.3 %; **Mexico 65.1 % is the only LATAM cell**; Mali growth NULL (no 2015 baseline) |
+
+⚠️ **Public-landing-page ingest only (Tier 1).** The full GCR PDF (auth-walled at `members.cisac.org`) carries per-country tables and the 2015–2024 historical series; that is **Tier 2** (~1 day, deferred — access routes in `_atana_intel/scoping_cisac_gcr_2025_2026-05-29.md` §5). Caveats — readable in `docs/methodology/cisac_gcr.md` §3 — (1) the **named-streams gap**: Digital + Live & background + Broadcast sum to €12.68 bn vs Total €13.97 bn; the €1.29 bn residual (~9.2 %) = physical formats + private copying (documented, not allocated); (2) **LATAM is the only declining region in 2024** (−0.6 %); (3) **Music = ~90 % of global** — scale context for the corpus's music-heavy Brazilian work; (4) currency is **EUR** while `atana.ecad` is **BRL** — any direct ECAD ↔ GCR-LATAM reconciliation needs an EUR/BRL FX series (not yet in corpus); (5) the GCR text gives large-market digital-share comparators in prose (USA 27.1 % · France 13.9 % · UK 11.4 %) — kept in methodology §4, not in the table (which stays strictly to CISAC's "leading smaller markets" framing).
+
+ETLs: `etl/cisac__gcr_2025_global_by_stream_to_parquet.py` · `etl/cisac__gcr_2025_global_by_repertoire_to_parquet.py` · `etl/cisac__gcr_2025_global_by_region_to_parquet.py` · `etl/cisac__gcr_2025_leading_smaller_markets_to_parquet.py` · Methodology: `docs/methodology/cisac_gcr.md` · Scoping: `_atana_intel/scoping_cisac_gcr_2025_2026-05-29.md`
+
+---
+
 ## `atana.canonical` — Curated analytical snapshots
 
 Read-only views and tables that power published analyses. **Do not modify directly** — regenerate via build scripts and versioned datasets.
@@ -408,3 +425,4 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | 2026-05-28 | `atana.ecad` v2 expansion — 1 table → **4 tables**, sourced from the ECAD *Relatório Anual 2025* PDF (markitdown-converted). `arrecadacao_distribuicao` extended 3 → 8 rows (2018–2025) with schema break (`_brl_billion` → `_brl_mi`/`_brl`); three new sibling tables — `arrecadacao_por_segmento` (6 rows), `distribuicao_por_segmento` (13 rows), `distribuicao_por_titular_tipo` (10 rows). 4 central caveats foregrounded in row `notes` + methodology §3, notably a flagged 2022 distribuição anomaly that needs PDF re-verification. New methodology doc `docs/methodology/ecad_relatorio_anual.md`; v1's `ecad_headline.md` reduced to a redirect stub. **Built locally — pending GitHub push + MotherDuck re-sync (João).** |
 | 2026-05-28 | `canonical.domain_crosswalk` refreshed — descriptive note on the `ecad` row updated to reflect the v2 4-table scope; `derived_from` meta repoints to `ecad_relatorio_anual.md`. Row count unchanged (still 85; coverage 13/14). **Built locally — pending re-sync.** |
 | 2026-05-29 | `atana.ecad` **v3 — correction + multi-year** from a cross-source of the ECAD Relatórios 2020/2021/2022/2024 + Transparência 2023. (a) **Corrected a v2 arrecadação year-scramble** (2018–2021 were permuted by markitdown; R$ 905.8 mi pandemic low was mis-yeared 2018 → 2020) — verified against contemporary reports; 2018 dropped; `arrecadacao_distribuicao` now 7 rows (2019–2025) with digital share + custo + titulares backfilled. (b) **`arrecadacao_por_segmento` extended 6 → 30 rows** (2020–2025 ex-2023). (c) **`distribuicao_por_titular_tipo` extended 10 → 20 rows** (back to 2016). `distribuicao_por_segmento` unchanged (13). atana.ecad total 37 → **70 rows**. Distribuição 2021/2022 flagged as likely-scrambled (not reordered). Crosswalk `ecad` note refreshed (still 85 rows). **Built locally — pending GitHub push + MotherDuck re-sync (João).** |
+| 2026-05-29 | **Phase 5a — `atana.cisac` schema added** (CISAC Global Collections Report 2025 → public landing page, Tier 1 ingest). **4 tables, 25 rows** — `gcr_2025_global_by_stream` (4 rows × 2024), `gcr_2025_global_by_repertoire` (5), `gcr_2025_global_by_region` (6), `gcr_2025_leading_smaller_markets_digital_share` (10). EUR millions, 2024 reference year. The first global creator-royalty frame the corpus carries; LATAM €786 mi (−0.6 %) is the comparable-aggregate row that ties `atana.ecad` (Brazil) and `canonical.cmo_directory_alcam` (LATAM CMO directory) into a global structure. `canonical.domain_crosswalk` extended 85 → **86 rows** (1 new `cisac` row → *Intellectual property*); coverage 13/14 unchanged. Tier 2 (full PDF, country-level + 2015–2024 historical series) deferred — PDF auth-walled. **Built locally — pending GitHub push + MotherDuck sync (João).** |

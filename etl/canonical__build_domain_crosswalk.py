@@ -583,11 +583,42 @@ def ecad_rows() -> list[dict]:
     return rows
 
 
+# ── Global — CISAC Global Collections Report (Phase 5a) ──────────────────────
+# The cultural-IP *income* lens at global scale — annual royalty collections
+# reported by all 228 CISAC member societies in 111 countries. Deepens the IP
+# domain that ECAD already reaches for Brazil; meter unchanged at 13/14.
+CISAC = [
+    ("gcr-global-headlines",
+     "CISAC Global Collections Report — global creator-royalty headlines",
+     "Intellectual property", "transversal", None, None, "good",
+     "Phase 5a (2026-05-29) — Tier 1 ingest of the public landing page of "
+     "the CISAC Global Collections Report 2025 (2024 data). 4 tables, 25 "
+     "rows: `gcr_2025_global_by_stream` (4 rows × 2024), "
+     "`gcr_2025_global_by_repertoire` (5 rows × 2024), "
+     "`gcr_2025_global_by_region` (6 rows × 2024), "
+     "`gcr_2025_leading_smaller_markets_digital_share` (10 rows × 2024). "
+     "EUR millions, current prices. Headline total €13.97 bn (+6.6 %); "
+     "LATAM €786 mi (−0.6 %) is the corpus's first comparable LATAM "
+     "aggregate. The full GCR PDF (auth-walled at members.cisac.org) + "
+     "country-level + 2015-2024 historical series remain as Tier 2 work. "
+     "See docs/methodology/cisac_gcr.md."),
+]
+
+
+def cisac_rows() -> list[dict]:
+    rows = []
+    for code, label, dom, dtype, cer, ncm, conf, note in CISAC:
+        rows.append(dict(zip(COLUMNS, (
+            "cisac", "CISAC Global Collections Report", code, label,
+            dom, dtype, cer, ncm, conf, note))))
+    return rows
+
+
 def build() -> pd.DataFrame:
     rows = (spine_rows() + inegi_rows() + dane_rows() + sinca_rows()
             + cr_bccr_rows() + unctad_goods_rows() + unctad_services_rows()
             + ibge_ncm_rows() + siic_rows() + bcb_rows() + inpi_rows()
-            + ecad_rows())
+            + ecad_rows() + cisac_rows())
     return pd.DataFrame(rows, columns=COLUMNS)
 
 
@@ -596,13 +627,13 @@ def validate(df: pd.DataFrame) -> None:
     print("Validating...")
     expect = {"fcs2025": 14, "inegi": 10, "dane": 22, "sinca": 2,
               "cr_bccr": 4, "unctad": 15, "ibge_comex": 5, "ibge_siic": 10,
-              "bcb": 1, "inpi": 1, "ecad": 1}
+              "bcb": 1, "inpi": 1, "ecad": 1, "cisac": 1}
     got = df["source_schema"].value_counts().to_dict()
     for schema, n in expect.items():
         assert got.get(schema) == n, (
             f"{schema}: expected {n} rows, got {got.get(schema)}")
     total = sum(expect.values())
-    assert len(df) == total == 85, f"total rows {len(df)} != 85"
+    assert len(df) == total == 86, f"total rows {len(df)} != 86"
     print(f"  ✓ {len(df)} rows — " + ", ".join(f"{k} {v}" for k, v in expect.items()))
 
     bad = set(df["mapping_confidence"]) - CONFIDENCE_VALUES
@@ -636,7 +667,7 @@ def validate(df: pd.DataFrame) -> None:
     # 'N/14 domains reached' progress meter for the transversal-blind-spot work.
     nat = df[df["source_schema"].isin(
         ["inegi", "dane", "sinca", "cr_bccr", "ibge_siic", "bcb", "inpi",
-         "ecad"])]
+         "ecad", "cisac"])]
     reached = set()
     for d in nat["fcs2025_domain"].dropna():
         for part in str(d).replace(";", "/").split("/"):
@@ -645,7 +676,7 @@ def validate(df: pd.DataFrame) -> None:
                 reached.add(p)
     unreached = sorted(FCS_DOMAIN_LABELS - reached)
     print(f"  · {len(reached)}/14 FCS domains reached by a national CSC, "
-          f"IBGE SIIC, BCB, INPI or ECAD row; not reached: {unreached or '—'}")
+          f"IBGE SIIC, BCB, INPI, ECAD or CISAC row; not reached: {unreached or '—'}")
     conf = df["mapping_confidence"].value_counts().to_dict()
     print(f"  · confidence mix: " + ", ".join(
         f"{k} {conf.get(k, 0)}" for k in
@@ -677,6 +708,7 @@ def write_meta(out_path: Path, df: pd.DataFrame) -> None:
         "docs/methodology/bcb_sgs_ip_services.md",
         "docs/methodology/inpi_indicadores.md",
         "docs/methodology/ecad_relatorio_anual.md",
+        "docs/methodology/cisac_gcr.md",
         "_atana_intel/phase3_schema_design.md",
         "_atana_intel/phase4_scoping.md",
     ]

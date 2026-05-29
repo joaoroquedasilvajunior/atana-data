@@ -1,0 +1,16 @@
+{
+  "table": "gcr_2025_global_by_repertoire",
+  "schema": "cisac",
+  "description": "CISAC Global Collections Report 2025 — 2024 global royalty collections by repertoire (Music, Audiovisual, Visual arts, Drama, Literature). EUR millions. Music is ~90 % of the global total — the scale context for atana.ecad's Brazilian music-royalty series.",
+  "source": "CISAC Global Collections Report 2025 — public landing page.",
+  "source_pages": [
+    "https://www.cisac.org/cisac-global-collections-report-2025"
+  ],
+  "fetch_date": "2026-05-29",
+  "etl_script": "etl/cisac__gcr_2025_global_by_repertoire_to_parquet.py",
+  "etl_run_date": "2026-05-29",
+  "licence": "CISAC published figures — public release",
+  "grain": "one row per (year, repertoire)",
+  "row_count": 5,
+  "notes": "2024 reference year. Five repertoires reconcile with the €13.97 bn global total (sum €13,975 mi — drift +5 mi from verbatim rounding). See docs/methodology/cisac_gcr.md."
+}

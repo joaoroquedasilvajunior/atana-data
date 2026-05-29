@@ -1,0 +1,16 @@
+{
+  "table": "gcr_2025_global_by_stream",
+  "schema": "cisac",
+  "description": "CISAC Global Collections Report 2025 — 2024 global royalty collections by income stream (Digital, Live & background, Broadcast, Total). EUR millions. The three named streams sum to €12.68 bn; the €1.29 bn residual to the €13.97 bn total = physical formats + private copying (documented in methodology §3).",
+  "source": "CISAC Global Collections Report 2025 — public landing page.",
+  "source_pages": [
+    "https://www.cisac.org/cisac-global-collections-report-2025"
+  ],
+  "fetch_date": "2026-05-29",
+  "etl_script": "etl/cisac__gcr_2025_global_by_stream_to_parquet.py",
+  "etl_run_date": "2026-05-29",
+  "licence": "CISAC published figures — public release",
+  "grain": "one row per (year, stream)",
+  "row_count": 4,
+  "notes": "2024 reference year. Future GCR editions append rows without schema change. Reporting currency: EUR. See docs/methodology/cisac_gcr.md."
+}

@@ -1,0 +1,16 @@
+{
+  "table": "gcr_2025_global_by_region",
+  "schema": "cisac",
+  "description": "CISAC Global Collections Report 2025 — 2024 global royalty collections by region (West Europe, Canada/USA, Asia-Pacific, Latin America, East Europe, Africa). EUR millions. Latin America = €786 mi (−0.6 %) — the LATAM frame the Atana corpus did not previously carry; joins to atana.ecad (Brazil) and to canonical.cmo_directory_alcam (the 12-country LATAM CMO map).",
+  "source": "CISAC Global Collections Report 2025 — public landing page.",
+  "source_pages": [
+    "https://www.cisac.org/cisac-global-collections-report-2025"
+  ],
+  "fetch_date": "2026-05-29",
+  "etl_script": "etl/cisac__gcr_2025_global_by_region_to_parquet.py",
+  "etl_run_date": "2026-05-29",
+  "licence": "CISAC published figures — public release",
+  "grain": "one row per (year, region)",
+  "row_count": 6,
+  "notes": "2024 reference year. Six regions reconcile with the €13.97 bn global total within rounding. Latin America is the only region with a YoY decline in 2024 (−0.6 %), 'following two years of strong post-pandemic gains' per the GCR. See docs/methodology/cisac_gcr.md."
+}

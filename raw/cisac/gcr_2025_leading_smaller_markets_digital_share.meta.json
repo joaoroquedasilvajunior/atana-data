@@ -1,0 +1,16 @@
+{
+  "table": "gcr_2025_leading_smaller_markets_digital_share",
+  "schema": "cisac",
+  "description": "CISAC Global Collections Report 2025 — the 'leading smaller markets' by digital royalty market share, 2024, with 2015-2024 growth. 10 rows. Mexico (65.1 %) is the only LATAM country in the GCR's top-10 and is directly relevant to Atana Note #07 (UNCTAD × CSCM pluralism), the DANE/INEGI work and the Authenticity Paradox narrative.",
+  "source": "CISAC Global Collections Report 2025 — public landing page, table 'Leading smaller markets by digital share (2024) and growth 2015–2024'.",
+  "source_pages": [
+    "https://www.cisac.org/cisac-global-collections-report-2025"
+  ],
+  "fetch_date": "2026-05-29",
+  "etl_script": "etl/cisac__gcr_2025_leading_smaller_markets_to_parquet.py",
+  "etl_run_date": "2026-05-29",
+  "licence": "CISAC published figures — public release",
+  "grain": "one row per (year, country)",
+  "row_count": 10,
+  "notes": "Mali growth_2015_2024_pct = NULL (no 2015 baseline; '—' in source). Large-market comparators (USA 27.1 %, France 13.9 %, UK 11.4 %) stated in the GCR prose are NOT in this table — see methodology §4 for the comparator block."
+}
