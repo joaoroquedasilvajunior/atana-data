@@ -1,0 +1,17 @@
+{
+  "table": "ye2025_us_genre_share",
+  "schema": "luminate",
+  "description": "Luminate Year-End 2025 — US genre breakdown of ondemand audio streams. Top 5: R&B/Hip-Hop 25.5 % (−0.8 pp), Rock 15.3 % (flat), Pop 12.6 % (+0.3), Latin 8.0 % (+0.6 pp = largest gainer), Christian/Gospel 3.5 % (+0.4). Latin's US-share gain coheres with the IFPI LATAM +17.1 % regional narrative.",
+  "source": "Luminate Year-End 2025 Music Industry Report; MBW coverage.",
+  "source_pages": [
+    "https://luminatedata.com/reports/yearend-music-industry-report-2025",
+    "https://www.musicbusinessworldwide.com/half-of-all-paid-music-streams-globally-derive-from-just-4-countries-and-other-highlights-from-luminates-latest-report"
+  ],
+  "fetch_date": "2026-06-04",
+  "etl_script": "etl/luminate__ye2025_us_genre_share_to_parquet.py",
+  "etl_run_date": "2026-06-04",
+  "licence": "Luminate published figures; MBW press coverage.",
+  "grain": "one row per (year, country, genre)",
+  "row_count": 5,
+  "notes": "US-only. Non-US genre breakdowns are publicly cited only for headline 'most-local' shares (separate table)."
+}

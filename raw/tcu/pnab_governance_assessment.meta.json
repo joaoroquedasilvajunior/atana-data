@@ -1,0 +1,16 @@
+{
+  "table": "pnab_governance_assessment",
+  "schema": "tcu",
+  "description": "TCU PNAB governance-maturity assessment, Acórdão 1709/2025 (sessão 30/07/2025, relator Augusto Nardes). 4 governance dimensions × 2025 (Formulação, Indicadores, Gestão de riscos e controles, M&E) with TCU verbatim ratings and ordinal scoring 1-3.",
+  "source": "TCU - Tribunal de Contas da União, Acórdão 1709/2025.",
+  "source_pages": [
+    "https://portal.tcu.gov.br/imprensa/noticias/politica-nacional-de-cultura-e-auditada-pelo-tribunal-de-contas-da-uniao"
+  ],
+  "fetch_date": "2026-06-04",
+  "etl_script": "etl/tcu__pnab_governance_assessment_to_parquet.py",
+  "etl_run_date": "2026-06-04",
+  "licence": "TCU published findings — public release.",
+  "grain": "one row per (audit_year, policy, governance_dimension)",
+  "row_count": 4,
+  "notes": "Maturity scale per TCU Referencial de Controle: 1 = não institucionalizada, 2 = parcialmente institucionalizada, 3 = institucionalizada. None of the 4 dimensions reached 3."
+}

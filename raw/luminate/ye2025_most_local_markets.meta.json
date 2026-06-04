@@ -1,0 +1,17 @@
+{
+  "table": "ye2025_most_local_markets",
+  "schema": "luminate",
+  "description": "Luminate Year-End 2025 — countries where domestic-language repertoire dominates streaming most: India 79.2 %, Brazil 75.2 %, Turkey 69.9 %, Nigeria 62.2 %. Brazil 75.2 % paired with Brazil #3 in absolute paid-stream growth (+38.6 bn YoY) grounds the Authenticity Paradox in a single year of evidence: local consumption massive, volume growth massive, CISAC LATAM author collection contracting.",
+  "source": "Luminate Year-End 2025 Music Industry Report; MBW coverage.",
+  "source_pages": [
+    "https://luminatedata.com/reports/yearend-music-industry-report-2025",
+    "https://www.musicbusinessworldwide.com/half-of-all-paid-music-streams-globally-derive-from-just-4-countries-and-other-highlights-from-luminates-latest-report"
+  ],
+  "fetch_date": "2026-06-04",
+  "etl_script": "etl/luminate__ye2025_most_local_markets_to_parquet.py",
+  "etl_run_date": "2026-06-04",
+  "licence": "Luminate published figures; MBW press coverage.",
+  "grain": "one row per (year, country)",
+  "row_count": 4,
+  "notes": "Luminate measures 'local' as repertoire whose primary language matches the country's primary language. Not the same as country-of-rights-ownership (which often sits with global majors). The label/CMO gap maps to that distinction."
+}

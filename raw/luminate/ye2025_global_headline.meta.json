@@ -1,0 +1,17 @@
+{
+  "table": "ye2025_global_headline",
+  "schema": "luminate",
+  "description": "Luminate Year-End 2025 — global headline: 5.1 tn ondemand audio streams (+9.6 %), ex-US 3.7 tn (+11.6 %), US 1.4 tn (+4.6 %), 253 mi tracks on streaming, 120.5 mi (~47 %) under 10 streams. The catalog-supply/consumer-platform lens — fourth in the corpus's music-money frame.",
+  "source": "Luminate Year-End 2025 Music Industry Report. Figures verified via MBW (22 Jan 2026).",
+  "source_pages": [
+    "https://luminatedata.com/reports/yearend-music-industry-report-2025",
+    "https://www.musicbusinessworldwide.com/half-of-all-paid-music-streams-globally-derive-from-just-4-countries-and-other-highlights-from-luminates-latest-report"
+  ],
+  "fetch_date": "2026-06-04",
+  "etl_script": "etl/luminate__ye2025_global_headline_to_parquet.py",
+  "etl_run_date": "2026-06-04",
+  "licence": "Luminate published figures; MBW press coverage.",
+  "grain": "one row per reference year",
+  "row_count": 1,
+  "notes": "The Luminate Year-End PDF is downloadable from luminatedata.com/reports/yearend-music-industry-report-2025; headline figures are publicly cited. May 2026 'State of the Industry' conference deck is a SEPARATE Luminate release, PDF-gated behind a lead form — not in this ingest."
+}

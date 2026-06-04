@@ -583,6 +583,145 @@ def ecad_rows() -> list[dict]:
     return rows
 
 
+# ── Global — IFPI Global Music Report (Phase 5b) ─────────────────────────────
+# The *recorded-music* lens at global scale — record-label revenue (mechanicals,
+# distribution) — distinct from CISAC/ECAD's *author-royalty* (CMO) lens. Together
+# the corpus now reads music money through three lenses. IP domain unchanged at 13/14.
+IFPI = [
+    ("recorded-music-revenue",
+     "IFPI Global Music Report — global recorded-music revenue by region / format / country",
+     "Intellectual property", "transversal", None, None, "good",
+     "Phase 5b (2026-06-01) — Tier 1 ingest of the public IFPI GMR 2026 press "
+     "release (2025 data). 4 tables, 25 rows: `gmr_2026_global_headline` "
+     "(1 row × 2025), `gmr_2026_global_by_format` (5), `gmr_2026_global_by_region` "
+     "(7), `gmr_2026_top_markets` (12 countries named in press release). USD "
+     "billions, 2025 reference year. Global headline US$ 31.7 bn (+6.4 %); "
+     "LATAM +17.1 % (fastest-growing region) — and the key cross-lens finding: "
+     "LATAM +17.1 % in IFPI vs −0.6 % in CISAC (same year, same region, "
+     "+17.7 pp gap = the difference between recorded-music revenue (label "
+     "side) and author-royalty collection (CMO side). Country detail beyond "
+     "the 12 named markets is paywalled (Premium Edition). "
+     "See docs/methodology/ifpi_gmr.md."),
+]
+
+
+def ifpi_rows() -> list[dict]:
+    rows = []
+    for code, label, dom, dtype, cer, ncm, conf, note in IFPI:
+        rows.append(dict(zip(COLUMNS, (
+            "ifpi", "IFPI Global Music Report", code, label,
+            dom, dtype, cer, ncm, conf, note))))
+    return rows
+
+
+# ── Global — Luminate Year-End Music Report (Phase 5c) ───────────────────────
+# The *consumer / catalog supply* lens at global scale — streaming volume,
+# catalog saturation, country and genre shares as measured at the platform
+# surface. Fourth music-money lens after ECAD (BR author payout), CISAC
+# (global author collection) and IFPI (global recorded-music revenue). Each
+# at a different stage of the value chain. IP domain unchanged at 13/14.
+LUMINATE = [
+    ("ye2025-streaming-supply",
+     "Luminate Year-End 2025 — global streaming consumption, catalog supply and country / genre splits",
+     "Music", "cultural", "CER040", "92", "good",
+     "★ Phase 5c (2026-06-04) — Tier 1 ingest of the public Luminate "
+     "Year-End 2025 Music Industry Report. 4 tables, 14 rows: "
+     "`ye2025_global_headline` (1 × 2025; 5.1 tn streams, 253 mi tracks, "
+     "47.6 % under 10 streams), `ye2025_top_markets_paid_share` (4 × 2025; "
+     "USA 31 % share + Mexico/Brazil/Germany absolute growth), "
+     "`ye2025_us_genre_share` (5 × 2025; Latin +0.6 pp largest US gainer), "
+     "`ye2025_most_local_markets` (4 × 2025; Brazil 75.2 % local "
+     "repertoire). Closes the four-lens music-money frame — pairs ECAD "
+     "(BR payout to authors) / CISAC (global CMO collection) / IFPI "
+     "(global label revenue) / Luminate (consumer-platform supply). "
+     "Three-corner reading for 2024-2025 LATAM is the empirical core of "
+     "the Note #08 extension. ⚠️ Public headline figures only; per-track "
+     "and per-artist Luminate Connect data are paywalled (Tier 2). "
+     "See docs/methodology/luminate_ye.md."),
+]
+
+
+def luminate_rows() -> list[dict]:
+    rows = []
+    for code, label, dom, dtype, cer, ncm, conf, note in LUMINATE:
+        rows.append(dict(zip(COLUMNS, (
+            "luminate", "Luminate Year-End Music Industry Report", code, label,
+            dom, dtype, cer, ncm, conf, note))))
+    return rows
+
+
+# ── Brazil — TCU PNAB audit (Phase 5c) ───────────────────────────────────────
+# Governance-and-accountability lens on Brazilian cultural fomento (the Política
+# Nacional Aldir Blanc, R$ 15 bn / R$ 3 bn/year). The FCS has no "cultural-
+# policy governance" domain — fomento crosses all 7 cultural domains by design.
+# The crosswalk row therefore carries a bundle value, with a ★ note. Meter
+# unchanged: TCU does not extend FCS coverage, it adds a NEW lens on the
+# fomento policy that the corpus already measures from the funded-projects side
+# (SALIC/Rouanet) and from the funded-workforce side (RAIS, PNADC).
+TCU = [
+    ("pnab-audit",
+     "TCU PNAB audit (Acórdão 1709/2025) — governance-maturity assessment + deliberations to MinC",
+     "Multiple — cultural fomento policy crosses all 7 cultural domains",
+     None, None, None, "approximate",
+     "★ Phase 5c (2026-06-04) — first governance/audit lens in the Atana "
+     "corpus. 2 tables, 8 rows: `pnab_governance_assessment` (4 × 2025; "
+     "TCU verbatim ratings on 4 dimensions, ordinal 1-3; mean 1.75 / 3; "
+     "Gestão de riscos = 1) and `pnab_deliberations` (4 × 2025; "
+     "recommendations the TCU addressed to MinC, incl. an 'equidade' "
+     "dimension that maps directly to Atana's distributional focus). "
+     "The FCS has no 'cultural-policy governance' domain — fomento "
+     "policy by design crosses all 7 cultural domains, hence the bundle "
+     "value. Pairs SALIC (what got funded) with TCU (what was held to "
+     "account) — same fomento system, two institutional standpoints. "
+     "See docs/methodology/tcu_pnab.md."),
+]
+
+
+def tcu_rows() -> list[dict]:
+    rows = []
+    for code, label, dom, dtype, cer, ncm, conf, note in TCU:
+        rows.append(dict(zip(COLUMNS, (
+            "tcu", "TCU - Tribunal de Contas da União audit", code, label,
+            dom, dtype, cer, ncm, conf, note))))
+    return rows
+
+
+# ── Global — OECD AI Papers (Phase 5c) ───────────────────────────────────────
+# Methodological-frame source, NOT a cultural classification. The OECD AI
+# Capability Indicators (Paper No. 59) and the AI-openness framework (Paper No.
+# 60) are the methodological apparatus the Atana AI Exposure Index (Vol. 1) and
+# Vol. 2 triangulate against — most importantly the EXPLICIT *creativity*
+# capability domain, which is the entry-point for LATAM cultural occupations
+# via the CBO crosswalk. Mapped to the transversal FCS Intellectual property
+# domain (the AI-IP policy frontier), ★ flagged as a methodological frame.
+OECD_AI = [
+    ("ai-exposure-frame",
+     "OECD AI Papers No. 59 (AI exposure measure, May 2026) + No. 60 (Benefits of AI Openness, Jun 2026) — methodological frame",
+     "Intellectual property", "transversal", None, None, "approximate",
+     "★ Phase 5c (2026-06-04) — methodological-frame source, NOT a cultural "
+     "classification. 2 tables, 12 rows: `papers_headline` (2 × papers; "
+     "headline findings) and `ai_capability_domains` (10 × OECD capability "
+     "domains, with `creativity` ★-flagged as the direct Atana entry-point). "
+     "Triangulation lens for Atana Index Vol. 1's AI Exposure × Readiness "
+     "framework and for the AI-IP policy frontier (the EU AI Act / Suno-Udio "
+     "axis discussed in Análise 20). Mapped to the transversal Intellectual "
+     "property domain because the AI-cultural intersection the corpus tracks "
+     "is principally a copyright / licensing frontier; the *creativity* "
+     "capability separately touches every FCS cultural domain via "
+     "occupation-level CBO mappings. ⚠️ Cross-sector by design — AI exposure "
+     "is not a cultural-only cut. See docs/methodology/oecd_ai_papers.md."),
+]
+
+
+def oecd_ai_rows() -> list[dict]:
+    rows = []
+    for code, label, dom, dtype, cer, ncm, conf, note in OECD_AI:
+        rows.append(dict(zip(COLUMNS, (
+            "oecd_ai", "OECD AI Papers (methodological frame)", code, label,
+            dom, dtype, cer, ncm, conf, note))))
+    return rows
+
+
 # ── Global — CISAC Global Collections Report (Phase 5a) ──────────────────────
 # The cultural-IP *income* lens at global scale — annual royalty collections
 # reported by all 228 CISAC member societies in 111 countries. Deepens the IP
@@ -618,7 +757,8 @@ def build() -> pd.DataFrame:
     rows = (spine_rows() + inegi_rows() + dane_rows() + sinca_rows()
             + cr_bccr_rows() + unctad_goods_rows() + unctad_services_rows()
             + ibge_ncm_rows() + siic_rows() + bcb_rows() + inpi_rows()
-            + ecad_rows() + cisac_rows())
+            + ecad_rows() + cisac_rows() + ifpi_rows()
+            + luminate_rows() + tcu_rows() + oecd_ai_rows())
     return pd.DataFrame(rows, columns=COLUMNS)
 
 
@@ -627,13 +767,14 @@ def validate(df: pd.DataFrame) -> None:
     print("Validating...")
     expect = {"fcs2025": 14, "inegi": 10, "dane": 22, "sinca": 2,
               "cr_bccr": 4, "unctad": 15, "ibge_comex": 5, "ibge_siic": 10,
-              "bcb": 1, "inpi": 1, "ecad": 1, "cisac": 1}
+              "bcb": 1, "inpi": 1, "ecad": 1, "cisac": 1, "ifpi": 1,
+              "luminate": 1, "tcu": 1, "oecd_ai": 1}
     got = df["source_schema"].value_counts().to_dict()
     for schema, n in expect.items():
         assert got.get(schema) == n, (
             f"{schema}: expected {n} rows, got {got.get(schema)}")
     total = sum(expect.values())
-    assert len(df) == total == 86, f"total rows {len(df)} != 86"
+    assert len(df) == total == 90, f"total rows {len(df)} != 90"
     print(f"  ✓ {len(df)} rows — " + ", ".join(f"{k} {v}" for k, v in expect.items()))
 
     bad = set(df["mapping_confidence"]) - CONFIDENCE_VALUES
@@ -667,7 +808,7 @@ def validate(df: pd.DataFrame) -> None:
     # 'N/14 domains reached' progress meter for the transversal-blind-spot work.
     nat = df[df["source_schema"].isin(
         ["inegi", "dane", "sinca", "cr_bccr", "ibge_siic", "bcb", "inpi",
-         "ecad", "cisac"])]
+         "ecad", "cisac", "ifpi", "luminate", "tcu", "oecd_ai"])]
     reached = set()
     for d in nat["fcs2025_domain"].dropna():
         for part in str(d).replace(";", "/").split("/"):
@@ -676,7 +817,8 @@ def validate(df: pd.DataFrame) -> None:
                 reached.add(p)
     unreached = sorted(FCS_DOMAIN_LABELS - reached)
     print(f"  · {len(reached)}/14 FCS domains reached by a national CSC, "
-          f"IBGE SIIC, BCB, INPI, ECAD or CISAC row; not reached: {unreached or '—'}")
+          f"IBGE SIIC, BCB, INPI, ECAD, CISAC, IFPI, Luminate, TCU or OECD AI row; "
+          f"not reached: {unreached or '—'}")
     conf = df["mapping_confidence"].value_counts().to_dict()
     print(f"  · confidence mix: " + ", ".join(
         f"{k} {conf.get(k, 0)}" for k in
@@ -709,6 +851,10 @@ def write_meta(out_path: Path, df: pd.DataFrame) -> None:
         "docs/methodology/inpi_indicadores.md",
         "docs/methodology/ecad_relatorio_anual.md",
         "docs/methodology/cisac_gcr.md",
+        "docs/methodology/ifpi_gmr.md",
+        "docs/methodology/luminate_ye.md",
+        "docs/methodology/tcu_pnab.md",
+        "docs/methodology/oecd_ai_papers.md",
         "_atana_intel/phase3_schema_design.md",
         "_atana_intel/phase4_scoping.md",
     ]

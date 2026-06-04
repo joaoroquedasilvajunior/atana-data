@@ -1,0 +1,17 @@
+{
+  "table": "ye2025_top_markets_paid_share",
+  "schema": "luminate",
+  "description": "Luminate Year-End 2025 — the 4 countries that account for ~half of global premium ondemand audio streams (USA 31 %, Mexico, Brazil, Germany). Volume growth of premium streams: USA +65.5 bn, Mexico +50.9 bn, Brazil +38.6 bn YoY. The Note #08 extension cell — paid-stream concentration as the demand-side counterpart to CISAC/IFPI divergence.",
+  "source": "Luminate Year-End 2025 Music Industry Report; MBW coverage.",
+  "source_pages": [
+    "https://luminatedata.com/reports/yearend-music-industry-report-2025",
+    "https://www.musicbusinessworldwide.com/half-of-all-paid-music-streams-globally-derive-from-just-4-countries-and-other-highlights-from-luminates-latest-report"
+  ],
+  "fetch_date": "2026-06-04",
+  "etl_script": "etl/luminate__ye2025_top_markets_paid_share_to_parquet.py",
+  "etl_run_date": "2026-06-04",
+  "licence": "Luminate published figures; MBW press coverage.",
+  "grain": "one row per (year, country)",
+  "row_count": 4,
+  "notes": "Only USA share is independently reported; the 4-country concentration is the summary claim. Germany volume growth not reported by MBW (NULL preserved, not zero)."
+}

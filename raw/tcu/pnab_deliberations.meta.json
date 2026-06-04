@@ -1,0 +1,16 @@
+{
+  "table": "pnab_deliberations",
+  "schema": "tcu",
+  "description": "TCU PNAB audit deliberations — 4 actionable recommendations to MinC from Acórdão 1709/2025: formal strategic planning with theory of change, short/medium/long-term targets, multidimensional indicators (efficiency/effectiveness/outcome/equity), transparent baseline.",
+  "source": "TCU - Tribunal de Contas da União, Acórdão 1709/2025.",
+  "source_pages": [
+    "https://portal.tcu.gov.br/imprensa/noticias/politica-nacional-de-cultura-e-auditada-pelo-tribunal-de-contas-da-uniao"
+  ],
+  "fetch_date": "2026-06-04",
+  "etl_script": "etl/tcu__pnab_deliberations_to_parquet.py",
+  "etl_run_date": "2026-06-04",
+  "licence": "TCU published findings — public release.",
+  "grain": "one row per (audit_year, deliberation_item)",
+  "row_count": 4,
+  "notes": "These deliberations feed the TCU Relatório de Fiscalizações em Políticas Públicas (Comissão Mista de Orçamento), the next-cycle budget oversight document. Future TCU follow-ups on MinC compliance append by audit_year."
+}

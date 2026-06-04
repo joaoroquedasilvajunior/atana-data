@@ -1,0 +1,13 @@
+{
+  "table": "papers_headline",
+  "schema": "oecd_ai",
+  "description": "OECD AI Papers — headline framing of Papers No. 59 (AI Exposure Measure, May 2026, 9 capability domains incl. creativity) and No. 60 (Benefits of AI Openness, 03/06/2026, G7 discussion paper, 33-country growth correlation). Methodological insumo for Atana Index Vol. 2.",
+  "source": "OECD Artificial Intelligence Papers series (2026).",
+  "fetch_date": "2026-06-04",
+  "etl_script": "etl/oecd_ai__papers_headline_to_parquet.py",
+  "etl_run_date": "2026-06-04",
+  "licence": "OECD published findings — public release.",
+  "grain": "one row per paper",
+  "row_count": 2,
+  "notes": "v1 captures headline findings from publication landing pages and press materials. Full-PDF deeper extraction (e.g. the 33-country dataset behind No. 60's openness-growth correlation) is Tier 2."
+}

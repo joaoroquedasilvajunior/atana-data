@@ -363,17 +363,64 @@ ETLs: `etl/ifpi__gmr_2026_global_headline_to_parquet.py` · `etl/ifpi__gmr_2026_
 
 ---
 
+## `atana.luminate` — Luminate Year-End Music Industry Report 🔜 Built locally — pending sync
+
+Source: **Luminate Year-End 2025 Music Industry Report** (released January 2026), via the public landing page; figures verified against Music Business Worldwide coverage (22 Jan 2026). Phase 5c — the *consumer / catalog-supply* lens at global scale. **Fourth music-money lens** in the corpus after `atana.ecad` (BR author payout), `atana.cisac` (global CMO collection) and `atana.ifpi` (global label revenue) — each at a different stage of the value chain.
+
+| Table | Rows | Years | Description |
+|---|---:|---|---|
+| `ye2025_global_headline` | 1 | 2025 | 5.1 tn global ondemand audio streams (+9.6 %), ex-US 3.7 tn (+11.6 %), US 1.4 tn (+4.6 %); 253 mi tracks on streaming year-end; **47.6 % of catalog under 10 streams** (long-tail saturation) |
+| `ye2025_top_markets_paid_share` | 4 | 2025 | The 4-country half-of-global-paid cell — USA (31 % share), Mexico (+50.9 bn YoY), Brazil (+38.6 bn YoY), Germany |
+| `ye2025_us_genre_share` | 5 | 2025 | US-only genre split — R&B/Hip-Hop 25.5 % (−0.8 pp), Rock 15.3 % (flat), Pop 12.6 % (+0.3), **Latin 8.0 % (+0.6 pp = largest gainer)**, Christian/Gospel 3.5 % (+0.4) |
+| `ye2025_most_local_markets` | 4 | 2025 | Most-local repertoire markets — India 79.2 %, **Brazil 75.2 %**, Turkey 69.9 %, Nigeria 62.2 % |
+
+⚠️ **Tier 1 — public headlines only.** Per-track and per-artist Luminate Connect data are paywalled (Tier 2 deferred). Central caveats — `docs/methodology/luminate_ye.md` §6 — (1) "local repertoire" measured by *language*, not rights-ownership country (a Brazilian Portuguese song owned by Universal Music Brasil still counts as local — that's exactly the gap that drives the Authenticity Paradox); (2) Luminate excludes some platforms (e.g., specific China-based services) — residual offset for IFPI / CISAC cross-reads; (3) free vs paid stream split partial in public summary. **The cross-lens reading is the value:** Brazil 75.2 % local consumption × +38.6 bn paid-stream growth × IFPI LATAM +17.1 % × CISAC LATAM −0.6 % = the **Authenticity Paradox in stereo** — value flows to platform + label, not to creator + CMO. Mexico is the convergence-pole (IFPI México +13.3 % × INEGI Música y conciertos +14.9 % × Luminate +50.9 bn); Brazil is the divergence-pole.
+
+ETLs: `etl/luminate__ye2025_global_headline_to_parquet.py` · `etl/luminate__ye2025_top_markets_paid_share_to_parquet.py` · `etl/luminate__ye2025_us_genre_share_to_parquet.py` · `etl/luminate__ye2025_most_local_markets_to_parquet.py` · Methodology: `docs/methodology/luminate_ye.md`
+
+---
+
+## `atana.tcu` — TCU PNAB audit (governance & accountability lens) 🔜 Built locally — pending sync
+
+Source: **Tribunal de Contas da União**, *Acórdão 1709/2025 - Plenário* (sessão 30/07/2025, relator Augusto Nardes, processo TC 025.939/2024-6). Phase 5c — the corpus's **first governance/audit lens**. Pairs SALIC (what got funded) with TCU (what was held to account) over the same fomento system — the *Política Nacional Aldir Blanc* (PNAB), R$ 15 bn / R$ 3 bn-per-year.
+
+| Table | Rows | Years | Description |
+|---|---:|---|---|
+| `pnab_governance_assessment` | 4 | 2025 | 4 governance dimensions × PNAB × 2025, with TCU verbatim ratings and ordinal scoring 1-3. **Mean maturity 1.75 / 3**; no dimension reached "institucionalizada" (3); **Gestão de riscos = 1** (the lowest TCU rating, the flagged concern) |
+| `pnab_deliberations` | 4 | 2025 | The TCU's recommendations to **MinC** — formal strategic planning with theory of change, short/medium/long-term targets, multidimensional indicators (eficiência / eficácia / efetividade / **equidade**), transparent baseline |
+
+⚠️ TCU PNAB audits are **episodic, not annual** — cadence depends on TCU's *Relatório de Fiscalizações em Políticas Públicas* priority. Central caveats — `docs/methodology/tcu_pnab.md` §6 — (1) the **equidade** deliberation dimension is the direct policy entry-point for Atana's distributional decomposition (Análises 1-3, 12, 17-20); (2) the R$ 22 bn / ~29.7 k projects pending PC at MinC + Ancine is a SEPARATE TCU finding (likely a future `pnab_pendings` table in Tier 2); (3) verbatim recommendations transcribed; full Acórdão PDF available but not extracted in this v1; (4) maturity scale is TCU's own (per the Referencial de Controle de Políticas Públicas) — not internationally comparable without caveats. The FCS has no "cultural-policy governance" domain — fomento crosses all 7 cultural domains by design; this is why the crosswalk row is `approximate` with a bundle value.
+
+ETLs: `etl/tcu__pnab_governance_assessment_to_parquet.py` · `etl/tcu__pnab_deliberations_to_parquet.py` · Methodology: `docs/methodology/tcu_pnab.md`
+
+---
+
+## `atana.oecd_ai` — OECD AI Papers (methodological frame for the Atana AI Exposure Index) 🔜 Built locally — pending sync
+
+Source: **OECD Artificial Intelligence Papers** series (OECD-OPSI), **No. 59** *The OECD AI exposure measure: Mapping the OECD AI Capability Indicators to occupations* (May 2026, 58 pp) and **No. 60** *Benefits of AI Openness* (3 Jun 2026, 46 pp; G7 discussion paper at the French presidency's request). Phase 5c — methodological-frame source for the Atana AI Exposure Index (Vol. 1) and Vol. 2.
+
+| Table | Rows | Years | Description |
+|---|---:|---|---|
+| `papers_headline` | 2 | 2026 | One row per paper, with 3 headline findings each + `atana_relevance`. No. 59 builds the AI Capability Gap Index across OECD-member labour markets (incl. **creativity** as one of 10 domains); No. 60 finds open models ≈ 90 % of closed performance, positive significant correlation between open-source AI activity and growth across 33 countries, and that **AI openness shifts value capture downstream** — to SMEs, public institutions, and creators |
+| `ai_capability_domains` | 10 | — | The 10 OECD AI capability domains (language, social interaction, problem solving, **creativity ★**, metacognition, knowledge, learning/memory, vision, manipulation, robotic intelligence) with cultural-occupation entry-points |
+
+⚠️ **Methodological-frame source — NOT a cultural classification.** Central caveats — `docs/methodology/oecd_ai_papers.md` §6 — (1) the papers measure OECD labour markets directly; LATAM not in analytical scope; (2) the OECD's `creativity` domain is functional ("production of novel and valuable outputs") and is *not* the same construct as the FCS creative-domain spine — mapping is methodological-frame, not classification-equivalence; (3) Tier 1 captures headline findings; full-PDF datasets (capability score tables, 33-country growth-correlation panel) are Tier 2 / not scheduled; (4) AI capability scoring updates annually — schema rotates when No. 59's successor drops. **Cross-lens role:** with Stanford HAI's Foundation Model Transparency Index (58 → 40 between editions), forms a three-corner methodological frame for Atana Index Vol. 2 — **exposure × openness × transparency**.
+
+ETLs: `etl/oecd_ai__papers_headline_to_parquet.py` · `etl/oecd_ai__ai_capability_domains_to_parquet.py` · Methodology: `docs/methodology/oecd_ai_papers.md`
+
+---
+
 ## `atana.canonical` — Curated analytical snapshots
 
 Read-only views and tables that power published analyses. **Do not modify directly** — regenerate via build scripts and versioned datasets.
 
-### `canonical.domain_crosswalk` ✅ Live at 83 rows (`ce72a56`) · 🔜 rebuilt to 85 (Phase 4c.2–4c.3) — pending re-sync
+### `canonical.domain_crosswalk` ✅ Live at 83 rows (`ce72a56`) · 🔜 rebuilt to 90 (Phase 4c.2–4c.3 + Phase 5) — pending re-sync
 
-The Atana harmonisation crosswalk — maps every cultural-statistics classification in the corpus onto one common spine. **85 rows**, one per classification code (Phase 3 built 72; Phase 4 added 10 `ibge_siic` rows and the `bcb`, `inpi` and `ecad` rows).
+The Atana harmonisation crosswalk — maps every cultural-statistics classification in the corpus onto one common spine. **90 rows**, one per classification code (Phase 3 built 72; Phase 4 added 10 `ibge_siic` rows and the `bcb` / `inpi` / `ecad` rows; Phase 5 added `cisac` / `ifpi` and most recently `luminate` / `tcu` / `oecd_ai`).
 
 | Column | Type | Description |
 |---|---|---|
-| `source_schema` | VARCHAR | `fcs2025` / `inegi` / `dane` / `sinca` / `cr_bccr` / `unctad` / `ibge_comex` / `ibge_siic` / `bcb` / `inpi` / `ecad` |
+| `source_schema` | VARCHAR | `fcs2025` / `inegi` / `dane` / `sinca` / `cr_bccr` / `unctad` / `ibge_comex` / `ibge_siic` / `bcb` / `inpi` / `ecad` / `cisac` / `ifpi` / `luminate` / `tcu` / `oecd_ai` |
 | `source_system` | VARCHAR | Human-readable classification name |
 | `source_code` | VARCHAR | Code within that classification |
 | `source_label` | VARCHAR | Label within that classification |
@@ -384,7 +431,7 @@ The Atana harmonisation crosswalk — maps every cultural-statistics classificat
 | `mapping_confidence` | VARCHAR | `exact` / `good` / `approximate` / `no-equivalent` |
 | `notes` | VARCHAR | The definitional gap, stated explicitly (`★` flags a finding) |
 
-Row composition: `fcs2025` 14 (the spine — 7 cultural + 7 transversal) · `inegi` 10 · `dane` 22 · `sinca` 2 · `cr_bccr` 4 · `unctad` 15 · `ibge_comex` 5 · `ibge_siic` 10 · `bcb` 1 · `inpi` 1 · `ecad` 1. It turns the isolated national schemas into a cross-queryable layer — a query joins any national CSC, the IBGE SIIC, the BCB account, the INPI register or the ECAD series to the FCS spine through this one table. Definitional gaps are kept visible (`mapping_confidence`, `notes`), never silently reconciled. The build script's coverage meter now reaches **13/14** FCS domains (Phase 4 added *Cultural and creative goods manufacturing*, *Social participation* as a proxy, and *Intellectual property* via the BCB flow, INPI registration-stock and ECAD royalty rows; only *Intangible cultural heritage* remains, out of scope by decision). Stored un-timestamped — a living reference table, not a versioned snapshot.
+Row composition: `fcs2025` 14 (the spine — 7 cultural + 7 transversal) · `inegi` 10 · `dane` 22 · `sinca` 2 · `cr_bccr` 4 · `unctad` 15 · `ibge_comex` 5 · `ibge_siic` 10 · `bcb` 1 · `inpi` 1 · `ecad` 1 · `cisac` 1 · `ifpi` 1 · `luminate` 1 · `tcu` 1 · `oecd_ai` 1. It turns the isolated national schemas into a cross-queryable layer — a query joins any national CSC, the IBGE SIIC, the BCB account, the INPI register, the ECAD/CISAC/IFPI/Luminate music series, the TCU governance assessment or the OECD AI methodological frame to the FCS spine through this one table. Definitional gaps are kept visible (`mapping_confidence`, `notes`), never silently reconciled. The build script's coverage meter still reaches **13/14** FCS domains (only *Intangible cultural heritage* remains, out of scope by decision). Stored un-timestamped — a living reference table, not a versioned snapshot.
 
 ETL: `etl/canonical__build_domain_crosswalk.py` · Methodology: `docs/methodology/canonical_domain_crosswalk.md`
 
@@ -451,3 +498,4 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | 2026-06-01 | **Phase 5b — `atana.ifpi` schema added** (IFPI Global Music Report 2026 → public press release, Tier 1 ingest, 2025 data). **4 tables, 25 rows** — `gmr_2026_global_headline` (1), `gmr_2026_global_by_format` (5), `gmr_2026_global_by_region` (7), `gmr_2026_top_markets` (12 countries). USD billions/millions. The **recorded-music** lens; third music-money lens in the corpus after `atana.ecad` (BR author royalties) and `atana.cisac` (global author royalties). **Headline cross-source finding:** LATAM +17.1 % in IFPI vs −0.6 % in CISAC = the value-chain gap between recorded-music revenue (label side) and author-royalty collection (CMO side). Brazil + Mexico both in IFPI top-10. `canonical.domain_crosswalk` extended 86 → **87 rows** (1 new `ifpi` row → *Intellectual property*); coverage 13/14 unchanged. Tier 2 (Premium Edition: top-200 countries, 2015–2024 historical, format-by-region cross-tabs) deferred — paywalled. **Built locally — pending GitHub push + MotherDuck sync (João).** |
 | 2026-06-01 | **Phase 5b — `atana.inegi` extended with non-trade modules** from the CSCM 2024 boletín (Comunicado 144/25, INEGI, 19 Nov 2025). 4 new tables × 30 new rows: `cscm_2024_pib_headline` (1), `cscm_2024_pib_by_origin` (3), `cscm_2024_pib_by_area` (10), `cscm_2024_pib_growth_series` (16). First LATAM non-Brazilian production-account + employment cells in the corpus. **Headline findings:** Mexican cultural PIB 2.8 % of total economy (MXN 865,682 mi), real growth +1.2 %; the **artesanías paradox** (largest area + largest decliner); **productivity-up / headcount-down** in 2024 (PIB +1.2 % / empleo −0.2 %, first such year); Música y conciertos +14.9 % (fastest grower) — cross-confirms IFPI Mexico +13.3 % (#10) and CISAC Mexico 65.1 % digital share. Crosswalk inherits the 10 existing `inegi` áreas rows — no new rows; coverage unchanged. **Built locally — pending GitHub push + MotherDuck sync (João).** |
 | 2026-06-04 | **RAIS 2024 + 2025 ingested** ✅ Live on GitHub `48996a7` + MotherDuck. `atana.rais.*` extended **2014–2023 → 2014–2025** (vínculos + panel) and 2014–2024 for establecimientos. 6 new year-partitions across 3 tables, **~3.2 M new vínculos rows** (2024: 1.57 M, 2025: 1.62 M). IPCA cache extended to 12 years (2014–2025); deflate script's `dataFinal` updated. ⚠️ **2025 establishments came back at 0 rows** — Base dos Dados' 2025 establishments partition has `cnae_2_subclasse` NULL across all 13.5 M rows (verified 2026-06-04 via direct BdD probe); the 2025 vínculos table is unaffected (its own per-relationship CNAE column is populated). Re-pull 2025 establishments via `--year 2025 --refresh` when BdD fills the column. **Headline finding from the new data:** real cultural wages dropped from R$ 3,549 (2022) → R$ 3,002 (2025) in 2024 BRL — **−15.4 % real over three years** even while vínculos grew +12.3 % — extends Análise 11 by two years and confirms a continued real-terms decline. |
+| 2026-06-04 | **Phase 5c — three new schemas added** acting on the W23 Atana Monday Briefing's four recommendations (option D). (1) **`atana.luminate`** (4 tables, 14 rows × 2025) — fourth music-money lens closing the value-chain frame, headline figures from the Luminate Year-End 2025 Music Industry Report verified against MBW coverage; key cell is Brazil 75.2 % local repertoire × +38.6 bn paid-stream growth, the **Authenticity Paradox in stereo** when cross-read with IFPI LATAM +17.1 % and CISAC LATAM −0.6 %. (2) **`atana.tcu`** (2 tables, 8 rows × 2025) — first governance/audit lens in the corpus, transcribing TCU Acórdão 1709/2025 on PNAB; mean governance maturity 1.75 / 3, **Gestão de riscos = 1** (TCU's flagged concern), and the **equidade** deliberation aligns directly with Atana's distributional decomposition. (3) **`atana.oecd_ai`** (2 tables, 12 rows) — methodological-frame source for the Atana AI Exposure Index (Paper No. 59 May 2026 with `creativity` as one of 10 explicit AI capability domains; Paper No. 60 Jun 2026 on AI openness shifting value capture downstream); with HAI's Foundation Model Transparency Index gives Vol. 2 a three-corner frame (exposure × openness × transparency). `canonical.domain_crosswalk` extended **87 → 90 rows** (3 new rows, one per new schema), all ★-flagged as approximate/good methodological-or-frame mappings; coverage 13/14 unchanged. Three methodology docs written. **Built locally — pending GitHub push + MotherDuck sync (João).** |
