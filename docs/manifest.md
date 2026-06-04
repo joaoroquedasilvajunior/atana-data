@@ -2,13 +2,13 @@
 
 Canonical catalog of every table available in this repository and in `md:atana`. Keep this file synchronized when adding or modifying datasets.
 
-**Last updated:** 2026-05-29
+**Last updated:** 2026-06-04
 
 ---
 
 ## Conventions
 
-- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `rais`, `inegi`, `dane`, `sinca`, `cr_bccr`, `ibge_estruturais`, `ibge_cempre`, `ibge_tic`, `ibge_turismo`, `bcb`, `inpi`, `ecad`, `cisac`, `canonical`
+- **Schemas** are organized by source: `unctad`, `ibge_pnadc`, `ibge_comex`, `salic`, `lexml`, `rais`, `inegi`, `dane`, `sinca`, `cr_bccr`, `ibge_estruturais`, `ibge_cempre`, `ibge_tic`, `ibge_turismo`, `bcb`, `inpi`, `ecad`, `cisac`, `ifpi`, `canonical`
 - **Table names** are snake_case, prefixed by the table number when applicable: `tab_6_10`, `tab_10_1`
 - **Curated tables** live in the `canonical` schema and represent ready-to-consume snapshots used in published analyses
 - **Currency**: each table documents its native currency (R$ corrente, R$ FOB, US$ corrente, etc.) — never mixed in one column
@@ -154,7 +154,7 @@ ETL: `etl/lexml__jsonl_to_parquet.py`
 
 ---
 
-## `atana.rais` — RAIS formal cultural employment ✅ Live (GitHub `8d874f5`)
+## `atana.rais` — RAIS formal cultural employment ✅ Live (GitHub `8d874f5`, extended to 2014–2025 in `48996a7`)
 
 Source: RAIS/MTE via Base dos Dados (`br_me_rais`, pulled through BigQuery). Sprint 1 of the RAIS phase — the administrative-register view of formal cultural employment, complementary to the survey-based `ibge_pnadc`. Base dos Dados de-identifies RAIS (no CNPJ, no PIS), so this is a three-table labour-market characterisation, not a firm- or worker-level panel.
 
@@ -164,7 +164,7 @@ Source: RAIS/MTE via Base dos Dados (`br_me_rais`, pulled through BigQuery). Spr
 | `estabelecimentos_culturais` | ~2.4 M | One row per cultural establishment (cultural CNAE), with active-link counts |
 | `panel_cnae_municipio_ano` | ~120 k | Derived aggregate — Cut A vínculos at `cnae_2_classe × município × ano` grain (median pay, hours, demographic shares) |
 
-**Coverage:** 2014–2023, one `year=YYYY` Parquet partition per table. **Convention:** active links on 31 Dec; the monetary columns of `vinculos_culturais` and `panel_cnae_municipio_ano` carry `_ipca` deflated twins in base-2024 BRL (IPCA from BCB SGS series 433, cached in `raw/rais/_reference/`). **Cuts:** A = cultural-CNAE employer (33 CNAE classes), B = cultural-CBO-family occupation (62 CBO families); A∪B = formal cultural workforce, A∩B = specialised core.
+**Coverage:** 2014–2025 (vínculos + panel) / 2014–2024 (establecimientos), one `year=YYYY` Parquet partition per table. ⚠️ The 2025 partition of `estabelecimentos_culturais` is present but **0 rows** — Base dos Dados' 2025 establishments partition has `cnae_2_subclasse` NULL across all 13.5 M rows (verified 2026-06-04), so the cultural-CNAE filter returns nothing. Re-pull with `--year 2025 --refresh` when BdD fills the column. **Convention:** active links on 31 Dec; the monetary columns of `vinculos_culturais` and `panel_cnae_municipio_ano` carry `_ipca` deflated twins in base-2024 BRL (IPCA from BCB SGS series 433, cached in `raw/rais/_reference/`). **Cuts:** A = cultural-CNAE employer (33 CNAE classes), B = cultural-CBO-family occupation (62 CBO families); A∪B = formal cultural workforce, A∩B = specialised core.
 
 ⚠️ **De-identified** — no CNPJ/PIS; firm- and worker-level linkage (Phase 2b) was cancelled because the MTE FTP is also de-identified. The BigQuery pull needs a billed GCP project (`atana-research`) and credentials — it is a local/credentialed step, never a sandbox one (see `etl/RAIS_2024_INGEST_RUNBOOK.md`).
 
@@ -172,20 +172,25 @@ ETL: `etl/rais__bigquery_to_parquet.py` + `rais__deflate_ipca.py` (both `--stagi
 
 ---
 
-## `atana.inegi` — INEGI Cuenta Satélite de la Cultura de México ✅ Live (GitHub + MotherDuck)
+## `atana.inegi` — INEGI Cuenta Satélite de la Cultura de México ✅ Live (trade); 🔜 non-trade built locally — pending sync
 
-Source: INEGI *Cuenta Satélite de la Cultura de México* (CSCM), base year 2018. Phase 3a of the LATAM expansion — the first non-Brazilian national source in the corpus.
+Source: INEGI *Cuenta Satélite de la Cultura de México* (CSCM), base year 2018. Phase 3a (trade module) + **Phase 5b (non-trade modules, 2026-06-01)** — the first LATAM non-Brazilian production-account + employment view the corpus carries, anchored on the just-released CSCM 2024 boletín (Comunicado 144/25, 19 Nov 2025).
 
-| Table | Rows | Description |
-|---|---:|---|
-| `csc_comercio` | 5,984 | Cultural imports/exports from the CSCM Cuadros de Oferta y Utilización, by functional area × year × flow × price basis, 2008–2024, MXN million (current + constant 2018) |
-| `fx_mxn_usd_annual` | 17 | Reference — annual-average MXN/USD exchange rate (World Bank PA.NUS.FCRF), used to derive the USD column of `csc_comercio` |
+| Table | Rows | Phase | Description |
+|---|---:|---|---|
+| `csc_comercio` | 5,984 | 3a | Cultural imports/exports from the CSCM Cuadros de Oferta y Utilización, by functional area × year × flow × price basis, 2008–2024, MXN million (current + constant 2018) |
+| `fx_mxn_usd_annual` | 17 | 3a | Reference — annual-average MXN/USD exchange rate (World Bank PA.NUS.FCRF), used to derive the USD column of `csc_comercio` |
+| `cscm_2024_pib_headline` | 1 | 5b | Cultural PIB MXN 865,682 mi (2.8 % of total economy); empleo 1,430,528 puestos (3.5 %); real growth 2024 +1.2 % vs total +1.3 %; empleo YoY −0.2 % |
+| `cscm_2024_pib_by_origin` | 3 | 5b | PIB by institutional origin: actividades de mercado 2.21 % / hogares 0.38 % / gestión pública 0.17 % |
+| `cscm_2024_pib_by_area` | 10 | 5b | Cultural PIB by clasificación funcional — sums to 100 %, growth for 5 named (top-3 + bottom-2) |
+| `cscm_2024_pib_growth_series` | 16 | 5b | Annual real growth 2009–2024, cultural sector vs total economy (Gráfica 1) |
 
 Schema highlights:
-- `csc_comercio`: grain is `year × area_level × area_general × area_especifica × flow × price_basis`. `area_level` ∈ {`total`, `area_general` (10), `area_especifica` (77)}. `flow` ∈ {`importacion`, `exportacion`}. `price_basis` ∈ {`corriente`, `constante_2018`}. `value_usd_million` is ETL-derived (current-price rows only).
-- ⚠️ The CSCM has **no balance-of-payments module**; `csc_comercio` is the import/export columns of the supply-use tables — no bilateral partner detail. Never mix with `unctad` or `ibge_comex` without explicit reconciliation (different methodologies).
+- `csc_comercio`: grain `year × area_level × area_general × area_especifica × flow × price_basis`. `area_level` ∈ {`total`, `area_general` (10), `area_especifica` (77)}. `flow` ∈ {`importacion`, `exportacion`}. `price_basis` ∈ {`corriente`, `constante_2018`}. `value_usd_million` is ETL-derived (current-price rows only).
+- ⚠️ The CSCM has **no balance-of-payments module**; `csc_comercio` is the import/export columns of the supply-use tables — no bilateral partner detail. Never mix with `unctad` or `ibge_comex` without explicit reconciliation.
+- **Phase 5b caveats** (`docs/methodology/inegi_csc.md` §10): (1) **the artesanías paradox** — Artesanías is the largest cultural PIB area (18.4 %) AND the largest 2024 decliner (−3.8 %); already trade-invisible in `csc_comercio`. (2) **productivity-up / headcount-down 2024** — cultural PIB +1.2 % while empleo −0.2 %, the first CSCM year of this pattern. (3) **three independent music-Mexico signals** — INEGI Música +14.9 %, IFPI Mexico +13.3 % (#10), CISAC Mexico 65.1 % digital share. (4) "Hogares" 0.38 % of PIB ≈ 13.8 % of cultural PIB is **household cultural activity the IBGE SIIC does not measure** — methodological gap on any direct Mexico vs Brazil comparison.
 
-ETL: `etl/inegi__csc_xlsx_to_parquet.py` · Methodology: `docs/methodology/inegi_csc.md`
+ETLs: `etl/inegi__csc_xlsx_to_parquet.py` (3a) · `etl/inegi__cscm_2024_pib_headline_to_parquet.py` (5b) · `etl/inegi__cscm_2024_pib_by_origin_to_parquet.py` (5b) · `etl/inegi__cscm_2024_pib_by_area_to_parquet.py` (5b) · `etl/inegi__cscm_2024_pib_growth_series_to_parquet.py` (5b) · Methodology: `docs/methodology/inegi_csc.md`
 
 ---
 
@@ -341,6 +346,23 @@ ETLs: `etl/cisac__gcr_2025_global_by_stream_to_parquet.py` · `etl/cisac__gcr_20
 
 ---
 
+## `atana.ifpi` — IFPI Global Music Report (global recorded-music revenue) 🔜 Built locally — pending sync
+
+Source: **IFPI Global Music Report 2026** (covering 2025 recorded-music revenue; press release 18 March 2026). Phase 5b of the Atana Data expansion — the *recorded-music* (record-label / master-recording) lens, structurally distinct from the *author-royalty* (CMO) lens carried by `atana.ecad` (Brazil) and `atana.cisac` (global). Three music-money lenses now in the corpus.
+
+| Table | Rows | Years | Description |
+|---|---:|---|---|
+| `gmr_2026_global_headline` | 1 | 2025 | Global recorded-music revenue US$ 31.7 bn (+6.4 %), 11th consecutive year of growth, 837 mi paid streaming users |
+| `gmr_2026_global_by_format` | 5 | 2025 | Streaming (total) 69.6 %, Paid sub-stream (subset) 52.4 % / +8.8 %, Physical +8.0 %, Performance rights US$ 2.9 bn / +0.3 %, Total |
+| `gmr_2026_global_by_region` | 7 | 2025 | USA & Canada +3.5 % / Europe +5.6 % / Asia +10.9 % / **LATAM +17.1 %** (fastest, streaming 88.1 %) / Australasia +1.5 % / MENA +15.2 % / Sub-Saharan Africa +15.2 % |
+| `gmr_2026_top_markets` | 12 | 2025 | 12 countries named in press release; 7 with global rank — USA #1, Japan #2, China #4, **Brazil #8 (+14.1 %)**, Canada #9, **Mexico #10 (+13.3 %)**, Australia #13 |
+
+⚠️ **Tier 1 public-press-release ingest only.** The GMR 2026 Premium Edition holds the full top-200 country list, 2015-onwards historical series, and format-by-region cross-tabs — paywalled, Tier 2 deferred. Caveats — `docs/methodology/ifpi_gmr.md` §3 — (1) **the IFPI ↔ CISAC LATAM divergence**: IFPI 2025 LATAM +17.1 % recorded-music vs CISAC 2025 LATAM −0.6 % author-royalties (a +17.7 pp gap on the same region/period = recorded-music label revenue vs CMO author royalties = different value-chain layers); (2) named-format coverage ≈ 79 % of total (Streaming 69.6 % + Performance rights 9.1 %); the ~21 % residual is Physical + downloads/sync, not separately stated in the press release; (3) USD figures restated annually by IFPI on revised FX, so historical values can change retrospectively; (4) the top-markets table is the press-release SUBSET, not the GMR's full ranking. Brazil + Mexico both top-10 is the LATAM corpus headline.
+
+ETLs: `etl/ifpi__gmr_2026_global_headline_to_parquet.py` · `etl/ifpi__gmr_2026_global_by_format_to_parquet.py` · `etl/ifpi__gmr_2026_global_by_region_to_parquet.py` · `etl/ifpi__gmr_2026_top_markets_to_parquet.py` · Methodology: `docs/methodology/ifpi_gmr.md`
+
+---
+
 ## `atana.canonical` — Curated analytical snapshots
 
 Read-only views and tables that power published analyses. **Do not modify directly** — regenerate via build scripts and versioned datasets.
@@ -426,3 +448,6 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | 2026-05-28 | `canonical.domain_crosswalk` refreshed — descriptive note on the `ecad` row updated to reflect the v2 4-table scope; `derived_from` meta repoints to `ecad_relatorio_anual.md`. Row count unchanged (still 85; coverage 13/14). **Built locally — pending re-sync.** |
 | 2026-05-29 | `atana.ecad` **v3 — correction + multi-year** from a cross-source of the ECAD Relatórios 2020/2021/2022/2024 + Transparência 2023. (a) **Corrected a v2 arrecadação year-scramble** (2018–2021 were permuted by markitdown; R$ 905.8 mi pandemic low was mis-yeared 2018 → 2020) — verified against contemporary reports; 2018 dropped; `arrecadacao_distribuicao` now 7 rows (2019–2025) with digital share + custo + titulares backfilled. (b) **`arrecadacao_por_segmento` extended 6 → 30 rows** (2020–2025 ex-2023). (c) **`distribuicao_por_titular_tipo` extended 10 → 20 rows** (back to 2016). `distribuicao_por_segmento` unchanged (13). atana.ecad total 37 → **70 rows**. Distribuição 2021/2022 flagged as likely-scrambled (not reordered). Crosswalk `ecad` note refreshed (still 85 rows). **Built locally — pending GitHub push + MotherDuck re-sync (João).** |
 | 2026-05-29 | **Phase 5a — `atana.cisac` schema added** (CISAC Global Collections Report 2025 → public landing page, Tier 1 ingest). **4 tables, 25 rows** — `gcr_2025_global_by_stream` (4 rows × 2024), `gcr_2025_global_by_repertoire` (5), `gcr_2025_global_by_region` (6), `gcr_2025_leading_smaller_markets_digital_share` (10). EUR millions, 2024 reference year. The first global creator-royalty frame the corpus carries; LATAM €786 mi (−0.6 %) is the comparable-aggregate row that ties `atana.ecad` (Brazil) and `canonical.cmo_directory_alcam` (LATAM CMO directory) into a global structure. `canonical.domain_crosswalk` extended 85 → **86 rows** (1 new `cisac` row → *Intellectual property*); coverage 13/14 unchanged. Tier 2 (full PDF, country-level + 2015–2024 historical series) deferred — PDF auth-walled. **Built locally — pending GitHub push + MotherDuck sync (João).** |
+| 2026-06-01 | **Phase 5b — `atana.ifpi` schema added** (IFPI Global Music Report 2026 → public press release, Tier 1 ingest, 2025 data). **4 tables, 25 rows** — `gmr_2026_global_headline` (1), `gmr_2026_global_by_format` (5), `gmr_2026_global_by_region` (7), `gmr_2026_top_markets` (12 countries). USD billions/millions. The **recorded-music** lens; third music-money lens in the corpus after `atana.ecad` (BR author royalties) and `atana.cisac` (global author royalties). **Headline cross-source finding:** LATAM +17.1 % in IFPI vs −0.6 % in CISAC = the value-chain gap between recorded-music revenue (label side) and author-royalty collection (CMO side). Brazil + Mexico both in IFPI top-10. `canonical.domain_crosswalk` extended 86 → **87 rows** (1 new `ifpi` row → *Intellectual property*); coverage 13/14 unchanged. Tier 2 (Premium Edition: top-200 countries, 2015–2024 historical, format-by-region cross-tabs) deferred — paywalled. **Built locally — pending GitHub push + MotherDuck sync (João).** |
+| 2026-06-01 | **Phase 5b — `atana.inegi` extended with non-trade modules** from the CSCM 2024 boletín (Comunicado 144/25, INEGI, 19 Nov 2025). 4 new tables × 30 new rows: `cscm_2024_pib_headline` (1), `cscm_2024_pib_by_origin` (3), `cscm_2024_pib_by_area` (10), `cscm_2024_pib_growth_series` (16). First LATAM non-Brazilian production-account + employment cells in the corpus. **Headline findings:** Mexican cultural PIB 2.8 % of total economy (MXN 865,682 mi), real growth +1.2 %; the **artesanías paradox** (largest area + largest decliner); **productivity-up / headcount-down** in 2024 (PIB +1.2 % / empleo −0.2 %, first such year); Música y conciertos +14.9 % (fastest grower) — cross-confirms IFPI Mexico +13.3 % (#10) and CISAC Mexico 65.1 % digital share. Crosswalk inherits the 10 existing `inegi` áreas rows — no new rows; coverage unchanged. **Built locally — pending GitHub push + MotherDuck sync (João).** |
+| 2026-06-04 | **RAIS 2024 + 2025 ingested** ✅ Live on GitHub `48996a7` + MotherDuck. `atana.rais.*` extended **2014–2023 → 2014–2025** (vínculos + panel) and 2014–2024 for establecimientos. 6 new year-partitions across 3 tables, **~3.2 M new vínculos rows** (2024: 1.57 M, 2025: 1.62 M). IPCA cache extended to 12 years (2014–2025); deflate script's `dataFinal` updated. ⚠️ **2025 establishments came back at 0 rows** — Base dos Dados' 2025 establishments partition has `cnae_2_subclasse` NULL across all 13.5 M rows (verified 2026-06-04 via direct BdD probe); the 2025 vínculos table is unaffected (its own per-relationship CNAE column is populated). Re-pull 2025 establishments via `--year 2025 --refresh` when BdD fills the column. **Headline finding from the new data:** real cultural wages dropped from R$ 3,549 (2022) → R$ 3,002 (2025) in 2024 BRL — **−15.4 % real over three years** even while vínculos grew +12.3 % — extends Análise 11 by two years and confirms a continued real-terms decline. |
