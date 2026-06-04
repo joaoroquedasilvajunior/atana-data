@@ -1,16 +1,20 @@
 """rais__deflate_ipca.py — post-ETL pass: add IPCA-deflated remuneração.
 
-Run this AFTER `rais__bigquery_to_parquet.py` has completed all years. It:
+Run this AFTER `rais__bigquery_to_parquet.py` has written the years to
+deflate. It:
 
-  1. Pulls annual IPCA index from `basedosdados.br_ipea_indices.ipca`
-  2. Computes the deflator factor against a base year (default 2024)
-  3. For each year's parquet of `vinculos_em_*` and `cnpj_cultural_employer_panel`,
-     adds columns:
-       - `valor_remuneracao_media_ipca`   (base-year BRL)
-       - `valor_remuneracao_dezembro_ipca` (base-year BRL)
-       - `salario_mediano_total_ipca`     (panel only)
-       - `salario_mediano_cultural_ipca`  (panel only)
-  4. Re-syncs to MotherDuck if MOTHERDUCK_TOKEN is set.
+  1. Pulls the annual IPCA index from the BCB SGS API (series 433),
+     compounded to a cumulative index — cached locally after the first run.
+  2. Computes the deflator factor against a base year (default 2024).
+  3. For each year's parquet of the Sprint 1 tables `vinculos_culturais`
+     and `panel_cnae_municipio_ano`, adds IPCA-deflated columns:
+       - `valor_remuneracao_media_ipca`     (vínculos, base-year BRL)
+       - `valor_remuneracao_dezembro_ipca`  (vínculos, base-year BRL)
+       - `valor_salario_contratual_ipca`    (vínculos, base-year BRL)
+       - `salario_mediano_ipca`             (panel, base-year BRL)
+       - `salario_dezembro_mediano_ipca`    (panel, base-year BRL)
+  4. Re-syncs to MotherDuck if MOTHERDUCK_TOKEN is set — skipped under
+     `--staging` or when `ATANA_ETL_SKIP_PUSH` is set.
 
 The deflation is separated from the main ETL so the base-year choice and
 the deflator semantics (annual mean vs December-only) can be revisited
@@ -22,13 +26,17 @@ deflator basis = annual mean IPCA accumulated.
 USAGE
 -----
   python rais__deflate_ipca.py
-  python rais__deflate_ipca.py --base 2023      # different base year
-  python rais__deflate_ipca.py --year 2023      # just one year
+  python rais__deflate_ipca.py --base 2023               # different base year
+  python rais__deflate_ipca.py --year 2024               # just one year
+  python rais__deflate_ipca.py --year 2024 --staging     # deflate raw/rais/_staging/, never push
 
 REQUIRED ENV
 ------------
-  GCP_PROJECT_ID
-  MOTHERDUCK_TOKEN (optional)
+  GCP_PROJECT_ID      (currently unused by the deflation step — the IPCA index
+                       comes from the BCB SGS API, not BigQuery — but still
+                       checked at startup, kept for parity with the main ETL)
+  MOTHERDUCK_TOKEN    (optional)
+  ATANA_ETL_SKIP_PUSH (optional — skips the MotherDuck re-sync; --staging implies it)
 """
 
 import argparse
@@ -71,7 +79,7 @@ def pull_ipca_annual(bid: str) -> pd.DataFrame:
     import json
     url = (
         "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados"
-        "?formato=json&dataInicial=01/01/2014&dataFinal=31/12/2024"
+        "?formato=json&dataInicial=01/01/2014&dataFinal=31/12/2025"
     )
     log(f"pulling IPCA monthly from BCB SGS series 433...")
     with urllib.request.urlopen(url, timeout=30) as resp:
@@ -121,12 +129,19 @@ def deflate_parquet(path: Path, year: int, deflator: float, cols_to_deflate: lis
     log(f"  deflated {path.relative_to(REPO_ROOT)} ({len(df):,} rows, factor={deflator:.4f})")
 
 
-def sync_motherduck_year(table: str, year: int, df: pd.DataFrame):
+def sync_motherduck_year(table: str, year: int, df: pd.DataFrame,
+                         skip_push: bool = False):
     """Sync per-year data to MotherDuck with schema-drift auto-recovery.
 
     The deflator adds _ipca columns that don't exist in the cloud table on
     first run; detect the mismatch and recreate the cloud table.
+
+    Skipped entirely when skip_push is set — under `--staging` or when
+    `ATANA_ETL_SKIP_PUSH` is in the environment.
     """
+    if skip_push:
+        log(f"  skip-push active (--staging or ATANA_ETL_SKIP_PUSH) — not syncing atana.rais.{table}")
+        return
     token = os.environ.get("MOTHERDUCK_TOKEN")
     if not token:
         return
@@ -150,9 +165,14 @@ def sync_motherduck_year(table: str, year: int, df: pd.DataFrame):
 
 
 def main():
+    global OUT_BASE
+
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", type=int, default=2024, help="base year for deflator (default 2024)")
     ap.add_argument("--year", type=int, help="just deflate one year")
+    ap.add_argument("--staging", action="store_true",
+                    help="read/write Parquet under raw/rais/_staging/ instead of "
+                         "the live partitions, and never sync MotherDuck")
     args = ap.parse_args()
 
     bid = os.environ.get("GCP_PROJECT_ID")
@@ -162,6 +182,15 @@ def main():
     log("=" * 70)
     log(f"IPCA deflation — base year {args.base}")
     log("=" * 70)
+
+    # --staging redirects the read/write target under raw/rais/_staging/ and
+    # forces skip-push; ATANA_ETL_SKIP_PUSH alone forces skip-push only.
+    skip_push = args.staging or bool(os.environ.get("ATANA_ETL_SKIP_PUSH"))
+    if args.staging:
+        OUT_BASE = REPO_ROOT / "raw" / "rais" / "_staging"
+        log(f"--staging: deflating Parquet under {OUT_BASE.relative_to(REPO_ROOT)}/  (MotherDuck sync disabled)")
+    elif skip_push:
+        log("ATANA_ETL_SKIP_PUSH set — MotherDuck sync disabled")
 
     ipca = pull_ipca_annual(bid)
     deflator_map = compute_deflator(ipca, args.base)
@@ -192,7 +221,7 @@ def main():
                 continue
             deflate_parquet(path, y, d, cols)
             df = pd.read_parquet(path)
-            sync_motherduck_year(table, y, df)
+            sync_motherduck_year(table, y, df, skip_push=skip_push)
 
     log("\nIPCA deflation complete.")
 
