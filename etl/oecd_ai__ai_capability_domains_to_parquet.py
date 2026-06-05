@@ -52,13 +52,9 @@ ROWS = [
      "Reflecting on, evaluating, and revising one's own reasoning.",
      "Cultural critique, research, archival evaluation, editorial judgment.",
      SOURCE_PAGE),
-    (59, "knowledge",
-     "Storage and recall of factual or procedural information.",
-     "Archives, libraries, museums; literacy and traditional-knowledge work.",
-     SOURCE_PAGE),
-    (59, "learning/memory",
-     "Acquiring and retaining new information from experience.",
-     "Teaching, training, cultural transmission across generations.",
+    (59, "knowledge, learning and memory",
+     "Storage and recall of factual or procedural information; acquiring and retaining new information from experience. OECD No. 59 keeps these as a SINGLE capability domain.",
+     "Archives, libraries, museums; literacy and traditional-knowledge work; teaching, training and cultural transmission across generations.",
      SOURCE_PAGE),
     (59, "vision",
      "Perception and interpretation of visual scenes.",
@@ -83,9 +79,9 @@ def build():
 
 def validate(df):
     print("Validating...")
-    assert len(df) == 10, f"expected 10 domains (OECD lists 10 incl. robotic), got {len(df)}"
+    assert len(df) == 9, f"expected 9 domains (OECD No. 59 lists 9), got {len(df)}"
     assert "creativity" in df["domain"].values
-    print(f"  ✓ 10 capability domains; creativity present (Atana direct entry-point)")
+    print(f"  ✓ 9 capability domains; creativity present (Atana direct entry-point)")
     starred = df[df["atana_relevance"].str.startswith("★", na=False)]
     assert len(starred) == 1 and starred["domain"].iloc[0] == "creativity"
     print(f"  ✓ exactly 1 ★ row (creativity)")
@@ -104,12 +100,16 @@ def write_parquet(df):
 def write_meta(out_path, df):
     meta = {
         "table": out_path.stem, "schema": "oecd_ai",
-        "description": "OECD AI Paper No. 59 — the 10 AI capability domains "
+        "description": "OECD AI Paper No. 59 — the 9 AI capability domains "
                        "mapped against occupational requirements (language, "
                        "social interaction, problem solving, creativity, "
-                       "metacognition, knowledge, learning/memory, vision, "
-                       "manipulation, robotic intelligence). Creativity is "
-                       "the direct entry-point for Atana cultural analysis.",
+                       "metacognition/critical thinking, knowledge/learning/memory, "
+                       "vision, manipulation, robotic intelligence). Creativity is "
+                       "the direct entry-point for Atana cultural analysis. "
+                       "Caveat: OECD's creativity scale level 5 (exceptional/"
+                       "world-class) is rarely required of whole occupations "
+                       "and compresses the active range — small measured "
+                       "creativity gap is partly artifactual.",
         "source": "OECD Artificial Intelligence Papers No. 59 (May 2026).",
         "source_pages": [SOURCE_PAGE], "fetch_date": "2026-06-04",
         "etl_script": "etl/oecd_ai__ai_capability_domains_to_parquet.py",

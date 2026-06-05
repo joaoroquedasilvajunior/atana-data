@@ -8,7 +8,7 @@ The OECD's *Artificial Intelligence Papers* series (OECD-OPSI) publishes short, 
 
 The Atana AI Exposure Index (introduced in *Atana_Index_Vol1.html* §3) is a country-level composite. Its credibility depends on being readable against external methodologies. Two May-June 2026 OECD papers give it exactly that backbone:
 
-- **Paper No. 59** — *The OECD AI exposure measure: Mapping the OECD AI Capability Indicators to occupations* (May 2026, 58 pp). Defines 10 AI capability domains, scores AI's current capability against occupational requirements, and ranks OECD-member labour markets on an *AI Capability Gap Index*. Critically for Atana, **creativity** is one of the 10 domains — explicitly, not as residual.
+- **Paper No. 59** — *The OECD AI exposure measure: Mapping the OECD AI Capability Indicators to occupations* (May 2026, 58 pp). Defines **9 AI capability domains** (Language, Social interaction, Problem solving, Creativity, Metacognition/critical thinking, Knowledge/learning/memory, Vision, Manipulation, Robotic intelligence), scores AI's current capability against occupational requirements, and ranks OECD-member labour markets on an *AI Capability Gap Index*. Critically for Atana, **creativity** is one of the 9 domains — explicitly, not as residual. Caveat from chapter 6 of the paper: level 5 of the creativity scale captures exceptional/world-class creativity rarely required of whole occupations, which compresses the active range — the small measured creativity gap (0.1 average across major groups) is partly artifactual. Cultural-trade value disproportionately driven by level-5 creativity is precisely what No. 59 acknowledges it cannot fully capture — the methodological space Atana operates in.
 
 - **Paper No. 60** — *Benefits of AI Openness* (3 Jun 2026, 46 pp; G7 discussion paper at the French presidency's request). Three structural findings: (i) open models reach ~90 % of closed performance at substantially lower cost, (ii) open-source AI activity has a positive significant correlation with growth across 33 countries, (iii) AI openness shifts value capture downstream — to SMEs, public institutions, and creators.
 
@@ -22,7 +22,7 @@ One row per paper. Columns: `paper_no`, `title`, `date_published`, `pages`, `hea
 
 The three headline findings per paper are publicly cited from the OECD landing page and the press write-ups; the `atana_relevance` column situates each paper in the Atana corpus (Vol. 1 framework, Vol. 2 triangulation lens).
 
-### `ai_capability_domains` (10 rows × Paper No. 59)
+### `ai_capability_domains` (9 rows × Paper No. 59)
 
 One row per capability domain, with the OECD's domain label, a short description, and the `atana_relevance` flag. The **creativity** row is marked ★ — it is the direct entry-point into LATAM cultural occupations via the CBO crosswalk (musicians, designers, artists). The remaining 9 domains (language, social interaction, problem solving, metacognition/critical thinking, knowledge, learning/memory, vision, manipulation, robotic intelligence) all have secondary cultural-occupation reads (e.g., social interaction → performing arts and cultural mediation; manipulation → crafts and instrument-making).
 

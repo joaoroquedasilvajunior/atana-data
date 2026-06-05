@@ -1,16 +1,16 @@
 {
   "table": "ai_capability_domains",
   "schema": "oecd_ai",
-  "description": "OECD AI Paper No. 59 — the 10 AI capability domains mapped against occupational requirements (language, social interaction, problem solving, creativity, metacognition, knowledge, learning/memory, vision, manipulation, robotic intelligence). Creativity is the direct entry-point for Atana cultural analysis.",
+  "description": "OECD AI Paper No. 59 — the 9 AI capability domains mapped against occupational requirements (language, social interaction, problem solving, creativity, metacognition/critical thinking, knowledge/learning/memory, vision, manipulation, robotic intelligence). Creativity is the direct entry-point for Atana cultural analysis. Caveat: OECD's creativity scale level 5 (exceptional/world-class) is rarely required of whole occupations and compresses the active range — small measured creativity gap is partly artifactual.",
   "source": "OECD Artificial Intelligence Papers No. 59 (May 2026).",
   "source_pages": [
     "https://www.oecd.org/en/publications/2026/05/the-oecd-ai-exposure-measure_489cfd42.html"
   ],
   "fetch_date": "2026-06-04",
   "etl_script": "etl/oecd_ai__ai_capability_domains_to_parquet.py",
-  "etl_run_date": "2026-06-04",
+  "etl_run_date": "2026-06-05",
   "licence": "OECD published findings — public release.",
   "grain": "one row per capability domain",
-  "row_count": 10,
+  "row_count": 9,
   "notes": "Domain definitions from the OECD AI Capability Indicators framework. atana_relevance column carries the cultural-occupation entry-point for each domain."
 }
