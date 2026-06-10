@@ -1,0 +1,39 @@
+{
+  "table": "latam_trade_by_fcs_domain",
+  "description": "Cross-LATAM cultural trade by 2025 UNESCO FCS domain — MX/CO/CR/BR/AR resolved through canonical.domain_crosswalk. Comparability is annotated per row (basis, comparability_note), never asserted: Brazil is goods-only NCM; Argentina is constant-2004 ARS with a deliberately empty USD column (sinca_csc.md §8).",
+  "source": "Derived — atana.inegi/dane/cr_bccr/ibge_comex/sinca × canonical.domain_crosswalk × atana.macro FX",
+  "source_files": [
+    {
+      "file": "domain_crosswalk.parquet",
+      "sha256": "3c43ae88562c5ccfc7f1fef70127fc54a631aba7d318c903856a593e261f7cf4"
+    },
+    {
+      "file": "csc_comercio.parquet",
+      "sha256": "3fa582f81d81facc45b452412d341945d5ce01f89482806c748c46c4f7e96347"
+    },
+    {
+      "file": "csecc_comercio.parquet",
+      "sha256": "fc6c951f159b2baed2ff7641f46a93fb9ead279c13199668738cb47abd5790f4"
+    },
+    {
+      "file": "csc_comercio.parquet",
+      "sha256": "932986799b79a2be515fa7cc203e0879ab184dfb8a006b2807e8d6c989e309a9"
+    },
+    {
+      "file": "tab_10_1.parquet",
+      "sha256": "f6869d02b85942dba32b5ae4ceb3502ca4c8f937338db77e41593c721b97c8c3"
+    },
+    {
+      "file": "csc_comercio.parquet",
+      "sha256": "42c9d6dcad428b0622445a2b8c3638670451f5846d88c44fc144678a161a3da1"
+    },
+    {
+      "file": "fx_brl_usd_annual.parquet",
+      "sha256": "82577f240e28d635bcca51f4309a9acbdd65b3837564a4ee8534ff87181b2db8"
+    }
+  ],
+  "grain": "country × year × flow × fcs2025_domain",
+  "etl_script": "etl/canonical__build_latam_trade_by_fcs.py",
+  "etl_run_date": "2026-06-10",
+  "licence": "CC BY 4.0 (derived from CC BY / open national sources)"
+}
