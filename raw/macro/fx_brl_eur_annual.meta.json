@@ -1,0 +1,48 @@
+{
+  "table": "fx_brl_eur_annual",
+  "description": "Annual-average BRL/EUR exchange rate (mean of daily BCB SGS 21619 'euro venda' observations; years with <200 obs dropped). Unblocks the A24 EUR/BRL precision caveat (ECAD R$ × CISAC € comparisons). Convenience series — see methodology for flow-vs-stock conversion guidance.",
+  "source": "BCB SGS 21619 (euro, venda, diária)",
+  "source_url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados",
+  "source_files": [
+    {
+      "file": "bcb_sgs21619_eur_daily_1994_2002.json",
+      "sha256": "91d02e659ae5b449c0027d02e08160dd2d4beac2c3344259e3d41529730fc369"
+    },
+    {
+      "file": "bcb_sgs21619_eur_daily_2003_2011.json",
+      "sha256": "bde41f52eb7dc62c743c67b2b2028400cd2d8cc23eb8b2390d517dbf444d4208"
+    },
+    {
+      "file": "bcb_sgs21619_eur_daily_2012_2020.json",
+      "sha256": "707fce5bb27021851a39811e9437a47fc0ac07dbb7f0f8b81571df34c78e3695"
+    },
+    {
+      "file": "bcb_sgs21619_eur_daily_2021_2026.json",
+      "sha256": "7cca6c5b8dcfa5860111b4e9e5d35fe7b702d084e47bdd83ac4dde5e7ab97347"
+    },
+    {
+      "file": "bcb_sgs3698_usd_monthly_1994_2002.json",
+      "sha256": "7011e7b762232b20df9dbc89cb1e5237517d441e5f2de5a6b49a8538a19e8090"
+    },
+    {
+      "file": "bcb_sgs3698_usd_monthly_2003_2011.json",
+      "sha256": "787a23ac53ec149835efe93fbfde6e507d402e2188d69817f856afdd1cc7950e"
+    },
+    {
+      "file": "bcb_sgs3698_usd_monthly_2012_2020.json",
+      "sha256": "a1cc0e5c4e39d81baedf50585689bb4da3036c6fd33ad0a137c62880c9ae7dc4"
+    },
+    {
+      "file": "bcb_sgs3698_usd_monthly_2021_2026.json",
+      "sha256": "ea3e794af49a16d182a5d5e1c24a603d3c4dab244926f10f4c72a4fbf1ecce6c"
+    },
+    {
+      "file": "worldbank_pa_nus_fcrf_bra.json",
+      "sha256": "979d78ad07f88b8b2c824369d6b7f21ff3431ec59ca7be4b0023541b649fcf0e"
+    }
+  ],
+  "fetch_date": "2026-06-10",
+  "etl_script": "etl/macro__fx_brl_annual_to_parquet.py",
+  "etl_run_date": "2026-06-10",
+  "licence": "World Bank Open Data CC BY 4.0 / BCB SGS dados abertos"
+}

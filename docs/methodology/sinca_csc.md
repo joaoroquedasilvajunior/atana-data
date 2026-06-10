@@ -82,7 +82,40 @@ For finer FCS alignment, Argentina's CSC sector-level GVA tables (a separate dat
 - **Derived goods** — 2004 constant goods exports = 685,133 − 417,851 = 267,282, confirmed.
 - **Idempotency** — re-running the ETL produces byte-identical Parquet.
 
-## 8. Citation
+## 8. Argentina in cross-LATAM comparisons — the incommensurability is the finding (Vol 2 guidance)
+
+*Added 2026-06-10 (Phase 6 scoping; strategic-review decision).*
+
+With the BRL FX series ingested (`atana.macro`, 2026-06-10), **Argentina is now the
+only country in the five-country trade layer that cannot enter a common-currency
+comparison** — Mexico, Colombia and Costa Rica carry World-Bank-pattern USD columns,
+and Brazil's R$ FOB converts through `fx_brl_usd_annual`. This is not an ingest gap
+to be fixed; it is a **deliberate decision documented at ingest time** (see §6): under
+the multiple-exchange-rate regime (*brecha cambiaria*, official vs. blue vs. financial
+rates diverging sharply in 2020–2023), *any* single ARS→USD conversion would assert a
+choice of rate that materially changes the result — the conversion would be the
+analyst's opinion wearing the data's clothes.
+
+**How Vol 2 (and any cross-LATAM piece) should state it:** Argentina appears in the
+FCS-domain comparison table with its structure (bienes/servicios shares, constant-2004
+trajectory) but **no USD column**, plus a stated reason. In house style, the missing
+cell *is* the finding, on two levels:
+
+1. **Measurement level** — a country's statistical comparability is itself a policy
+   outcome. Argentina's cultural-trade record is rendered internationally
+   incommensurable not by the quality of SInCA's work but by the macroeconomic regime
+   the data lived under. (Compare Costa Rica's 2022+ coverage collapse — a different
+   failure mode, same lesson.)
+2. **Regional level** — "LATAM" aggregates that silently convert ARS at the official
+   rate (as some international sources do) overstate precision. When Atana shows the
+   empty cell instead, that is the methodological-pluralism move: the gap between what
+   sources publish is data.
+
+The series ending in 2022 compounds this: post-2023 cultural trade is currently
+**unmeasured** in the national CSC. If SInCA resumes publication, the new vintage is a
+DB-updater refresh; until then, do not proxy it.
+
+## 9. Citation
 
 > SInCA / INDEC. *Cuenta Satélite de Cultura — comercio exterior, 2004–2022*. Sistema de Información Cultural de la Argentina, Ministerio de Cultura. datos.cultura.gob.ar, CC BY 4.0.
 
