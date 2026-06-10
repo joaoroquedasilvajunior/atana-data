@@ -25,6 +25,9 @@ secrets.json
 etl/_tmp/
 etl/__cache__/
 
+# DB-updater / ETL --staging output — throwaway, diffed against live then discarded
+raw/*/_staging/
+
 # OS
 Thumbs.db
 

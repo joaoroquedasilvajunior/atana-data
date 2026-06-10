@@ -722,6 +722,38 @@ def oecd_ai_rows() -> list[dict]:
     return rows
 
 
+# ── Anthropic Economic Index — revealed-usage frame (Phase 6b.1) ─────────────
+# The empirical counterpart to OECD_AI's expert-rated frame: real Claude.ai
+# conversations classified onto O*NET tasks and geographies. Same FCS anchor
+# (Intellectual property, transversal), same cross-sector caveat; the pairing
+# of the two frames IS the methodological-pluralism move (cf. Note #18).
+ANTHROPIC_EEI = [
+    ("revealed-usage-frame",
+     "Anthropic Economic Index (Hugging Face, releases 2025-02 → 2026-03) — revealed-usage frame",
+     "Intellectual property", "transversal", None, None, "approximate",
+     "★ Phase 6b.1 (2026-06-10) — methodological-frame source, NOT a cultural "
+     "classification. 4 tables: `country_usage` (178 countries × share of "
+     "global Claude.ai usage; BR = 2.55 %), `task_usage_by_country` (GLOBAL/"
+     "US + 5 corpus countries × O*NET tasks — Brazil-NATIVE revealed usage, "
+     "269 tasks), `collaboration_by_country` (automation-vs-augmentation "
+     "patterns), `occupation_usage_global_v2` (DERIVED, 749 SOC occupations; "
+     "SOC 27-* cultural occupations = 9.4 % of matched usage). The "
+     "revealed-usage counterpart to the `oecd_ai` expert-rated frame — two "
+     "epistemologies on one question; their divergence is the finding. "
+     "⚠️ Usage ≠ exposure ≠ automation risk; selected population; vintages "
+     "differ by table. See docs/methodology/anthropic_eei.md."),
+]
+
+
+def anthropic_eei_rows() -> list[dict]:
+    rows = []
+    for code, label, dom, dtype, cer, ncm, conf, note in ANTHROPIC_EEI:
+        rows.append(dict(zip(COLUMNS, (
+            "anthropic_eei", "Anthropic Economic Index (revealed-usage frame)",
+            code, label, dom, dtype, cer, ncm, conf, note))))
+    return rows
+
+
 # ── Global — CISAC Global Collections Report (Phase 5a) ──────────────────────
 # The cultural-IP *income* lens at global scale — annual royalty collections
 # reported by all 228 CISAC member societies in 111 countries. Deepens the IP
@@ -758,7 +790,8 @@ def build() -> pd.DataFrame:
             + cr_bccr_rows() + unctad_goods_rows() + unctad_services_rows()
             + ibge_ncm_rows() + siic_rows() + bcb_rows() + inpi_rows()
             + ecad_rows() + cisac_rows() + ifpi_rows()
-            + luminate_rows() + tcu_rows() + oecd_ai_rows())
+            + luminate_rows() + tcu_rows() + oecd_ai_rows()
+            + anthropic_eei_rows())
     return pd.DataFrame(rows, columns=COLUMNS)
 
 
@@ -768,13 +801,13 @@ def validate(df: pd.DataFrame) -> None:
     expect = {"fcs2025": 14, "inegi": 10, "dane": 22, "sinca": 2,
               "cr_bccr": 4, "unctad": 15, "ibge_comex": 5, "ibge_siic": 10,
               "bcb": 1, "inpi": 1, "ecad": 1, "cisac": 1, "ifpi": 1,
-              "luminate": 1, "tcu": 1, "oecd_ai": 1}
+              "luminate": 1, "tcu": 1, "oecd_ai": 1, "anthropic_eei": 1}
     got = df["source_schema"].value_counts().to_dict()
     for schema, n in expect.items():
         assert got.get(schema) == n, (
             f"{schema}: expected {n} rows, got {got.get(schema)}")
     total = sum(expect.values())
-    assert len(df) == total == 90, f"total rows {len(df)} != 90"
+    assert len(df) == total == 91, f"total rows {len(df)} != 91"
     print(f"  ✓ {len(df)} rows — " + ", ".join(f"{k} {v}" for k, v in expect.items()))
 
     bad = set(df["mapping_confidence"]) - CONFIDENCE_VALUES

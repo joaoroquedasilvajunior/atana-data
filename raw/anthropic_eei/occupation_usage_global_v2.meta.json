@@ -1,0 +1,21 @@
+{
+  "table": "occupation_usage_global_v2",
+  "description": "DERIVED — global Claude.ai usage share by O*NET-SOC occupation, v2 (early 2025): task shares apportioned equally across occupations sharing a task statement. The apportionment is an Atana methodological choice, not an Anthropic figure. Pairs with atana.oecd_ai (expert-rated frame) — full occupation-level pairing gated on oecd_ai Tier 2.",
+  "source": "Anthropic Economic Index (AEI), Hugging Face Anthropic/EconomicIndex",
+  "source_url": "https://huggingface.co/datasets/Anthropic/EconomicIndex",
+  "vintage": "global v2 (release_2025_03_27)",
+  "source_files": [
+    {
+      "file": "task_pct_v2.csv",
+      "sha256": "0c20f184cd4a1e3d8ef3d77f500b32b62431ce61a3c2f133c3af7fa8429f97db"
+    },
+    {
+      "file": "onet_task_statements.csv",
+      "sha256": "82e4c418dc08475ef1263ad1e8c66ffa3357291370cd35ee1065ecea590597ec"
+    }
+  ],
+  "fetch_date": "2026-06-10",
+  "etl_script": "etl/anthropic_eei__to_parquet.py",
+  "etl_run_date": "2026-06-10",
+  "licence": "AEI data released openly by Anthropic (see dataset card)"
+}
