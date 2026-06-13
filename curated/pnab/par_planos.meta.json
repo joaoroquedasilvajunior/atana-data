@@ -1,0 +1,9 @@
+{
+  "table": "pnab.par_planos",
+  "rows": 10131,
+  "source": "MinC Portal de Dados da Cultura — dataset 'Implementação e Execução da PNAB' (DFD/SEFIC); LC 195/2022 + Decreto 11.453/2023",
+  "currency": "BRL nominal (not deflated — see methodology §4)",
+  "etl_script": "etl/pnab__to_parquet.py",
+  "etl_run_date": "2026-06-13",
+  "licence": "CC BY 4.0 (Portal de Dados da Cultura)"
+}
