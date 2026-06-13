@@ -1,0 +1,16 @@
+{
+  "table": "gmr_2026_global_by_region",
+  "schema": "ifpi",
+  "description": "IFPI GMR 2026 — 2025 recorded-music revenue by region. 7 rows. LATAM (+17.1 %) is the fastest-growing region; MENA streaming share 97.5 % the highest. Critical cross-lens row: LATAM +17.1 % here vs CISAC GCR 2025's LATAM −0.6 % author-royalties — same market, opposite direction by lens.",
+  "source": "IFPI Global Music Report 2026 (press release).",
+  "source_pages": [
+    "https://www.ifpi.org/global-music-report-2026-global-recorded-music-revenues-grow-6-4-as-record-companies-drive-innovation/"
+  ],
+  "fetch_date": "2026-06-01",
+  "etl_script": "etl/ifpi__gmr_2026_global_by_region_to_parquet.py",
+  "etl_run_date": "2026-06-03",
+  "licence": "IFPI published figures — public press release.",
+  "grain": "one row per (year, region)",
+  "row_count": 7,
+  "notes": "share_pct, usd_mi, streaming_share_pct NULL where the press release does not state them. See methodology §3 on the IFPI ↔ CISAC LATAM divergence."
+}

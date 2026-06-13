@@ -1,0 +1,16 @@
+{
+  "table": "gmr_2026_global_headline",
+  "schema": "ifpi",
+  "description": "IFPI GMR 2026 — 2025 global recorded-music headline. US$ 31.7 bn, +6.4 %, 11th consecutive year of growth, 837 mi paid streaming users. Recorded-music lens, distinct from the author-royalty lens (atana.cisac, atana.ecad).",
+  "source": "IFPI Global Music Report 2026 (press release, 18 March 2026).",
+  "source_pages": [
+    "https://www.ifpi.org/global-music-report-2026-global-recorded-music-revenues-grow-6-4-as-record-companies-drive-innovation/"
+  ],
+  "fetch_date": "2026-06-01",
+  "etl_script": "etl/ifpi__gmr_2026_global_headline_to_parquet.py",
+  "etl_run_date": "2026-06-03",
+  "licence": "IFPI published figures — public press release.",
+  "grain": "one row per reference year",
+  "row_count": 1,
+  "notes": "Tier 1 — public press release only. Premium Edition has country-level detail (paywalled). See docs/methodology/ifpi_gmr.md."
+}

@@ -1,0 +1,16 @@
+{
+  "table": "gmr_2026_top_markets",
+  "schema": "ifpi",
+  "description": "IFPI GMR 2026 — 12 countries with 2025 growth named verbatim in the press release. 7 countries also carry a global rank (USA #1, Japan #2, China #4, Brazil #8, Canada #9, Mexico #10, Australia #13). Brazil + Mexico in the top-10 is the corpus headline.",
+  "source": "IFPI Global Music Report 2026 (press release).",
+  "source_pages": [
+    "https://www.ifpi.org/global-music-report-2026-global-recorded-music-revenues-grow-6-4-as-record-companies-drive-innovation/"
+  ],
+  "fetch_date": "2026-06-01",
+  "etl_script": "etl/ifpi__gmr_2026_top_markets_to_parquet.py",
+  "etl_run_date": "2026-06-03",
+  "licence": "IFPI published figures — public press release.",
+  "grain": "one row per (year, country)",
+  "row_count": 12,
+  "notes": "NOT the complete top-20 / top-200 country list — that lives in the paywalled GMR 2026 Premium Edition. This table is the named-in-press-release subset."
+}
