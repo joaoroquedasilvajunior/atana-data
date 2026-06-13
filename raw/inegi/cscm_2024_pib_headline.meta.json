@@ -1,0 +1,16 @@
+{
+  "table": "cscm_2024_pib_headline",
+  "schema": "inegi",
+  "description": "INEGI Cuenta Satélite de la Cultura de México (CSCM) 2024 — headline PIB + empleo for the cultural sector. MXN 865,682 mi (2.8 % of total economy), 1.43 mi puestos (3.5 %), real growth +1.2 % vs total economy +1.3 %. Phase 5b of the corpus expansion — sibling to csc_comercio (the trade module already ingested).",
+  "source": "INEGI Comunicado de Prensa 144/25, 19 November 2025 (CSCM 2024).",
+  "source_pages": [
+    "https://www.inegi.org.mx/contenidos/saladeprensa/boletines/2025/cultura/CSCM2024_CP.pdf"
+  ],
+  "fetch_date": "2026-06-01",
+  "etl_script": "etl/inegi__cscm_2024_pib_headline_to_parquet.py",
+  "etl_run_date": "2026-06-03",
+  "licence": "INEGI public data — open licence",
+  "grain": "one row per reference year",
+  "row_count": 1,
+  "notes": "Reference year 2018 for real-value series. Atana corpus's first LATAM non-Brazilian PIB/empleo cell. See docs/methodology/inegi_csc.md §6 for the non-trade module update."
+}

@@ -1,0 +1,16 @@
+{
+  "table": "cscm_2024_pib_by_area",
+  "schema": "inegi",
+  "description": "INEGI CSCM 2024 — cultural PIB by clasificación funcional (10 áreas), share + growth. Artesanías paradox highlighted (largest + largest decliner); Música y conciertos fastest grower at +14.9 %.",
+  "source": "INEGI Comunicado 144/25 (CSCM 2024).",
+  "source_pages": [
+    "https://www.inegi.org.mx/contenidos/saladeprensa/boletines/2025/cultura/CSCM2024_CP.pdf"
+  ],
+  "fetch_date": "2026-06-01",
+  "etl_script": "etl/inegi__cscm_2024_pib_by_area_to_parquet.py",
+  "etl_run_date": "2026-06-03",
+  "licence": "INEGI public data — open licence",
+  "grain": "one row per (year, area)",
+  "row_count": 10,
+  "notes": "10 áreas sum to 100.0 % of cultural PIB. Growth NULL for 5 áreas — the boletín only names the top-3 and bottom-2."
+}

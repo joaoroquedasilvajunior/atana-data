@@ -1,0 +1,16 @@
+{
+  "table": "cscm_2024_pib_growth_series",
+  "schema": "inegi",
+  "description": "INEGI CSCM 2024 — annual real-growth series 2009–2024 (cultural sector vs total economy, 16 rows × 2 series). Reference prices = 2018. Shows the cultural sector's higher volatility (2020 pandemic 2.5× deeper than total economy) and 2021–2022 sharp rebound.",
+  "source": "INEGI Comunicado 144/25 (CSCM 2024) — Gráfica 1.",
+  "source_pages": [
+    "https://www.inegi.org.mx/contenidos/saladeprensa/boletines/2025/cultura/CSCM2024_CP.pdf"
+  ],
+  "fetch_date": "2026-06-01",
+  "etl_script": "etl/inegi__cscm_2024_pib_growth_series_to_parquet.py",
+  "etl_run_date": "2026-06-03",
+  "licence": "INEGI public data — open licence",
+  "grain": "one row per reference year",
+  "row_count": 16,
+  "notes": "Cumulative ≈ 2009–2024 — derive in-query, not stored. The INEGI Gráfica 1 reads as a bar chart; values transcribed verbatim."
+}

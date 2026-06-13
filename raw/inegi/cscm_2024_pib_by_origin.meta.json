@@ -1,0 +1,16 @@
+{
+  "table": "cscm_2024_pib_by_origin",
+  "schema": "inegi",
+  "description": "INEGI CSCM 2024 — cultural PIB by institutional origin (mercado / hogares / gestión pública). 3 rows × 2024. 'Hogares' (0.38 %) is the structural piece the IBGE SIIC does not measure — a methodological-pluralism data point.",
+  "source": "INEGI Comunicado 144/25 (CSCM 2024).",
+  "source_pages": [
+    "https://www.inegi.org.mx/contenidos/saladeprensa/boletines/2025/cultura/CSCM2024_CP.pdf"
+  ],
+  "fetch_date": "2026-06-01",
+  "etl_script": "etl/inegi__cscm_2024_pib_by_origin_to_parquet.py",
+  "etl_run_date": "2026-06-03",
+  "licence": "INEGI public data — open licence",
+  "grain": "one row per (year, origen)",
+  "row_count": 3,
+  "notes": "Three origins sum to 2.76 % vs the 2.8 % headline (rounding)."
+}
