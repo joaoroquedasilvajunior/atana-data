@@ -39,3 +39,4 @@ raw/unctad/goods_value.parquet
 raw/unctad/_placeholder.md
 *.log
 raw/*/_source/
+raw/pnab/_source/

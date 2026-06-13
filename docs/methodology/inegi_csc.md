@@ -129,6 +129,103 @@ Note: a web snippet citing "5.6% import share of cultural supply in 2019" does *
 
 > INEGI (2025). *Cuenta Satélite de la Cultura de México (CSCM), base 2018*. Instituto Nacional de Estadística y Geografía. <https://www.inegi.org.mx/programas/cultura/2018/>
 
+> INEGI (2025). *Cuenta Satélite de la Cultura de México (CSCM) 2024 — Comunicado de Prensa 144/25*. 19 November 2025. <https://www.inegi.org.mx/contenidos/saladeprensa/boletines/2025/cultura/CSCM2024_CP.pdf>
+
 ---
 
-*Methodology note for `atana.inegi`. Prepared 2026-05-22. Pairs with `_atana_intel/phase3_schema_design.md` and `_atana_intel/latam_cultural_sources_inventory.md`.*
+## 10. Non-trade modules — CSCM 2024 (Phase 5b, 2026-06-01)
+
+The original Phase 3a ingest carried only the **trade module** of the CSCM
+(`csc_comercio`). Phase 5b extends `atana.inegi` with the **production-account
++ employment** view from the just-released CSCM 2024 boletín — the first
+LATAM non-Brazilian value-added / employment cells the corpus carries.
+
+### Tables added
+
+| Table | Rows | Description |
+|---|---:|---|
+| `cscm_2024_pib_headline` | 1 | Cultural PIB MXN 865,682 mi (2.8 %); empleo 1,430,528 puestos (3.5 %); real 2024 +1.2 % vs total +1.3 %; empleo YoY −0.2 % |
+| `cscm_2024_pib_by_origin` | 3 | PIB by institutional origin: mercado 2.21 % / hogares 0.38 % / gestión pública 0.17 % (sum 2.76 ≈ 2.8 headline) |
+| `cscm_2024_pib_by_area` | 10 | Cultural PIB by clasificación funcional — 10 áreas sum to 100 %, with growth for the 5 named (top-3 + bottom-2) |
+| `cscm_2024_pib_growth_series` | 16 | Annual real growth 2009–2024, cultural vs total economy (Gráfica 1, reference prices 2018) |
+
+### Central caveats
+
+#### (a) The artesanías paradox — the v1 INEGI headline
+
+Artesanías is the **largest area** of cultural PIB (18.4 %) AND the
+**largest decliner** in 2024 (−3.8 %). It is also historically Mexico's
+biggest cultural employer (~30 % of cultural empleo per prior CSCM vintages)
+yet contributes only 18.4 % of cultural PIB — a productivity (value-per-
+worker) trough that is now shrinking. The corpus's existing `csc_comercio`
+already flags Artesanías as trade-invisible (informal household production;
+see §7 above); the new non-trade tables show the same area is also the
+specific face of the 2024 contraction.
+
+#### (b) Productivity up, headcount down — the 2024 inflection
+
+Cultural PIB +1.2 % real while cultural empleo −0.2 % (−2,852 puestos) →
+implied value-per-puesto ≈ +1.4 % real. This is the *first* CSCM year
+where cultural empleo fell while PIB rose. Sets up a cross-country read
+against Brazil's RAIS (`atana.rais`), where the formal cultural workforce
+has been falling since 2019 — see Análise 11.
+
+#### (c) Three independent music-Mexico signals in 2024-2025
+
+- INEGI CSCM 2024: **Música y conciertos +14.9 % real** (fastest-growing área).
+- IFPI GMR 2026 (`atana.ifpi`): **Mexico +13.3 % recorded-music revenue, #10 globally**.
+- CISAC GCR 2025 (`atana.cisac`): **Mexico 65.1 % digital share** — the only
+  LATAM country in the top-10 leading-smaller-markets-by-digital-share.
+
+Three different sources, three different methodologies, same direction.
+
+#### (d) Hogares — the methodological-pluralism cell
+
+`cscm_2024_pib_by_origin` row "Hogares" = 0.38 % of total PIB ≈ 13.8 % of
+cultural PIB. This is **household cultural activity** the IBGE SIIC does not
+measure for Brazil — a structural gap to flag on any direct Mexico vs Brazil
+cultural-PIB comparison.
+
+#### (e) Five áreas with NULL growth
+
+The boletín names growth for the top-3 (Música y conciertos +14.9, Diseño y
+servicios creativos +7.7, Artes visuales y plásticas +5.3) and bottom-2
+(Artesanías −3.8, Medios audiovisuales −3.6) only. The other five áreas
+(Contenidos digitales, Artes escénicas, Patrimonio, Libros, Formación) have
+growth NULL — full distribution is in the underlying CSCM cuadros, deferred
+to a future Tier 2 acquisition.
+
+### What's deferred (Tier 2)
+
+- The **full CSCM 2024 cuadros xlsx** (same portal as the Phase 3a trade
+  module) carries per-año, per-área detail for production / value added /
+  employment / remuneración. The boletín-driven ingest here captures the
+  headline numbers; the cuadros would extend each table by year and add
+  empleo-by-área and per-worker-remuneración cells.
+- Cross-source FX-adjusted comparison against `atana.ibge_estruturais` —
+  needs an MXN ↔ BRL series the corpus does not yet hold.
+
+### Validation (2026-06-01)
+
+- `cscm_2024_pib_headline` — single 2024 row, key invariants confirmed.
+- `cscm_2024_pib_by_origin` — three origins sum 2.76 ≈ 2.8 headline.
+- `cscm_2024_pib_by_area` — ten áreas sum exactly 100.0 %; Artesanías paradox
+  surfaced; Música y conciertos fastest grower at +14.9 %.
+- `cscm_2024_pib_growth_series` — 16 contiguous years 2009–2024; 2020 cultural
+  −20.3 % vs total −8.0 % (2.5× deeper pandemic shock); 2024 near-converged at
+  +1.2 % vs +1.3 %.
+
+### Domain mapping
+
+The Phase 3a `csc_comercio` already maps the 10 INEGI áreas to FCS via
+`canonical.domain_crosswalk`. The non-trade tables use the **same 10 áreas**
+and therefore inherit those crosswalk rows — no new rows needed; coverage
+unchanged at 13/14 reached.
+
+---
+
+*Methodology note for `atana.inegi`. Prepared 2026-05-22 (Phase 3a trade
+module); extended 2026-06-01 (Phase 5b non-trade modules). Pairs with
+`_atana_intel/phase3_schema_design.md`,
+`_atana_intel/latam_cultural_sources_inventory.md`, and (for the
+music-Mexico cross-source) `ifpi_gmr.md` and `cisac_gcr.md`.*

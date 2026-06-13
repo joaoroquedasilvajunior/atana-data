@@ -17,8 +17,10 @@ For each year (2023 → 2014):
        a. estabelecimentos_culturais   (one row per establishment)
        b. vinculos_culturais           (one row per vínculo, Cut A ∪ Cut B)
        c. panel_cnae_municipio_ano     (derived aggregate)
-  8. Write per-year Parquet to `raw/rais/<table>/year=YYYY/part-0.parquet`.
-  9. Sync to MotherDuck `md:atana.rais.<table>`.
+  8. Write per-year Parquet to `raw/rais/<table>/year=YYYY/part-0.parquet`
+     (or `raw/rais/_staging/<table>/...` under `--staging`).
+  9. Sync to MotherDuck `md:atana.rais.<table>` — skipped under `--staging`
+     or when `ATANA_ETL_SKIP_PUSH` is set.
   10. Per-year QA (row counts, null rates on derived join keys).
 
 The pass is idempotent: years already written are skipped unless `--refresh`.
@@ -27,14 +29,18 @@ USAGE
 -----
   python rais__bigquery_to_parquet.py --smoke                  # no BigQuery
   python rais__bigquery_to_parquet.py --year 2023 --limit 10000
-  python rais__bigquery_to_parquet.py --year 2023
-  python rais__bigquery_to_parquet.py                          # all 10 years
+  python rais__bigquery_to_parquet.py --year 2024              # pull one new year
+  python rais__bigquery_to_parquet.py                          # all default years
   python rais__bigquery_to_parquet.py --year 2022 --refresh
+  python rais__bigquery_to_parquet.py --year 2024 --staging    # → raw/rais/_staging/, never syncs MotherDuck
 
 REQUIRED ENV
 ------------
   GCP_PROJECT_ID
-  MOTHERDUCK_TOKEN (optional — Parquets always written locally)
+  MOTHERDUCK_TOKEN     (optional — Parquets always written locally)
+  ATANA_ETL_SKIP_PUSH  (optional — if set to any value, the inline MotherDuck
+                        sync is skipped even when MOTHERDUCK_TOKEN is present.
+                        The --staging flag implies this.)
 
 NOTES
 -----
@@ -293,11 +299,18 @@ def transform_vinculos(df: pd.DataFrame, refs: dict) -> pd.DataFrame:
     cnae_lookup = refs["cnae_df"].set_index("cnae_2_subclasse")["siic_dominio"].to_dict()
     df["siic_dominio"] = df["cnae_2_classe"].map(cnae_lookup)
 
+    # Coerce numeric columns. pd.to_numeric → float64 with NaN for unparseable;
+    # vinculo_ativo_3112 is 0/1 so coerce to Int64 (nullable int).
     for col in ["valor_remuneracao_media", "valor_remuneracao_dezembro",
                 "valor_salario_contratual",
-                "quantidade_horas_contratadas", "idade", "tempo_emprego"]:
+                "quantidade_horas_contratadas", "tempo_emprego"]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
+    for col in ["idade", "vinculo_ativo_3112",
+                "indicador_trabalho_intermitente", "indicador_trabalho_parcial",
+                "indicador_simples", "indicador_portador_deficiencia"]:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
 
     return df
 
@@ -428,9 +441,17 @@ def write_year(tables: dict, year: int):
         log(f"  wrote {path.relative_to(REPO_ROOT)} ({path.stat().st_size/1e6:.1f} MB)")
 
 
-def sync_motherduck(tables: dict, year: int):
+def sync_motherduck(tables: dict, year: int, skip_push: bool = False):
     """Sync per-year data to MotherDuck. Detects schema drift and recreates
-    the cloud table if the column set has changed during active development."""
+    the cloud table if the column set has changed during active development.
+
+    Skipped entirely when skip_push is set — i.e. under `--staging` or when
+    `ATANA_ETL_SKIP_PUSH` is in the environment. This keeps staging / sandbox
+    runs from touching the live cloud tables; the sync stays with João.
+    """
+    if skip_push:
+        log("  skip-push active (--staging or ATANA_ETL_SKIP_PUSH) — skipping md:atana sync")
+        return
     token = os.environ.get("MOTHERDUCK_TOKEN")
     if not token:
         log("  MOTHERDUCK_TOKEN not set — skipping md:atana sync")
@@ -590,7 +611,8 @@ def smoke_test():
 # Main
 # ============================================================================
 
-def process_year(year: int, refs: dict, bid: str, refresh: bool, limit: int):
+def process_year(year: int, refs: dict, bid: str, refresh: bool, limit: int,
+                 skip_push: bool = False):
     if year_already_done(year, refresh) and not limit:
         log(f"year {year}: all 3 parquets exist — skipping (use --refresh to force)")
         return
@@ -606,22 +628,36 @@ def process_year(year: int, refs: dict, bid: str, refresh: bool, limit: int):
 
     tables = build_tables_for_year(vinc_raw, estab_raw, refs, year)
     write_year(tables, year)
-    sync_motherduck(tables, year)
+    sync_motherduck(tables, year, skip_push=skip_push)
     quick_qa(tables, year)
     log(f"YEAR {year} — done\n")
 
 
 def main():
+    global OUT_BASE
+
     ap = argparse.ArgumentParser(description="RAIS Sprint 1 ETL (3-table model)")
     ap.add_argument("--year", type=int, help="single year to process (else all)")
     ap.add_argument("--refresh", action="store_true", help="re-run even if parquets exist")
     ap.add_argument("--smoke", action="store_true", help="run smoke test (no BigQuery)")
     ap.add_argument("--limit", type=int, default=None, help="LIMIT for sanity testing")
+    ap.add_argument("--staging", action="store_true",
+                    help="write Parquet to raw/rais/_staging/ instead of the live "
+                         "partitions, and never sync MotherDuck (safe for the DB-updater)")
     args = ap.parse_args()
 
     log("=" * 70)
     log("RAIS Sprint 1 ETL — start (3-table basedosdados model)")
     log("=" * 70)
+
+    # --staging redirects all output under raw/rais/_staging/ and forces
+    # skip-push; ATANA_ETL_SKIP_PUSH alone forces skip-push without the redirect.
+    skip_push = args.staging or bool(os.environ.get("ATANA_ETL_SKIP_PUSH"))
+    if args.staging:
+        OUT_BASE = REPO_ROOT / "raw" / "rais" / "_staging"
+        log(f"--staging: output → {OUT_BASE.relative_to(REPO_ROOT)}/  (MotherDuck sync disabled)")
+    elif skip_push:
+        log("ATANA_ETL_SKIP_PUSH set — MotherDuck sync disabled")
 
     if args.smoke:
         smoke_test()
@@ -640,7 +676,7 @@ def main():
 
     for y in years:
         try:
-            process_year(y, refs, bid, args.refresh, args.limit)
+            process_year(y, refs, bid, args.refresh, args.limit, skip_push=skip_push)
         except KeyboardInterrupt:
             log("interrupted by user")
             sys.exit(130)

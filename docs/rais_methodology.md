@@ -283,6 +283,38 @@ CREATE TABLE atana.rais.panel_cnae_municipio_ano (
 );
 ```
 
+### 5.quater PNADC vs RAIS — comparison structure and definitional differences
+
+For any cross-source claim against PNADC household-survey data (notably the "5.86M cultural workers in 2024" figure repeatedly cited in IBGE *Informações Culturais*), the methodologies are **structurally analogous but operationally different**.
+
+**Identical components:**
+
+- Both PNADC and RAIS (via our atana.rais.*) define the cultural workforce as the **union** of two filters: (i) cultural establishments, plus (ii) cultural occupations.
+- The **occupation classification is identical** in both: CBO-Domiciliar 4-digit families, 62 codes per SIIC 2007-2010 Notas Técnicas pp. 20-22. RAIS expands these via `LIKE 'NNNN%'` to CBO 2002 6-digit subgroups; PNADC uses them at 4-digit directly. Same operative universe.
+
+**Different components:**
+
+- The **establishment classification differs**. PNADC uses **CNAE-Domiciliar** (currently version 2.0, derived from CNAE 2.0 but coarser); RAIS uses **CNAE 2.0** directly at the 5-digit class level.
+- PNADC's cultural CNAE-Dom is approximately 13 broad categories per SIIC 2007-2010 (e.g., `22000` "Edição, impressão e reprodução" as one bucket). Our RAIS list has 33 5-digit classes — generally more granular within the same domains.
+- **Notable absences** from the PNADC CNAE-Dom list (relative to our RAIS list): architecture (we include 71.11-1), design (74.10-2), photography (74.20-0), and the edição-integrada-à-impressão codes (58.21-2 / 22-1 / 23-9). For these activities, PNADC counts workers only via the CBO-occupation side, not the CNAE-establishment side.
+- **Notable absences** from our RAIS list (relative to PNADC CNAE-Dom): sports & recreation (PNADC includes `92040` Atividades desportivas; we treat this as out-of-scope per SIIC's direct-cultural definition).
+
+**Comparison strategy for the H0 paper:**
+
+1. **Primary comparison** (defensible aggregate): *atana.rais Cut A ∪ Cut B* vs *PNADC total*. Both are unions of CNAE + CBO filters; the CNAE-side definitional difference is bounded and partially symmetric (PNADC includes sports we exclude; we include architecture/design/photography PNADC's CNAE-Dom excludes). The dominant gap (~70%) is informality, not definitional drift.
+
+2. **Cleanest CBO-side comparison** (identical universes): *atana.rais Cut B* vs *PNADC cultural-occupation count*. Both use the same 62 CBO-Domiciliar 4-digit families. The PNADC published tables don't directly publish this sub-count (the 5.86M is the union, not separable from published outputs without microdata access), so this comparison is conceptually clean but operationally requires either (i) PNADC microdata or (ii) IBGE publishing the CBO-side decomposition.
+
+3. **Cleanest CNAE-side comparison** (avoids the PNADC household-survey altogether): *atana.rais Cut A* vs *IBGE Cempre* (administrative formal-firm census, published in *Atividades formalmente constituídas*). Both use CNAE 2.0; both are formal-employment measures. This is the apples-to-apples comparison for the *formal* part of the labor market and is documented in `notes/rais_validation_findings.md` §Check 1 (87% match at aggregate 2022).
+
+**Source documents:**
+
+- IBGE Concla, *CNAE-Domiciliar — correspondências CNAE e PNAD/CD91* (2001). Available at <https://concla.ibge.gov.br/images/concla/documentacao/CNAEDOMxCNAExPNAD91.pdf>. CNAE 1.0 era; cultural codes carried into CNAE-Domiciliar 2.0 with renumbering.
+- IBGE Concla, *Introdução à Classificação Nacional de Atividades Econômicas Versão 2.0*. <https://concla.ibge.gov.br/images/concla/documentacao/CNAE20_Introducao.pdf>.
+- IBGE *Informações Culturais 2013-2024* (SIIC) publication notes. CNAE-Domiciliar 2.0 cultural-sector definition is published in the *Notas Técnicas* of each SIIC edition.
+
+**Limitation acknowledged for publication:** the H0 paper cites the PNADC 5.86M figure and the atana.rais 1.50M union figure together as evidence of formal/informal divergence. The figures answer the same conceptual question but operate over slightly different CNAE universes. The qualitative finding (massive gap dominated by informality) is robust to this difference; any quantitative claim that exceeds ~10% precision would require explicit microdata-level reconciliation, which Phase 2b (MTE FTP) would enable on the RAIS side and which IBGE PNADC microdata access would require on the household-survey side.
+
 ### 5.ter CNAE 2.0: class (5-digit) vs subclasse (7-digit)
 
 basedosdados stores `cnae_2_subclasse` as a 7-digit zero-padded code: the IBGE CNAE 2.0 5-digit class plus a 2-digit subclasse suffix (e.g. `5811500` = `5811-5/00` = "Edição de livros"). The SIIC publication and our `_reference/cnae_cultural.parquet` use the 5-digit class root (e.g. `58115` covers all subclasse variants of "Edição de livros"). The ETL:

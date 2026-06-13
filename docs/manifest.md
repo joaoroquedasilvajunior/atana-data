@@ -410,6 +410,23 @@ ETLs: `etl/oecd_ai__papers_headline_to_parquet.py` · `etl/oecd_ai__ai_capabilit
 
 ---
 
+## `atana.pnab` — Política Nacional Aldir Blanc (direct-transfer cultural funding) 🔜 Built locally — pending first sync (NEW schema)
+
+Source: **MinC Portal de Dados da Cultura**, dataset *"Implementação e Execução da PNAB"* (DFD/SEFIC; monthly). LC 195/2022 + Decreto 11.453/2023. Phase PNAB — the corpus's first **direct-intergovernmental-transfer** funding lens, structural counterpart to `atana.salic` (Rouanet, corporate-mediated fiscal capture).
+
+| Table | Rows | Description |
+|---|---:|---|
+| `execucao_financeira` | 5.425 | Execution per ente, Ciclo 1 — R$ 3,00 bi received, R$ 2,82 bi spent (**94 %** vs Rouanet ≈51 %) |
+| `par_planos` | 10.131 | Action plans Ciclo 1 ∪ Ciclo 2 (5.084 + 5.047), **harmonised** core schema + `ciclo` flag (see methodology §3.2) |
+| `governanca_entes` | 5.084 | Derived from PAR C1 — Conselho×Plano×Fundo + escore 0–3 |
+| `extratos_bancarios` | 212.288 | Granular transactions Ciclo 1 (uf, ente, recebedor, descrição, tipo, data, valor) |
+
+⚠️ BRL nominal (not deflated — methodology §4); key is **`cod_ibge`** (no CNPJ in execução/extrato); extrato débitos R$ 6,25 bi ≠ gasto R$ 2,82 bi (inclui aplicações automáticas); Rondônia-estado outlier 0,07 % execução kept; Ciclo 2 = plans only (execution unpublished). `canonical.domain_crosswalk` 91 → **92 rows** (1 `pnab` row → transversal "Multiple — not separable"); coverage 13/14 unchanged. Pairs with `atana.tcu` (Acórdão 1709/2025 audited these cycles).
+
+ETL: `etl/pnab__to_parquet.py` (idempotent, byte-identical reruns; 4 source xlsx gitignored under `raw/pnab/_source/`) · Methodology: `docs/methodology/pnab_aldir_blanc.md`
+
+---
+
 ## `atana.anthropic_eei` — Anthropic Economic Index (revealed-usage frame) 🔜 Built locally — pending first sync (NEW schema)
 
 Source: **Anthropic Economic Index**, Hugging Face `Anthropic/EconomicIndex` (releases 2025-02 → 2026-03). Phase 6b.1 — the **revealed-usage** counterpart to `atana.oecd_ai`'s expert-rated AI-capability frame: real Claude.ai conversations classified onto O*NET tasks and geographies. Passes accretion-criterion gate 1 (Vol 2 minimum corpus).
@@ -542,3 +559,4 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | 2026-06-10 | **Phase 6a (first item) — `atana.macro` schema added (NEW)** — BRL annual FX reference series: `fx_brl_usd_annual` (32 rows, 1994–2025; World Bank PA.NUS.FCRF primary + BCB SGS 3698 for 2025, WB×BCB cross-check ≤2 %) and `fx_brl_eur_annual` (27 rows, 1999–2025; BCB SGS 21619 daily annualised). Closes the "Brazil can't join the cross-LATAM USD comparison" gap (phase6 scoping §2.2) and the A24 EUR/BRL caveat (2025 = 6.3095 measured). External benchmark: ibge_comex 2024 cultural exports → US$ 747.6 mi vs A10 figT8's independently derived US$ 746 mi (0.2 %). ETL `etl/macro__fx_brl_annual_to_parquet.py` (API cache in `raw/macro/_source/`); methodology `docs/methodology/macro_fx_brl.md`. Same date: `sinca_csc.md` §8 added — Argentina's USD incommensurability documented as a Vol 2 finding, not an ingest gap. **Built locally — pending GitHub push + first MotherDuck sync of the new schema (João).** |
 | 2026-06-10 | **Phase 6a.2 — `canonical.latam_trade_by_fcs_domain` materialised** (794 rows; MX/CO/CR/BR/AR × year × flow × FCS domain). Promotes the 2026-06-10 scouting query to a measured, reproducible artifact; comparability annotated per row, Argentina USD NULL by design, CR 2022+ break kept visible. Build `etl/canonical__build_latam_trade_by_fcs.py`; methodology `docs/methodology/latam_trade_by_fcs_domain.md`. Same date: Curious Scientist definition gains the mandatory **"Consumed by"** column + parking-lot convention (accretion criterion, phase6 memo §1). **Built locally — pending push + MotherDuck sync (João).** |
 | 2026-06-10 | **Phase 6b.1 — `atana.anthropic_eei` schema added (NEW)** — Anthropic Economic Index Tier 1, the revealed-usage counterpart to `atana.oecd_ai` (two epistemologies, one question). 4 tables: `country_usage` (178; BR 2.55 % of global Claude.ai), `task_usage_by_country` (5,321; **Brazil-native O*NET-task rows**, 269 tasks), `collaboration_by_country` (42; BR more automation-leaning than global), `occupation_usage_global_v2` (749, derived; SOC 27-* cultural = 9.4 % of matched usage). `canonical.domain_crosswalk` 90 → **91 rows** (1 `anthropic_eei` row → Intellectual property, ★ frame); coverage 13/14 unchanged. ETL `etl/anthropic_eei__to_parquet.py` (HF cache; 103 MB raw file gitignored); methodology `docs/methodology/anthropic_eei.md`. Phase 6b.2 (CBO↔ISCO↔SOC crosswalk for the RAIS join) deferred — separately checkpointed. **Built locally — pending push + first MotherDuck sync (João).** |
+| 2026-06-13 | **Phase PNAB — `atana.pnab` schema added (NEW)** — Política Nacional Aldir Blanc, the corpus's first direct-transfer funding lens (counterpart to SALIC/Rouanet). 4 tables, 232.928 rows: `execucao_financeira` (5.425; R$ 3,00 bi recebido / R$ 2,82 bi gasto = 94 %), `par_planos` (10.131; Ciclo 1∪2 harmonised, §3.2), `governanca_entes` (5.084; escore 0–3), `extratos_bancarios` (212.288). Key = cod_ibge (no CNPJ in execução/extrato). `canonical.domain_crosswalk` 91 → **92** (1 `pnab` row → transversal "Multiple — not separable"); coverage 13/14 unchanged. ETL `etl/pnab__to_parquet.py` (idempotent, byte-identical; 4 source xlsx gitignored); methodology `docs/methodology/pnab_aldir_blanc.md`. Validations 8.1 (R$ 3,00 bi ✓) 8.2 (execução↔PAR on cod_ibge 100 %) 8.4 (governança: 90,9 %→93,8 % no passo 0→1, platô depois). **Built locally — pending push + first MotherDuck sync (João).** |

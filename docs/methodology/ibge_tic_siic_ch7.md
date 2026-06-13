@@ -79,11 +79,25 @@ limitation, do not imply full measurement.
 supplement to *Social participation*, transversal, **`approximate`** — the proxy
 is explicit in the row's note.
 
-## 6. Validation (2026-05-23)
+## 6. Validation (2026-05-23; column map corrected 2026-05-24)
 
 - **Coverage** — 8 Parquet tables, 5 387 rows; years per table recorded in meta.
-- **Spot value** — `tab_7_7`, 2024, `Total`, paid-streaming-access column
-  (`c08`) = 24.4634 % — matches the source workbook.
+- **Tables 7.7 / 7.8 column map** (`is_cv = FALSE` rows, % of household
+  residents): `c02` total residents (1 000 persons) · `c04` household has a
+  television · `c06` has a flat-screen television · **`c08` has access to
+  pay-TV by subscription (*serviço de televisão por assinatura*)** ·
+  **`c10` has access to a paid video-streaming service (Netflix, Prime Video,
+  Disney+, Globoplay…)**.
+- **Spot values** — `tab_7_7`, 2024, `Total`: pay-TV (`c08`) = 24.46 % and
+  paid streaming (`c10`) = 11.39 % — both match the source workbook.
+  ⚠️ **Correction (2026-05-24):** an earlier version of this note labelled
+  `c08` (24.46 %) as the paid-streaming column. That was wrong — `c08` is
+  pay-TV by subscription; the paid-streaming column is `c10`. Any analysis of
+  streaming access must use `c10`.
+- **Streaming is a short series** — the paid-streaming question (`c10`) was
+  added to the supplement only in 2022; for 2016–2019 the column reads 0.0,
+  which is *not a real zero* — the question did not yet exist. The same holds
+  for the music, reading and gaming purpose columns in tables 7.3 / 7.4.
 - **Idempotency** — re-running the ETL produces byte-identical Parquet.
 
 ## 7. Citation

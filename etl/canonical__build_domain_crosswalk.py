@@ -754,6 +754,35 @@ def anthropic_eei_rows() -> list[dict]:
     return rows
 
 
+# ── PNAB — Política Nacional Aldir Blanc (Phase PNAB) ────────────────────────
+# The corpus's first direct-intergovernmental-transfer funding lens, the
+# structural counterpart to SALIC (Rouanet, corporate-mediated fiscal capture).
+# Maps to a transversal frame: local PARs span every cultural domain.
+PNAB = [
+    ("aldir_blanc_fund",
+     "Política Nacional Aldir Blanc (LC 195/2022 + Decreto 11.453/2023)",
+     "Multiple — not separable", "transversal", None, None, "good",
+     "★ Phase PNAB (2026-06-13) — first direct-transfer funding lens in the "
+     "corpus, complementary to SALIC (Rouanet). 4 tables: `execucao_financeira` "
+     "(5,425 entes Ciclo 1; R$ 3.00 bi recebido, R$ 2.82 bi gasto = 94 %), "
+     "`par_planos` (10,131; Ciclo 1∪2 harmonised — see §3.2), `governanca_entes` "
+     "(5,084; Conselho×Plano×Fundo escore 0–3), `extratos_bancarios` (212,288 "
+     "transações Ciclo 1). Maps transversal because local PARs span every FCS "
+     "domain. Pairs with `atana.tcu` (Acórdão 1709/2025 audited these cycles) "
+     "and `atana.salic` (Rouanet ≈51 % vs PNAB ≈94 % execution). "
+     "See docs/methodology/pnab_aldir_blanc.md."),
+]
+
+
+def pnab_rows() -> list[dict]:
+    rows = []
+    for code, label, dom, dtype, cer, ncm, conf, note in PNAB:
+        rows.append(dict(zip(COLUMNS, (
+            "pnab", "MinC PNAB (Aldir Blanc permanent fund)",
+            code, label, dom, dtype, cer, ncm, conf, note))))
+    return rows
+
+
 # ── Global — CISAC Global Collections Report (Phase 5a) ──────────────────────
 # The cultural-IP *income* lens at global scale — annual royalty collections
 # reported by all 228 CISAC member societies in 111 countries. Deepens the IP
@@ -791,7 +820,7 @@ def build() -> pd.DataFrame:
             + ibge_ncm_rows() + siic_rows() + bcb_rows() + inpi_rows()
             + ecad_rows() + cisac_rows() + ifpi_rows()
             + luminate_rows() + tcu_rows() + oecd_ai_rows()
-            + anthropic_eei_rows())
+            + anthropic_eei_rows() + pnab_rows())
     return pd.DataFrame(rows, columns=COLUMNS)
 
 
@@ -801,13 +830,14 @@ def validate(df: pd.DataFrame) -> None:
     expect = {"fcs2025": 14, "inegi": 10, "dane": 22, "sinca": 2,
               "cr_bccr": 4, "unctad": 15, "ibge_comex": 5, "ibge_siic": 10,
               "bcb": 1, "inpi": 1, "ecad": 1, "cisac": 1, "ifpi": 1,
-              "luminate": 1, "tcu": 1, "oecd_ai": 1, "anthropic_eei": 1}
+              "luminate": 1, "tcu": 1, "oecd_ai": 1, "anthropic_eei": 1,
+              "pnab": 1}
     got = df["source_schema"].value_counts().to_dict()
     for schema, n in expect.items():
         assert got.get(schema) == n, (
             f"{schema}: expected {n} rows, got {got.get(schema)}")
     total = sum(expect.values())
-    assert len(df) == total == 91, f"total rows {len(df)} != 91"
+    assert len(df) == total == 92, f"total rows {len(df)} != 92"
     print(f"  ✓ {len(df)} rows — " + ", ".join(f"{k} {v}" for k, v in expect.items()))
 
     bad = set(df["mapping_confidence"]) - CONFIDENCE_VALUES
