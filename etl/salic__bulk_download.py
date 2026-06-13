@@ -56,10 +56,17 @@ YEARS_TO_BACKFILL = [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
 # Refresh mode tuning — per-PRONAC GET is lighter than pagination
 REFRESH_PAUSE_EVERY = 60         # pause every 60 PRONACs
 REFRESH_PAUSE_SECONDS = 15
-REFRESH_MIN_ANO_PROJETO = 2020   # only refresh PRONACs from 2020 onwards
+REFRESH_MIN_ANO_PROJETO = 2023   # narrowed to post-Lula cohort (was 2020) for FlareSolverr cost
+REFRESH_REQUIRE_AUTHORIZED = True # only PRONACs with valor_aprovado > 0
 
 # Fields whose changes we want to track in refresh_log
 REFRESH_TRACKED_FIELDS = ["valor_captado", "situacao", "valor_aprovado"]
+
+# Cloudflare Turnstile bypass — Jun/2026 the MinC enabled WAF on api.salic.cultura.gov.br.
+# Set FLARESOLVERR_URL=http://localhost:8191/v1 to route requests through a local
+# FlareSolverr Docker container that holds a real browser session. Without this env
+# var the script falls back to direct urllib (which now fails with HTTP 403).
+FLARESOLVERR_URL = os.environ.get("FLARESOLVERR_URL", "").strip() or None
 
 # Exact column list of atana.salic.projetos (matches base table schema).
 # Order matters for INSERT INTO ... SELECT cols.
@@ -83,6 +90,69 @@ def md_token() -> str:
     return token
 
 
+def _flaresolverr_get(url: str, timeout: int = 60) -> dict | None:
+    """Route GET through a local FlareSolverr Docker proxy.
+
+    Raises HTTPError on non-200 responses (so callers can distinguish 404 from
+    transient failures). Returns the parsed JSON body on success.
+    """
+    if not FLARESOLVERR_URL:
+        raise RuntimeError("FLARESOLVERR_URL not set")
+    payload = json.dumps({
+        "cmd": "request.get",
+        "url": url,
+        "maxTimeout": timeout * 1000,
+    }).encode("utf-8")
+    req = urllib.request.Request(
+        FLARESOLVERR_URL,
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=timeout + 30) as resp:
+        envelope = json.loads(resp.read().decode("utf-8"))
+    if envelope.get("status") != "ok":
+        raise RuntimeError(f"FlareSolverr error: {envelope.get('message', envelope)}")
+    sol = envelope["solution"]
+    status = sol.get("status")
+    body = sol.get("response", "")
+    if status == 404:
+        raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)
+    if status != 200:
+        raise urllib.error.HTTPError(url, status, f"FlareSolverr returned {status}", {}, None)
+    # FlareSolverr wraps API JSON inside an HTML envelope sometimes — find and parse the JSON payload
+    body_stripped = body.strip()
+    if body_stripped.startswith("{") or body_stripped.startswith("["):
+        return json.loads(body_stripped)
+    # extract from <pre>...</pre> or generic body content
+    import re
+    m = re.search(r"<pre[^>]*>(.+?)</pre>", body_stripped, re.DOTALL)
+    if m:
+        return json.loads(m.group(1))
+    # last resort: try to find a JSON object in the body
+    m = re.search(r"(\{.+\})", body_stripped, re.DOTALL)
+    if m:
+        return json.loads(m.group(1))
+    raise RuntimeError(f"Could not extract JSON from FlareSolverr response body: {body_stripped[:200]}")
+
+
+def _direct_get_json(url: str, timeout: int = 60) -> dict:
+    """Direct urllib GET (legacy path — works only without WAF)."""
+    req = urllib.request.Request(url, headers={
+        "User-Agent": "atana-data/1.0 (research)",
+        "Accept": "application/json",
+    })
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return json.loads(resp.read().decode("utf-8"))
+
+
+def _http_get_json(url: str, timeout: int = 60) -> dict:
+    """Routes through FlareSolverr if FLARESOLVERR_URL is set; direct urllib otherwise."""
+    if FLARESOLVERR_URL:
+        return _flaresolverr_get(url, timeout)
+    return _direct_get_json(url, timeout)
+
+
 def fetch_page(year: int, offset: int, retries: int = 5) -> dict:
     """Fetch one page. Returns {"total": int, "items": list[dict]}."""
     year_2dig = year - 2000  # W-S1: ano_projeto is 2-digit
@@ -90,12 +160,7 @@ def fetch_page(year: int, offset: int, retries: int = 5) -> dict:
     last_err = None
     for attempt in range(retries):
         try:
-            req = urllib.request.Request(url, headers={
-                "User-Agent": "atana-data/1.0 (research)",
-                "Accept": "application/json",
-            })
-            with urllib.request.urlopen(req, timeout=60) as resp:
-                payload = json.loads(resp.read().decode("utf-8"))
+            payload = _http_get_json(url, timeout=60)
             total = int(payload.get("total", 0))
             items = payload.get("_embedded", {}).get("projetos", [])
             return {"total": total, "items": items}
@@ -221,17 +286,16 @@ def ensure_refresh_log_table(con) -> None:
 
 
 def fetch_pronac(pronac: str, retries: int = 3) -> dict | None:
-    """Fetch one PRONAC by id. Returns the project dict or None on hard failure."""
+    """Fetch one PRONAC by id. Returns the project dict or None on hard failure.
+
+    Uses _http_get_json which routes via FlareSolverr if FLARESOLVERR_URL is set.
+    Without FlareSolverr this will return 403 in Jun/2026+ due to the MinC WAF.
+    """
     url = f"{API_BASE}/{pronac}"
     last_err = None
     for attempt in range(retries):
         try:
-            req = urllib.request.Request(url, headers={
-                "User-Agent": "atana-data/1.0 (research)",
-                "Accept": "application/json",
-            })
-            with urllib.request.urlopen(req, timeout=45) as resp:
-                payload = json.loads(resp.read().decode("utf-8"))
+            payload = _http_get_json(url, timeout=45)
             # API may return the project directly or wrapped in _embedded
             if "_embedded" in payload and "projetos" in payload["_embedded"]:
                 items = payload["_embedded"]["projetos"]
@@ -243,7 +307,7 @@ def fetch_pronac(pronac: str, retries: int = 3) -> dict | None:
             last_err = e
             time.sleep(5 * (2 ** attempt))
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError,
-                ConnectionResetError, ConnectionError, OSError) as e:
+                ConnectionResetError, ConnectionError, OSError, RuntimeError) as e:
             last_err = e
             time.sleep(5 * (2 ** attempt))
     print(f"    WARN fetch_pronac({pronac}) failed after {retries} retries: {last_err}")
@@ -258,23 +322,30 @@ def pronacs_to_refresh(con) -> list[tuple[str, float | None, str | None, float |
     valor_aprovado, ano_int).
     """
     rows = con.execute(f"""
-        SELECT
-          p.PRONAC,
-          p.valor_captado,
-          p.situacao,
-          p.valor_aprovado,
-          CASE
-            WHEN p.ano_projeto IS NULL THEN NULL
-            WHEN LENGTH(p.ano_projeto) = 2 THEN 2000 + CAST(p.ano_projeto AS INTEGER)
-            WHEN LENGTH(p.ano_projeto) = 4 THEN CAST(p.ano_projeto AS INTEGER)
-            ELSE NULL
-          END AS ano_int
-        FROM atana.salic.projetos p
-        LEFT JOIN atana.salic.cycle_status_map m ON p.situacao = m.situacao
-        WHERE p.PRONAC IS NOT NULL
-          AND (m.is_cycle_closed IS NULL OR m.is_cycle_closed = FALSE)
-        QUALIFY ano_int IS NULL OR ano_int >= {REFRESH_MIN_ANO_PROJETO}
-        ORDER BY p.PRONAC
+        WITH base AS (
+          SELECT
+            p.PRONAC,
+            p.valor_captado,
+            p.situacao,
+            p.valor_aprovado,
+            CASE
+              WHEN p.ano_projeto IS NULL THEN NULL
+              WHEN LENGTH(p.ano_projeto) = 2 THEN 2000 + CAST(p.ano_projeto AS INTEGER)
+              WHEN LENGTH(p.ano_projeto) = 4 THEN CAST(p.ano_projeto AS INTEGER)
+              ELSE NULL
+            END AS ano_int,
+            m.is_cycle_closed
+          FROM atana.salic.projetos p
+          LEFT JOIN atana.salic.cycle_status_map m ON p.situacao = m.situacao
+          WHERE p.PRONAC IS NOT NULL
+        )
+        SELECT PRONAC, valor_captado, situacao, valor_aprovado, ano_int
+        FROM base
+        WHERE (is_cycle_closed IS NULL OR is_cycle_closed = FALSE)
+          AND ano_int IS NOT NULL
+          AND ano_int >= {REFRESH_MIN_ANO_PROJETO}
+          AND ({"valor_aprovado IS NOT NULL AND valor_aprovado > 0" if REFRESH_REQUIRE_AUTHORIZED else "TRUE"})
+        ORDER BY PRONAC
     """).fetchall()
     return rows
 
