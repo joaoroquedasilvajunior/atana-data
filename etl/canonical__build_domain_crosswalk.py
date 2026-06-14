@@ -238,11 +238,13 @@ DANE = [
      "Jewellery — CER024 is a leaf of UNCTAD CER020 (crafts/design goods)."),
     (32, "Instrumentos musicales", "Music", "cultural", "CER040", "92",
      "Musical instruments."),
-    (33, "Juegos y juguetes", "Design / CC goods manufacturing",
+    (33, "Juegos y juguetes",
+     "Design; Cultural and creative goods manufacturing",
      "cultural / transversal", "CER025", "95",
-     "★ Toys and games straddle FCS Design and the transversal Cultural and "
-     "creative goods manufacturing domain — no 1:1 map. CER025 is a leaf of "
-     "UNCTAD CER020."),
+     "★ hybrid — toys and games straddle FCS Design (cultural) and the "
+     "transversal Cultural and creative goods manufacturing domain; no 1:1 "
+     "map. Confidence forced to 'approximate' downstream. CER025 is a leaf "
+     "of UNCTAD CER020."),
     (35, "Servicios publicitarios", "Design", "cultural", "CER050-adjacent",
      None,
      "★ Advertising — FCS routes advertising under Design; UNCTAD treats it "
