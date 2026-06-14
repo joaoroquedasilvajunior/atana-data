@@ -1,5 +1,7 @@
 # TCU PNAB audit (Acórdão 1709/2025) — governance & accountability lens
 
+> **Status (2026-06-14):** GitHub ✅ `4e48176` on origin/main · MotherDuck ✅ live · 2 tables / 8 rows in `raw/tcu/`
+
 **Schema:** `atana.tcu` · **Tables:** 2 · **Rows:** 8 · **Ingested:** 2026-06-04 (Phase 5c)
 
 The **Tribunal de Contas da União** is Brazil's federal audit court. Under the *Referencial de Controle de Políticas Públicas* it audited the *Política Nacional Aldir Blanc de Fomento à Cultura* (PNAB) — the largest single fomento policy in Brazilian cultural-economy history (R$ 15 bn statutory / R$ 3 bn-per-year). Acórdão **1709/2025** (sessão 30/07/2025, relator Augusto Nardes, processo TC 025.939/2024-6) carries the assessment.

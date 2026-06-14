@@ -1,5 +1,7 @@
 # Methodology — BCB SGS intellectual-property-services balance of payments
 
+> **Status (2026-06-14):** GitHub ✅ `e435a1e` on origin/main · MotherDuck ✅ live · 1 table / 750 rows in `raw/bcb/ip_services_bop.parquet`
+
 Schema `atana.bcb`. Phase 4c.1 of the Atana Data expansion — the first of the
 three Intellectual-property sources, and the one that reaches the FCS
 *Intellectual property* transversal domain.

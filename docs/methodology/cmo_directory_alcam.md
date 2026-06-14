@@ -1,5 +1,7 @@
 # Methodology — `canonical.cmo_directory_alcam`
 
+> **Status (2026-06-14):** GitHub ✅ `958c72b` on origin/main · MotherDuck ⏳ pending first sync · 1 table / 13 rows in `curated/cmo_directory_alcam.parquet`
+
 The LATAM music-CMO reference directory. A curated 13-row table listing the
 member societies of **ALCAM** — *Alianza Latinoamericana de Autores y
 Compositores de Música*, the LATAM regional federation of music creator

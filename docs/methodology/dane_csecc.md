@@ -1,5 +1,7 @@
 # Methodology — DANE Cuenta Satélite de Economía Cultural y Creativa (CSECC)
 
+> **Status (2026-06-14):** GitHub ✅ `64031c5` on origin/main · MotherDuck ✅ live · 1 table / 484 rows in `raw/dane/csecc_comercio.parquet`
+
 Schema `atana.dane`. Phase 3b of the Atana Data LATAM expansion — the second non-Brazilian national source, after Mexico's INEGI CSCM (`atana.inegi`).
 
 **Source:** DANE — *Cuenta Satélite de Economía Cultural y Creativa (CSECC)*, an extension of Colombia's Sistema de Cuentas Nacionales.

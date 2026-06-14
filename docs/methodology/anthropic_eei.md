@@ -1,5 +1,7 @@
 # `atana.anthropic_eei` — Anthropic Economic Index (revealed-usage frame)
 
+> **Status (2026-06-14):** GitHub ✅ `6b41030` on origin/main · MotherDuck ⏳ pending first sync · 4 tables / 6,290 rows in `raw/anthropic_eei/`
+
 > Methodology note. Phase 6b.1, ingested 2026-06-10. ETL: `etl/anthropic_eei__to_parquet.py`.
 > Accretion-criterion gate 1: Vol 2 minimum corpus (`phase6_corpus_criterion_and_vol2_scoping.md` §3).
 > **Consumed by:** Atana Index Vol 2 (the two-epistemology exposure read) · candidate method Note (pairing with `atana.oecd_ai`, cf. Note #18).

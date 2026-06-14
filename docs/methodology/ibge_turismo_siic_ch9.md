@@ -1,5 +1,7 @@
 # Methodology — IBGE SIIC chapter 9: leisure, culture and nature tourism
 
+> **Status (2026-06-14):** GitHub ✅ `5bc5d17` on origin/main · MotherDuck 🔜 pending re-sync after schema change · 5 tables / 891 rows in `raw/ibge_turismo/`
+
 Schema `atana.ibge_turismo`. Phase 4b of the Atana Data expansion — the second
 of the two ingests that reach the FCS transversal domain *Social participation*
 **as a proxy** (see §3).

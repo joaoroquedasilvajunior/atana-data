@@ -1,5 +1,7 @@
 # `atana.macro` — BRL annual exchange-rate reference series (USD + EUR)
 
+> **Status (2026-06-14):** GitHub ✅ `e4d9306` on origin/main · MotherDuck ⏳ pending first sync · 3 tables / 93 rows in `raw/macro/`
+
 > Methodology note for `raw/macro/fx_brl_usd_annual.parquet` and
 > `raw/macro/fx_brl_eur_annual.parquet`. Prepared 2026-06-10 (Phase 6a, first item).
 > ETL: `etl/macro__fx_brl_annual_to_parquet.py`.

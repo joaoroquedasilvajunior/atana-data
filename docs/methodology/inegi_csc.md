@@ -1,5 +1,7 @@
 # Methodology — INEGI Cuenta Satélite de la Cultura de México (CSCM)
 
+> **Status (2026-06-14):** GitHub ✅ `4e48176` on origin/main · MotherDuck 🔜 pending re-sync after schema change · 5 tables / 6,014 rows in `raw/inegi/`
+
 Schema `atana.inegi`. Phase 3a of the Atana Data LATAM expansion.
 
 **Source:** INEGI — *Cuenta Satélite de la Cultura de México (CSCM)*, part of the Sistema de Cuentas Nacionales de México, base year 2018.

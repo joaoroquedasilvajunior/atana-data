@@ -1,5 +1,7 @@
 # Methodology — `atana.cisac` from the CISAC Global Collections Report
 
+> **Status (2026-06-14):** GitHub ✅ `4e48176` on origin/main · MotherDuck 🔜 pending re-sync after schema change · 4 tables / 25 rows in `raw/cisac/`
+
 Schema `atana.cisac`. **Phase 5a** of the Atana Data expansion — first ingest
 of the *CISAC Global Collections Report* (GCR), the global counterpart to
 `atana.ecad`. CISAC (International Confederation of Societies of Authors and

@@ -1,5 +1,7 @@
 # Methodology — ECAD headline royalty series (DEPRECATED — v1)
 
+> **Status (2026-06-14):** GitHub ✅ `4e48176` on origin/main · MotherDuck 🔜 pending re-sync after schema change · 4 tables / 70 rows in `raw/ecad/`
+
 > **⚠ Deprecated 2026-05-28.** This v1 methodology note covered the 3-row
 > headline series. It has been superseded by **`ecad_relatorio_anual.md`**,
 > which documents the full 4-table v2 `atana.ecad` schema (8-row headline +

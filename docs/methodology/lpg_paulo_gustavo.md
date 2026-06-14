@@ -1,5 +1,7 @@
 # `atana.lpg` — Lei Paulo Gustavo (LC 195/2022) execution data
 
+> **Status (2026-06-14):** GitHub ✅ `c613558` on origin/main · MotherDuck ⏳ pending first sync · 4 tables / 45,727 rows in `curated/lpg/`
+
 **Ingest date:** 2026-06-14
 **Source publisher:** Ministério da Cultura, DFD/SEFIC — *dados.cultura.gov.br* (Portal de Dados da Cultura)
 **License:** Brazilian public-domain convention (verify on each resource page)

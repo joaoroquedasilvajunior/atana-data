@@ -1,5 +1,7 @@
 # OECD AI Papers — methodological frame for the Atana AI Exposure Index
 
+> **Status (2026-06-14):** GitHub ✅ `4e48176` on origin/main · MotherDuck ✅ live · 2 tables / 11 rows in `raw/oecd_ai/`
+
 **Schema:** `atana.oecd_ai` · **Tables:** 2 · **Rows:** 12 · **Ingested:** 2026-06-04 (Phase 5c)
 
 The OECD's *Artificial Intelligence Papers* series (OECD-OPSI) publishes short, methodology-rich papers framing the public-sector AI conversation across OECD members. This schema captures Tier 1 — headline framing — of two papers the Atana AI Exposure Index (Vol. 1) and the upcoming Vol. 2 directly triangulate against.

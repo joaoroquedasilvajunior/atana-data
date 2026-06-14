@@ -1,5 +1,7 @@
 # Luminate Year-End Music Industry Report — consumer / catalog-supply lens
 
+> **Status (2026-06-14):** GitHub ✅ `4e48176` on origin/main · MotherDuck ✅ live · 4 tables / 14 rows in `raw/luminate/`
+
 **Schema:** `atana.luminate` · **Tables:** 4 · **Rows:** 14 · **Ingested:** 2026-06-04 (Phase 5c)
 
 **Luminate** is the data company behind the Billboard charts (jointly owned with PMC) and the Recording Academy's GRAMMY analytics. Its *Year-End Music Industry Report* aggregates global streaming consumption from the platform surface — what listeners played, how much catalog exists, and how concentrated paid consumption is by country and genre.
