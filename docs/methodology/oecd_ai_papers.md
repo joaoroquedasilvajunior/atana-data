@@ -1,6 +1,6 @@
 # OECD AI Papers — methodological frame for the Atana AI Exposure Index
 
-> **Status (2026-06-14):** GitHub ✅ `4e48176` on origin/main · MotherDuck ✅ live · 2 tables / 11 rows in `raw/oecd_ai/`
+> **Status (2026-06-14):** GitHub ✅ `9d435b3` on origin/main · MotherDuck ✅ live · 2 tables / 11 rows in `raw/oecd_ai/`
 
 **Schema:** `atana.oecd_ai` · **Tables:** 2 · **Rows:** 12 · **Ingested:** 2026-06-04 (Phase 5c)
 

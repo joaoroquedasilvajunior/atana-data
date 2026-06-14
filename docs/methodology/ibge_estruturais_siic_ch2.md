@@ -1,6 +1,6 @@
 # Methodology — IBGE SIIC chapter 2: structural business surveys
 
-> **Status (2026-06-14):** GitHub ✅ `5bc5d17` on origin/main · MotherDuck 🔜 pending re-sync after schema change · 8 tables / 2,832 rows in `raw/ibge_estruturais/`
+> **Status (2026-06-14):** GitHub ✅ `9d435b3` on origin/main · MotherDuck 🔜 pending re-sync after schema change · 8 tables / 2,832 rows in `raw/ibge_estruturais/`
 
 Schema `atana.ibge_estruturais`. Phase 4a of the Atana Data expansion — the
 first of the Brazil-first non-trade ingests that close the FCS transversal

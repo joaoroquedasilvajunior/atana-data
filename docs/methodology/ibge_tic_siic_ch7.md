@@ -1,6 +1,6 @@
 # Methodology — IBGE SIIC chapter 7: internet and television access
 
-> **Status (2026-06-14):** GitHub ✅ `4e48176` on origin/main · MotherDuck 🔜 pending re-sync after schema change · 8 tables / 5,387 rows in `raw/ibge_tic/`
+> **Status (2026-06-14):** GitHub ✅ `9d435b3` on origin/main · MotherDuck 🔜 pending re-sync after schema change · 8 tables / 5,387 rows in `raw/ibge_tic/`
 
 Schema `atana.ibge_tic`. Phase 4b of the Atana Data expansion — one of the two
 ingests that reach the FCS transversal domain *Social participation* **as a

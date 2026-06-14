@@ -1,6 +1,6 @@
 # `atana.pnab` — Política Nacional Aldir Blanc
 
-> **Status (2026-06-14):** GitHub ✅ `549bc99` on origin/main · MotherDuck ⏳ pending first sync · 4 tables / 232,928 rows in `curated/pnab/`
+> **Status (2026-06-14):** GitHub ✅ `9d435b3` on origin/main · MotherDuck ⏳ pending first sync · 4 tables / 232,928 rows in `curated/pnab/`
 
 > Methodology note. Phase PNAB ingest, 2026-06-13. ETL: `etl/pnab__to_parquet.py`
 > → 4 Parquet tables in `curated/pnab/`. Accretion-criterion gate 3 (consumers:
