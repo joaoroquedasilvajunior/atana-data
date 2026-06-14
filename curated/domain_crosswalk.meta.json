@@ -24,7 +24,7 @@
     "_atana_intel/phase4_scoping.md"
   ],
   "build_script": "etl/canonical__build_domain_crosswalk.py",
-  "build_date": "2026-06-13",
+  "build_date": "2026-06-14",
   "grain": "one row per classification code (source_schema, source_code)",
   "row_composition": {
     "dane": 22,
@@ -36,6 +36,7 @@
     "cr_bccr": 4,
     "sinca": 2,
     "luminate": 1,
+    "pnab": 1,
     "anthropic_eei": 1,
     "oecd_ai": 1,
     "tcu": 1,
@@ -44,7 +45,7 @@
     "cisac": 1,
     "ecad": 1,
     "bcb": 1,
-    "pnab": 1
+    "lpg": 1
   },
   "fcs_spine": "2025 UNESCO Framework for Cultural Statistics — 7 cultural + 7 transversal domains",
   "licence": "CC BY 4.0 (Atana) — the underlying classifications retain their own licences",

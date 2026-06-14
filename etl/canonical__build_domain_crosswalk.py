@@ -783,6 +783,40 @@ def pnab_rows() -> list[dict]:
     return rows
 
 
+# ── LPG — Lei Paulo Gustavo (Phase LPG) ──────────────────────────────────────
+# Audiovisual-targeted emergency cultural support under LC 195/2022 (same legal
+# vehicle as PNAB) but financially distinct — direct-to-ente transfer with a
+# `Meta do Plano` split: Audiovisual R$ 2.80 bi + Outras Áreas R$ 1.07 bi.
+# Cultural-focused: classifies primarily to *Audiovisual and interactive media*
+# because ~72 % of the money is AV-targeted. Deepens an FCS domain already
+# reached; coverage meter stays 13/14.
+LPG = [
+    ("paulo_gustavo_lc195",
+     "Lei Paulo Gustavo (LC 195/2022) — direct-to-ente audiovisual emergency",
+     "Audiovisual", "cultural", None, None, "good",
+     "★ Phase LPG (2026-06-14) — first AV-specific direct-transfer governance "
+     "lens. 4 tables: `adesao_entes` (5,596 estados∪munis), "
+     "`execucao_financeira` (10,984 rows; Meta do Plano splits AV R$ 2.80 bi "
+     "from Outras Áreas R$ 1.07 bi; total R$ 3.86 bi reconciles to law), "
+     "`extratos_bancarios` (10,967 transações), `relatorio_gestao` "
+     "(18,180 narrative + execução-física rows — richer per-edital granularity "
+     "than PNAB). LPG and PNAB are sibling MinC datasets under LC 195/2022 + "
+     "Decreto 11.453/2023 — joinable on cod_ibge. NOTE: contrary to the 2026-06-13 "
+     "scoping memo, LPG-AV money flows through the same MinC ente-federado "
+     "pipe as Outras Áreas — there is NO separate ANCINE/FSA channel in this "
+     "dataset. See docs/methodology/lpg_paulo_gustavo.md."),
+]
+
+
+def lpg_rows() -> list[dict]:
+    rows = []
+    for code, label, dom, dtype, cer, ncm, conf, note in LPG:
+        rows.append(dict(zip(COLUMNS, (
+            "lpg", "MinC Lei Paulo Gustavo (audiovisual emergency)",
+            code, label, dom, dtype, cer, ncm, conf, note))))
+    return rows
+
+
 # ── Global — CISAC Global Collections Report (Phase 5a) ──────────────────────
 # The cultural-IP *income* lens at global scale — annual royalty collections
 # reported by all 228 CISAC member societies in 111 countries. Deepens the IP
@@ -820,7 +854,7 @@ def build() -> pd.DataFrame:
             + ibge_ncm_rows() + siic_rows() + bcb_rows() + inpi_rows()
             + ecad_rows() + cisac_rows() + ifpi_rows()
             + luminate_rows() + tcu_rows() + oecd_ai_rows()
-            + anthropic_eei_rows() + pnab_rows())
+            + anthropic_eei_rows() + pnab_rows() + lpg_rows())
     return pd.DataFrame(rows, columns=COLUMNS)
 
 
@@ -831,13 +865,13 @@ def validate(df: pd.DataFrame) -> None:
               "cr_bccr": 4, "unctad": 15, "ibge_comex": 5, "ibge_siic": 10,
               "bcb": 1, "inpi": 1, "ecad": 1, "cisac": 1, "ifpi": 1,
               "luminate": 1, "tcu": 1, "oecd_ai": 1, "anthropic_eei": 1,
-              "pnab": 1}
+              "pnab": 1, "lpg": 1}
     got = df["source_schema"].value_counts().to_dict()
     for schema, n in expect.items():
         assert got.get(schema) == n, (
             f"{schema}: expected {n} rows, got {got.get(schema)}")
     total = sum(expect.values())
-    assert len(df) == total == 92, f"total rows {len(df)} != 92"
+    assert len(df) == total == 93, f"total rows {len(df)} != 93"
     print(f"  ✓ {len(df)} rows — " + ", ".join(f"{k} {v}" for k, v in expect.items()))
 
     bad = set(df["mapping_confidence"]) - CONFIDENCE_VALUES
@@ -871,7 +905,7 @@ def validate(df: pd.DataFrame) -> None:
     # 'N/14 domains reached' progress meter for the transversal-blind-spot work.
     nat = df[df["source_schema"].isin(
         ["inegi", "dane", "sinca", "cr_bccr", "ibge_siic", "bcb", "inpi",
-         "ecad", "cisac", "ifpi", "luminate", "tcu", "oecd_ai"])]
+         "ecad", "cisac", "ifpi", "luminate", "tcu", "oecd_ai", "lpg"])]
     reached = set()
     for d in nat["fcs2025_domain"].dropna():
         for part in str(d).replace(";", "/").split("/"):
