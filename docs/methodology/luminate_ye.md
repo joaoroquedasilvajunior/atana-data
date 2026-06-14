@@ -1,6 +1,6 @@
 # Luminate Year-End Music Industry Report — consumer / catalog-supply lens
 
-> **Status (2026-06-14):** GitHub ✅ `128a657` on origin/main · MotherDuck ✅ live · 4 tables / 14 rows in `raw/luminate/`
+> **Status (2026-06-14):** GitHub ✅ `5fa9c34` on origin/main · MotherDuck ✅ live · 4 tables / 14 rows in `raw/luminate/`
 
 **Schema:** `atana.luminate` · **Tables:** 4 · **Rows:** 14 · **Ingested:** 2026-06-04 (Phase 5c)
 

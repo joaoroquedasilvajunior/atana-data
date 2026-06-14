@@ -1,6 +1,6 @@
 # `atana.anthropic_eei` — Anthropic Economic Index (revealed-usage frame)
 
-> **Status (2026-06-14):** GitHub ✅ `128a657` on origin/main · MotherDuck ✅ live · 4 tables / 6,290 rows in `raw/anthropic_eei/`
+> **Status (2026-06-14):** GitHub ✅ `5fa9c34` on origin/main · MotherDuck ✅ live · 4 tables / 6,290 rows in `raw/anthropic_eei/`
 
 > Methodology note. Phase 6b.1, ingested 2026-06-10. ETL: `etl/anthropic_eei__to_parquet.py`.
 > Accretion-criterion gate 1: Vol 2 minimum corpus (`phase6_corpus_criterion_and_vol2_scoping.md` §3).

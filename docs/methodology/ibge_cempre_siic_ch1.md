@@ -1,6 +1,6 @@
 # Methodology — IBGE SIIC chapter 1: formally constituted activities
 
-> **Status (2026-06-14):** GitHub ✅ `128a657` on origin/main · MotherDuck ✅ live · 23 tables / 1,202 rows in `raw/ibge_cempre/`
+> **Status (2026-06-14):** GitHub ✅ `5fa9c34` on origin/main · MotherDuck ✅ live · 23 tables / 1,202 rows in `raw/ibge_cempre/`
 
 Schema `atana.ibge_cempre`. Phase 4a of the Atana Data expansion — the
 firm-structure complement to `atana.ibge_estruturais` (chapter 2).

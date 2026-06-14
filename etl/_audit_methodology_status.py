@@ -54,20 +54,26 @@ NOTE_TO_SCHEMA = {
     "ecad_headline.md":           "ecad",       # superseded — annotate
     "ecad_relatorio_anual.md":    "ecad",
     "ibge_cempre_siic_ch1.md":    "ibge_cempre",
+    "ibge_comex_siic_ch10.md":    "ibge_comex",       # OG — added 2026-06-14
     "ibge_estruturais_siic_ch2.md": "ibge_estruturais",
+    "ibge_pnadc_siic_ch6.md":     "ibge_pnadc",       # OG — added 2026-06-14
     "ibge_tic_siic_ch7.md":       "ibge_tic",
     "ibge_turismo_siic_ch9.md":   "ibge_turismo",
     "ifpi_gmr.md":                "ifpi",
     "inegi_csc.md":               "inegi",
     "inpi_indicadores.md":        "inpi",
     "latam_trade_by_fcs_domain.md": "canonical_latam_trade",  # special
+    "lexml_genealogy.md":         "lexml",            # OG — added 2026-06-14
     "lpg_paulo_gustavo.md":       "lpg",
     "luminate_ye.md":             "luminate",
     "macro_fx_brl.md":            "macro",
     "oecd_ai_papers.md":          "oecd_ai",
     "pnab_aldir_blanc.md":        "pnab",
+    "rais_mte.md":                "rais",             # OG — added 2026-06-14
+    "salic_api.md":               "salic",            # OG — added 2026-06-14
     "sinca_csc.md":               "sinca",
     "tcu_pnab.md":                "tcu",
+    "unctad_creative_economy.md": "unctad",           # OG — added 2026-06-14
 }
 
 # Special path overrides — the "canonical" notes don't follow raw/curated convention
@@ -88,7 +94,10 @@ def find_parquet_paths(schema: str) -> list[Path]:
     for prefix in ("curated", "raw"):
         d = REPO / prefix / schema
         if d.exists():
-            return sorted(d.glob("*.parquet"))
+            # Recursive walk, but skip _source/ and _staging/ subtrees
+            return sorted(p for p in d.rglob("*.parquet")
+                          if "_source" not in p.parts
+                          and "_staging" not in p.parts)
     return []
 
 
@@ -120,24 +129,34 @@ def last_commit_for(schema: str, paths: list[Path]) -> tuple[str | None, bool]:
     return sha[:7], on_origin
 
 
-def count_rows(parquets: list[Path]) -> int:
-    """Sum row counts across parquets. Uses duckdb if available; else parquet meta."""
+def count_rows(parquets: list[Path]) -> tuple[int, int]:
+    """Sum row counts across parquets, skipping unreadable files.
+    Returns (n_rows, n_bad) — n_bad is the number of corrupt / unreadable parquets."""
     if not parquets:
-        return 0
+        return 0, 0
+    n_bad = 0
     try:
         import duckdb  # type: ignore
         con = duckdb.connect(":memory:")
         total = 0
         for p in parquets:
-            total += con.execute(f"SELECT count(*) FROM read_parquet('{p}')").fetchone()[0]
-        return total
+            try:
+                total += con.execute(f"SELECT count(*) FROM read_parquet('{p}')").fetchone()[0]
+            except Exception:
+                n_bad += 1
+        return total, n_bad
     except ImportError:
-        # parquet metadata fallback — slower path
         try:
             import pyarrow.parquet as pq  # type: ignore
-            return sum(pq.ParquetFile(p).metadata.num_rows for p in parquets)
+            total = 0
+            for p in parquets:
+                try:
+                    total += pq.ParquetFile(p).metadata.num_rows
+                except Exception:
+                    n_bad += 1
+            return total, n_bad
         except ImportError:
-            return -1  # unknown
+            return -1, 0  # unknown
 
 
 # ─── Manifest parser for MotherDuck-sync hint ───────────────────────────────
@@ -184,7 +203,7 @@ def parse_md_state(schema: str, manifest_text: str) -> str:
 
 # ─── Status-line composer ───────────────────────────────────────────────────
 def compose_status_line(date: str, schema: str, sha: str | None, on_origin: bool,
-                        md_state: str, n_tables: int, n_rows: int,
+                        md_state: str, n_tables: int, n_rows: int, n_bad: int,
                         rel_path: str) -> str:
     if sha is None:
         gh = "⏳ uncommitted"
@@ -207,6 +226,8 @@ def compose_status_line(date: str, schema: str, sha: str | None, on_origin: bool
         rows_part = f"{n_tables} {tbl_word} (row count unavailable)"
     else:
         rows_part = f"{n_tables} {tbl_word} / {n_rows:,} {row_word}"
+    if n_bad > 0:
+        rows_part += f" · ⚠ {n_bad} corrupt parquet{'s' if n_bad != 1 else ''}"
 
     return (f"> **Status ({date}):** GitHub {gh} · {md} · {rows_part} in `{rel_path}`\n")
 
@@ -282,7 +303,7 @@ def main():
         sha, on_origin = last_commit_for(schema, parquets)
         md_state = parse_md_state(schema, manifest)
         n_tables = len(parquets)
-        n_rows = count_rows(parquets) if parquets else 0
+        n_rows, n_bad = (count_rows(parquets) if parquets else (0, 0))
         if parquets:
             # show a representative path (the dir, or the single file)
             if len(parquets) == 1:
@@ -293,12 +314,13 @@ def main():
             rel_path = "(no parquets yet)"
 
         status_line = compose_status_line(
-            today, schema, sha, on_origin, md_state, n_tables, n_rows, rel_path)
+            today, schema, sha, on_origin, md_state, n_tables, n_rows, n_bad, rel_path)
 
         audit.append({
             "note": note_name, "schema": schema,
             "github_sha": sha, "on_origin": on_origin,
             "md_state": md_state, "tables": n_tables, "rows": n_rows,
+            "corrupt_parquets": n_bad,
             "path": rel_path,
             "status_line": status_line.rstrip(),
         })

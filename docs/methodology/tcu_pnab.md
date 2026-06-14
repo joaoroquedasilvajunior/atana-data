@@ -1,6 +1,6 @@
 # TCU PNAB audit (Acórdão 1709/2025) — governance & accountability lens
 
-> **Status (2026-06-14):** GitHub ✅ `128a657` on origin/main · MotherDuck ✅ live · 2 tables / 8 rows in `raw/tcu/`
+> **Status (2026-06-14):** GitHub ✅ `5fa9c34` on origin/main · MotherDuck ✅ live · 2 tables / 8 rows in `raw/tcu/`
 
 **Schema:** `atana.tcu` · **Tables:** 2 · **Rows:** 8 · **Ingested:** 2026-06-04 (Phase 5c)
 

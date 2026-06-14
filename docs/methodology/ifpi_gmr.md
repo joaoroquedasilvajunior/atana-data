@@ -1,6 +1,6 @@
 # Methodology — `atana.ifpi` from the IFPI Global Music Report
 
-> **Status (2026-06-14):** GitHub ✅ `128a657` on origin/main · MotherDuck ✅ live · 4 tables / 25 rows in `raw/ifpi/`
+> **Status (2026-06-14):** GitHub ✅ `5fa9c34` on origin/main · MotherDuck ✅ live · 4 tables / 25 rows in `raw/ifpi/`
 
 Schema `atana.ifpi`. **Phase 5b** of the Atana Data expansion — first ingest of
 the *IFPI Global Music Report* (GMR), the global record-label-side music-revenue
