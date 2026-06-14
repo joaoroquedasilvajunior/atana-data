@@ -1,6 +1,6 @@
 # `canonical.latam_trade_by_fcs_domain` — cross-LATAM cultural trade through the FCS 2025 spine
 
-> **Status (2026-06-14):** GitHub ✅ `958c72b` on origin/main · MotherDuck ⏳ pending first sync · 1 table / 794 rows in `curated/latam_trade_by_fcs_domain.parquet`
+> **Status (2026-06-14):** GitHub ✅ `958c72b` on origin/main · MotherDuck ✅ live · 1 table / 794 rows in `curated/latam_trade_by_fcs_domain.parquet`
 
 > Methodology note. Built 2026-06-10 (Phase 6a.2). Build script:
 > `etl/canonical__build_latam_trade_by_fcs.py` → `curated/latam_trade_by_fcs_domain.parquet`.

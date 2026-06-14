@@ -172,7 +172,7 @@ ETL: `etl/rais__bigquery_to_parquet.py` + `rais__deflate_ipca.py` (both `--stagi
 
 ---
 
-## `atana.inegi` — INEGI Cuenta Satélite de la Cultura de México ✅ Live (trade); 🔜 non-trade built locally — pending sync
+## `atana.inegi` — INEGI Cuenta Satélite de la Cultura de México ✅ Live, all modules (MotherDuck synced 2026-06-14)
 
 Source: INEGI *Cuenta Satélite de la Cultura de México* (CSCM), base year 2018. Phase 3a (trade module) + **Phase 5b (non-trade modules, 2026-06-01)** — the first LATAM non-Brazilian production-account + employment view the corpus carries, anchored on the just-released CSCM 2024 boletín (Comunicado 144/25, 19 Nov 2025).
 
@@ -246,7 +246,7 @@ ETL: `etl/cr_bccr__csc_to_parquet.py` · Methodology: `docs/methodology/cr_bccr_
 
 ---
 
-## `atana.ibge_estruturais` — IBGE SIIC ch. 2: structural business surveys 🔜 Built — pending sync
+## `atana.ibge_estruturais` — IBGE SIIC ch. 2: structural business surveys ✅ Live (MotherDuck synced 2026-06-14)
 
 Source: IBGE *Sistema de Informações e Indicadores Culturais* (SIIC), "Informações Culturais" 2024 edition, chapter 2 — structural business surveys (PIA / PAS / PAC). Phase 4a of the Brazil-first transversal-domain expansion — the production-account view that closes the FCS *Cultural and creative goods manufacturing* domain.
 
@@ -258,7 +258,7 @@ Long format: grain `table_id × variable × row_label × year → value, cv`. ET
 
 ---
 
-## `atana.ibge_cempre` — IBGE SIIC ch. 1: formally constituted activities 🔜 Built — pending sync
+## `atana.ibge_cempre` — IBGE SIIC ch. 1: formally constituted activities ✅ Live (MotherDuck synced 2026-06-14)
 
 Source: SIIC "Informações Culturais" 2024, chapter 1 — CEMPRE (Cadastro Central de Empresas) + company demography + public-register statistics. Phase 4a — the firm-structure complement to `ibge_estruturais`.
 
@@ -266,7 +266,7 @@ Source: SIIC "Informações Culturais" 2024, chapter 1 — CEMPRE (Cadastro Cent
 
 ---
 
-## `atana.ibge_tic` — IBGE SIIC ch. 7: internet & television access 🔜 Built — pending sync
+## `atana.ibge_tic` — IBGE SIIC ch. 7: internet & television access ✅ Live (MotherDuck synced 2026-06-14)
 
 Source: SIIC "Informações Culturais" 2024, chapter 7 — PNAD Contínua ICT supplement. Phase 4b — reaches the FCS *Social participation* transversal domain **as a proxy**.
 
@@ -278,7 +278,7 @@ Source: SIIC "Informações Culturais" 2024, chapter 7 — PNAD Contínua ICT su
 
 ---
 
-## `atana.ibge_turismo` — IBGE SIIC ch. 9: leisure, culture & nature tourism 🔜 Built — pending sync
+## `atana.ibge_turismo` — IBGE SIIC ch. 9: leisure, culture & nature tourism ✅ Live (MotherDuck synced 2026-06-14)
 
 Source: SIIC "Informações Culturais" 2024, chapter 9 — PNAD Contínua leisure-tourism supplement. Phase 4b — reaches FCS *Social participation* **as a proxy**.
 
@@ -302,7 +302,7 @@ Source: Banco Central do Brasil — SGS series 22777 (receita) / 22778 (despesa)
 
 ---
 
-## `atana.inpi` — INPI industrial-property register (cultural IP) 🔜 Built — pending sync
+## `atana.inpi` — INPI industrial-property register (cultural IP) ✅ Live (MotherDuck synced 2026-06-14)
 
 Source: INPI — *Tabelas Completas dos Indicadores de Propriedade Industrial* (Anuário Estatístico), 2024 edition. Phase 4c.2 — the cultural-IP *stock* (registration counts), deepening the FCS *Intellectual property* domain that BCB (4c.1) reached as a flow.
 
@@ -312,7 +312,7 @@ Faithful wide preservation — original cells kept as `c01…` (all VARCHAR). Th
 
 ---
 
-## `atana.ecad` — ECAD music public-performance royalties ✅ Live v2 · 🔜 v3 built locally — pending re-sync
+## `atana.ecad` — ECAD music public-performance royalties ✅ Live v3 (MotherDuck synced 2026-06-14)
 
 Source: ECAD — *Escritório Central de Arrecadação e Distribuição*. Phase 4c.3 — the cultural-IP *income* lens; the third reach into the FCS *Intellectual property* domain. **v3 (2026-05-29)** corrects a v2 year-scramble and adds multi-year series, sourced from the ECAD Relatórios Anuais **2020 / 2021 / 2022 / 2024 / 2025** (markitdown-converted) + Transparência 2023. **4 tables, 70 rows.**
 
@@ -329,7 +329,7 @@ ETLs: `etl/ecad__headline_series_to_parquet.py` · `etl/ecad__arrecadacao_por_se
 
 ---
 
-## `atana.cisac` — CISAC Global Collections Report (global creator-royalty headlines) 🔜 Built locally — pending sync
+## `atana.cisac` — CISAC Global Collections Report (global creator-royalty headlines) ✅ Live (MotherDuck synced 2026-06-14)
 
 Source: **CISAC Global Collections Report 2025** (covering 2024 royalty data; published ~November 2025), via the public landing page. Phase 5a of the Atana Data expansion — the global counterpart to `atana.ecad`. CISAC is the global federation of authors' and composers' collective-management societies (228 members across 111 countries; ALCAM is its LATAM bloc — see `canonical.cmo_directory_alcam`).
 
@@ -346,7 +346,7 @@ ETLs: `etl/cisac__gcr_2025_global_by_stream_to_parquet.py` · `etl/cisac__gcr_20
 
 ---
 
-## `atana.ifpi` — IFPI Global Music Report (global recorded-music revenue) 🔜 Built locally — pending sync
+## `atana.ifpi` — IFPI Global Music Report (global recorded-music revenue) ✅ Live (MotherDuck synced 2026-06-14)
 
 Source: **IFPI Global Music Report 2026** (covering 2025 recorded-music revenue; press release 18 March 2026). Phase 5b of the Atana Data expansion — the *recorded-music* (record-label / master-recording) lens, structurally distinct from the *author-royalty* (CMO) lens carried by `atana.ecad` (Brazil) and `atana.cisac` (global). Three music-money lenses now in the corpus.
 
@@ -410,7 +410,7 @@ ETLs: `etl/oecd_ai__papers_headline_to_parquet.py` · `etl/oecd_ai__ai_capabilit
 
 ---
 
-## `atana.pnab` — Política Nacional Aldir Blanc (direct-transfer cultural funding) 🔜 Built locally — pending first sync (NEW schema)
+## `atana.pnab` — Política Nacional Aldir Blanc (direct-transfer cultural funding) ✅ Live (MotherDuck synced 2026-06-14)
 
 Source: **MinC Portal de Dados da Cultura**, dataset *"Implementação e Execução da PNAB"* (DFD/SEFIC; monthly). LC 195/2022 + Decreto 11.453/2023. Phase PNAB — the corpus's first **direct-intergovernmental-transfer** funding lens, structural counterpart to `atana.salic` (Rouanet, corporate-mediated fiscal capture).
 
@@ -427,7 +427,7 @@ ETL: `etl/pnab__to_parquet.py` (idempotent, byte-identical reruns; 4 source xlsx
 
 ---
 
-## `atana.lpg` — Lei Paulo Gustavo (LC 195/2022) direct-transfer audiovisual emergency 🔜 Built locally — pending first sync (NEW schema)
+## `atana.lpg` — Lei Paulo Gustavo (LC 195/2022) direct-transfer audiovisual emergency ✅ Live (MotherDuck synced 2026-06-14)
 
 Source: **MinC Portal de Dados da Cultura**, dataset *"Lei Paulo Gustavo (LPG)"* (DFD/SEFIC; monthly). LC 195/2022 + Decreto 11.453/2023. Phase LPG — **sibling schema to `atana.pnab`** under the same legal vehicle; the AV-specific direct-transfer pipe.
 
@@ -444,7 +444,7 @@ ETL: `etl/lpg__to_parquet.py` (idempotent, byte-identical reruns; 4 CSV + 2 XLSX
 
 ---
 
-## `atana.anthropic_eei` — Anthropic Economic Index (revealed-usage frame) 🔜 Built locally — pending first sync (NEW schema)
+## `atana.anthropic_eei` — Anthropic Economic Index (revealed-usage frame) ✅ Live (MotherDuck synced 2026-06-14)
 
 Source: **Anthropic Economic Index**, Hugging Face `Anthropic/EconomicIndex` (releases 2025-02 → 2026-03). Phase 6b.1 — the **revealed-usage** counterpart to `atana.oecd_ai`'s expert-rated AI-capability frame: real Claude.ai conversations classified onto O*NET tasks and geographies. Passes accretion-criterion gate 1 (Vol 2 minimum corpus).
 
@@ -461,7 +461,7 @@ ETL: `etl/anthropic_eei__to_parquet.py` (HF fetch + cache, `--refresh` = DB-upda
 
 ---
 
-## `atana.macro` — Macro reference series (FX, deflators) 🔜 Built locally — pending first sync (NEW schema)
+## `atana.macro` — Macro reference series (FX, deflators) ✅ Live (MotherDuck synced 2026-06-14)
 
 Cross-cutting convenience reference series used to derive comparable views of BRL-denominated corpus tables. **Not cultural statistics** — documented derivation inputs, in the convention of the per-country `fx_*_usd_annual` tables.
 
@@ -503,7 +503,7 @@ Row composition: `fcs2025` 14 (the spine — 7 cultural + 7 transversal) · `ine
 
 ETL: `etl/canonical__build_domain_crosswalk.py` · Methodology: `docs/methodology/canonical_domain_crosswalk.md`
 
-### `canonical.cmo_directory_alcam` ✅ Live locally — pending push + sync
+### `canonical.cmo_directory_alcam` ✅ Live (MotherDuck synced 2026-06-14)
 
 The LATAM music-CMO reference directory. **13 rows**, one per member society of ALCAM (*Alianza Latinoamericana de Autores y Compositores de Música*, alcammusica.org), across 12 countries (Brazil has two: ABRAMUS + UBC).
 
@@ -525,7 +525,7 @@ A join key for any future per-society data across the 11 non-Brazilian ALCAM cou
 
 ETL: `etl/canonical__build_cmo_directory_alcam.py` (inline data → DuckDB COPY → Parquet, idempotent, byte-identical reruns) · Methodology: `docs/methodology/cmo_directory_alcam.md`
 
-### `canonical.latam_trade_by_fcs_domain` 🔜 Built locally — pending push + first sync
+### `canonical.latam_trade_by_fcs_domain` ✅ Live (MotherDuck synced 2026-06-14)
 
 Cross-LATAM cultural trade by 2025 UNESCO FCS domain — **794 rows**, grain `country × year × flow × fcs2025_domain`. The materialised "query the crosswalk was built to enable": MX (2008–2024, CSCM supply-use) · CO (2014–2024, CSECC) · CR (2010–2024, dedicated table; 2022+ n.d. rows kept) · BR (2014–2024, NCM pure-cultural goods chapters, USD via `atana.macro`) · AR (2004–2022, constant-2004 ARS, **USD deliberately NULL** — sinca_csc.md §8). Comparability annotated per row (`basis`, `comparability_note`), never asserted. Headline build-time findings: Colombia AV exports ×4.2 (2021–2024, US$ 38.8→162.3 mi); Mexico digital ×2.4. In-script validation on every build; byte-identical reruns. **Consumers:** Atana Index Vol 2 backbone · the cross-LATAM Note (research backlog) · Data Subscription demo.
 
@@ -579,3 +579,4 @@ The dataset behind Análise 10 — Brazilian cultural foreign trade time series.
 | 2026-06-13 | **Phase PNAB — `atana.pnab` schema added (NEW)** — Política Nacional Aldir Blanc, the corpus's first direct-transfer funding lens (counterpart to SALIC/Rouanet). 4 tables, 232.928 rows: `execucao_financeira` (5.425; R$ 3,00 bi recebido / R$ 2,82 bi gasto = 94 %), `par_planos` (10.131; Ciclo 1∪2 harmonised, §3.2), `governanca_entes` (5.084; escore 0–3), `extratos_bancarios` (212.288). Key = cod_ibge (no CNPJ in execução/extrato). `canonical.domain_crosswalk` 91 → **92** (1 `pnab` row → transversal "Multiple — not separable"); coverage 13/14 unchanged. ETL `etl/pnab__to_parquet.py` (idempotent, byte-identical; 4 source xlsx gitignored); methodology `docs/methodology/pnab_aldir_blanc.md`. Validations 8.1 (R$ 3,00 bi ✓) 8.2 (execução↔PAR on cod_ibge 100 %) 8.4 (governança: 90,9 %→93,8 % no passo 0→1, platô depois). **Built locally — pending push + first MotherDuck sync (João).** |
 | 2026-06-14 | **Phase LPG — `atana.lpg` schema added (NEW)** — Lei Paulo Gustavo (LC 195/2022), the AV-specific direct-transfer pipe; sibling to `atana.pnab` under the same legal vehicle but separate fiscal scope. 4 tables, 45.727 rows: `adesao_entes` (5.596 estados∪munis), `execucao_financeira` (10.984 — **R$ 3,86 bi total recebido reconciles to law exactly**; `Meta do Plano` splits AV R$ 2,80 bi / Outras Áreas R$ 1,07 bi; taxa execução 101,9 % agregada, 105,1 % estados, 97,9 % munis), `extratos_bancarios` (10.967), `relatorio_gestao` (18.180 narrative + execução-física rows — richer per-edital granularity than PNAB). **Important correction** of the 2026-06-13 scoping memo: all R$ 3,86 bi flow through the same MinC ente-federado pipe; there is NO separate ANCINE/FSA channel — `Meta do Plano` flag is the only AV-vs-generalist split. `canonical.domain_crosswalk` 92 → **93 rows** (1 `lpg` row → *Audiovisual* cultural-focused, "good" confidence; included in the FCS coverage tracker); coverage 13/14 unchanged. ETL `etl/lpg__to_parquet.py` (idempotent; 4 CSV + 2 XLSX gitignored); methodology `docs/methodology/lpg_paulo_gustavo.md`. Pairs with `atana.pnab` on cod_ibge (same-ente paired sample) and `atana.salic` on UF+ano (caso 5.2 da A8 Opção B — Rouanet AV crowding-out test). **Built locally — pending push + first MotherDuck sync (João).** |
 | 2026-06-14 | **Convention — `Status` line on every methodology note** — a one-line availability block now lives at the top of every doc under `docs/methodology/`. Format: `> **Status (YYYY-MM-DD):** GitHub <state> · MotherDuck <state> · N tables / R rows in <path>`. Resolved per-schema via the new audit tool `etl/_audit_methodology_status.py` (idempotent; reads git + parquets + manifest; reruns produce byte-identical output). First pass written today against the 24 methodology notes. Also corrected `canonical.domain_crosswalk` H3: was "Live at 90 rows (`9f8611b`)", now "Live at 93 rows (`958c72b` + MotherDuck refreshed 2026-06-14)" — accounting for `anthropic_eei` (+1), `pnab` (+1), `lpg` (+1) since the last edit, plus the `Design / CC goods manufacturing` → `;`-bundle reclassification of DANE row 33. **Built locally — pending push (João).** |
+| 2026-06-14 | **MotherDuck synchronisation pass — 15 schemas brought live in a single block.** Six brand-new schemas materialised for the first time (`atana.anthropic_eei`, `atana.lpg`, `atana.macro`, `atana.pnab` + the two canonical tables `canonical.cmo_directory_alcam` and `canonical.latam_trade_by_fcs_domain`); nine previously-only-local schemas synced (`atana.cisac`, `atana.ecad` v3, `atana.ibge_cempre`, `atana.ibge_estruturais`, `atana.ibge_tic`, `atana.ibge_turismo`, `atana.ifpi`, `atana.inegi` non-trade modules, `atana.inpi`). 146 `CREATE OR REPLACE TABLE` statements executed via `etl/_motherduck_sync_2026-06-14.sql`; §SANITY block returned 15 / 15 rows with `actual = expected` (anthropic_eei.country_usage = 178, lpg.execucao_financeira = 10.984, pnab.extratos_bancarios = 212.288, macro.fx_brl_usd_annual = 32, canonical.domain_crosswalk = 93, …). Corpus state now reads `✅ 24/24 live` end-to-end — every "Consumed by" claim in a methodology note is now a verifiable live query. Methodology notes' Status lines re-auditied via `etl/_audit_methodology_status.py --apply` to reflect the live state. **Pushed (João).** |

@@ -1,6 +1,6 @@
 # Methodology — Cuenta Satélite de Cultura de Costa Rica (CSCCR)
 
-> **Status (2026-06-14):** GitHub ✅ `9d435b3` on origin/main · MotherDuck ✅ live · 1 table / 150 rows in `raw/cr_bccr/csc_comercio.parquet`
+> **Status (2026-06-14):** GitHub ✅ `128a657` on origin/main · MotherDuck ✅ live · 1 table / 150 rows in `raw/cr_bccr/csc_comercio.parquet`
 
 Schema `atana.cr_bccr`. Phase 3d of the Atana Data LATAM expansion — the fourth non-Brazilian national source, after Mexico (`atana.inegi`), Colombia (`atana.dane`) and Argentina (`atana.sinca`).
 

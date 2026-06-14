@@ -1,6 +1,6 @@
 # `atana.anthropic_eei` — Anthropic Economic Index (revealed-usage frame)
 
-> **Status (2026-06-14):** GitHub ✅ `9d435b3` on origin/main · MotherDuck ⏳ pending first sync · 4 tables / 6,290 rows in `raw/anthropic_eei/`
+> **Status (2026-06-14):** GitHub ✅ `128a657` on origin/main · MotherDuck ✅ live · 4 tables / 6,290 rows in `raw/anthropic_eei/`
 
 > Methodology note. Phase 6b.1, ingested 2026-06-10. ETL: `etl/anthropic_eei__to_parquet.py`.
 > Accretion-criterion gate 1: Vol 2 minimum corpus (`phase6_corpus_criterion_and_vol2_scoping.md` §3).
@@ -41,7 +41,10 @@ apportionment, primary-occupation assignment) would shift individual occupations
 - **Cultural occupations (SOC 27-\*) = 9.41 %** of all occupation-matched global
   Claude usage. Top: Technical Writers (1.35), Actors (1.04 — see caveat 5),
   Copy Writers (0.92), Interpreters & Translators (0.89), Editors (0.84),
-  Poets/Lyricists/Creative Writers (0.73).
+  Poets/Lyricists/Creative Writers (0.73). **This 9.41 % is a *global* figure** —
+  the occupation table is global v2; Brazil has *task-level* revealed use only
+  (`geo_id='BR'`), not occupation-level, until the 6b.2 CBO↔SOC crosswalk. It must
+  not be read as a Brazilian share (caveat 2 selection bias applies in full).
 - **Brazil's collaboration mix is more automation-leaning than global:** directive
   35.0 % (global 32.6), task iteration 29.9 (25.6), **learning 16.7 (22.4)** —
   Brazil uses Claude more to *do* and less to *learn* than the global average.

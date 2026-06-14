@@ -1,6 +1,6 @@
 # Methodology — `atana.ecad` from the ECAD Annual Reports
 
-> **Status (2026-06-14):** GitHub ✅ `9d435b3` on origin/main · MotherDuck 🔜 pending re-sync after schema change · 4 tables / 70 rows in `raw/ecad/`
+> **Status (2026-06-14):** GitHub ✅ `128a657` on origin/main · MotherDuck ✅ live · 4 tables / 70 rows in `raw/ecad/`
 
 Schema `atana.ecad`. Phase 4c.3 of the Atana Data expansion — the third lens on
 the FCS *Intellectual property* domain: cultural-IP **income** actually

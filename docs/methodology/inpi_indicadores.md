@@ -1,6 +1,6 @@
 # Methodology — INPI Indicadores de Propriedade Industrial
 
-> **Status (2026-06-14):** GitHub ✅ `9d435b3` on origin/main · MotherDuck 🔜 pending re-sync after schema change · 68 tables / 15,321 rows in `raw/inpi/`
+> **Status (2026-06-14):** GitHub ✅ `128a657` on origin/main · MotherDuck ✅ live · 68 tables / 15,321 rows in `raw/inpi/`
 
 Schema `atana.inpi`. Phase 4c.2 of the Atana Data expansion — the cultural-IP
 *stock* (registration counts), enriching the FCS *Intellectual property* domain
