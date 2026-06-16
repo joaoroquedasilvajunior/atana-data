@@ -1,0 +1,17 @@
+{
+  "name": "cultural_sector_baseline_a27_trajectory",
+  "rows": 270,
+  "description": "Long-format trajectory of Brazilian cultural sector by IBGE SIIC cap. 2: 9 recortes × 5 indicators × 6 years (2013, 2019-2023). Each monetary row carries both nominal value and IPCA-2023-deflated value. Source: atana.ibge_estruturais.",
+  "source": "atana.ibge_estruturais (long-format) + atana.macro.ipca (deflator)",
+  "ipca_factors_to_2023": {
+    "2013": 1.7752,
+    "2019": 1.2871,
+    "2020": 1.222,
+    "2021": 1.118,
+    "2022": 1.061,
+    "2023": 1.0
+  },
+  "build_script": "etl/canonical__build_cultural_baseline_a27.py",
+  "consumed_by": "Análise 27 (linha de base); cross-analyses with atana.salic, atana.pnab, atana.lpg, atana.rais.",
+  "license": "CC BY 4.0"
+}
