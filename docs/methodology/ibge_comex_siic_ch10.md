@@ -1,6 +1,6 @@
 # `atana.ibge_comex` — IBGE Brazilian Cultural Foreign Trade (SIIC Ch. 10)
 
-> **Status (2026-06-14):** GitHub ✅ `0921400` on origin/main · MotherDuck ✅ live · 4 tables / 1,298 rows in `raw/ibge_comex/`
+> **Status (2026-06-14):** GitHub ✅ `411644f` on origin/main · MotherDuck ✅ live · 4 tables / 1,298 rows in `raw/ibge_comex/`
 
 > Methodology note. Phase 1 (foundational corpus). ETL: `etl/ibge_comex__xlsx_to_parquet.py`.
 > **Consumed by:** Análise 10 (anchor) · Atana Index Vol. 1 (Brazil drill-down in §6.bis) · Note #03 (cross-source UNCTAD × IBGE methodological gap) · Note #18 (OECD No. 59 × IBGE Comex Authenticity Paradox).

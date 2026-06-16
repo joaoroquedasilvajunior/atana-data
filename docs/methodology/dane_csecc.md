@@ -1,6 +1,6 @@
 # Methodology — DANE Cuenta Satélite de Economía Cultural y Creativa (CSECC)
 
-> **Status (2026-06-14):** GitHub ✅ `5fa9c34` on origin/main · MotherDuck ✅ live · 2 tables / 495 rows in `raw/dane/_reference/`
+> **Status (2026-06-14):** GitHub ✅ `411644f` on origin/main · MotherDuck ✅ live · 2 tables / 495 rows in `raw/dane/_reference/`
 
 Schema `atana.dane`. Phase 3b of the Atana Data LATAM expansion — the second non-Brazilian national source, after Mexico's INEGI CSCM (`atana.inegi`).
 

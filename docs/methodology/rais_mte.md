@@ -1,6 +1,6 @@
 # `atana.rais` — Formal Cultural Employment (RAIS / MTE)
 
-> **Status (2026-06-14):** GitHub ✅ `5fa9c34` on origin/main · MotherDuck ✅ live · 39 tables / 19,829,011 rows in `raw/rais/_reference/`
+> **Status (2026-06-14):** GitHub ✅ `411644f` on origin/main · MotherDuck ✅ live · 39 tables / 19,829,011 rows in `raw/rais/_reference/`
 
 > Methodology note. Phase 2 (foundational corpus). ETL: `etl/rais__bigquery_to_parquet.py` + `etl/rais__deflate_ipca.py` + `etl/rais__build_reference_tables.py`. Companion long-form methodology lives at **`docs/rais_methodology.md`** (12 sections, ~2,200 words) — referenced rather than duplicated here.
 > **Consumed by:** Análise 11 *A moldura formal: o emprego cultural brasileiro nos registros da RAIS (2014–2025)* — the corpus's formal-employment anchor · Análise 17 (música) · Análise 18 (cinco portas) · Análise 19 (geografia da captura) · Análise 22 (geografia regional) · Análise 25 (Brazilian Design & Software 4-lens) · the H0 paper draft.

@@ -1,6 +1,6 @@
 # `atana.unctad` — UNCTAD Creative Economy Trade Statistics
 
-> **Status (2026-06-14):** GitHub ✅ `0921400` on origin/main · MotherDuck ✅ live · 26 tables / 25,443,890 rows · ⚠ 1 corrupt parquet in `raw/unctad/`
+> **Status (2026-06-14):** GitHub ✅ `411644f` on origin/main · MotherDuck ✅ live · 26 tables / 25,443,890 rows · ⚠ 1 corrupt parquet in `raw/unctad/`
 
 > Methodology note. Phase 1 (foundational corpus). ETL: `etl/unctad__export_parquet.py`.
 > **Consumed by:** Análise 4 *Comércio criativo na América Latina* · Análise 6 *LATAM na Era Agêntica* · **Atana Index Vol. 1** (the entire publication is anchored on this schema) · Note #03 (UNCTAD × IBGE methodological pluralism) · Note #07 (UNCTAD × CSCM) · Note #08 (IFPI × CISAC × UNCTAD).

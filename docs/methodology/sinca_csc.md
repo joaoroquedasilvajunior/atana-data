@@ -1,6 +1,6 @@
 # Methodology — Argentina Cuenta Satélite de Cultura (CSC)
 
-> **Status (2026-06-14):** GitHub ✅ `5fa9c34` on origin/main · MotherDuck ✅ live · 2 tables / 304 rows in `raw/sinca/`
+> **Status (2026-06-14):** GitHub ✅ `411644f` on origin/main · MotherDuck ✅ live · 2 tables / 304 rows in `raw/sinca/`
 
 Schema `atana.sinca`. Phase 3c of the Atana Data LATAM expansion — the third non-Brazilian national source, after Mexico (`atana.inegi`) and Colombia (`atana.dane`).
 

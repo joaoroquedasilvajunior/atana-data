@@ -1,6 +1,6 @@
 # `atana.lexml` — Legislative Genealogy of Brazil's Creative Economy
 
-> **Status (2026-06-14):** GitHub ✅ `4e48176` on origin/main · MotherDuck ✅ live · 6 tables / 1,034 rows in `raw/lexml/`
+> **Status (2026-06-14):** GitHub ✅ `411644f` on origin/main · MotherDuck ✅ live · 6 tables / 1,034 rows in `raw/lexml/`
 
 > Methodology note. Phase 2 (foundational corpus). ETL: `etl/lexml__jsonl_to_parquet.py`.
 > **Consumed by:** Análise 9 *A genealogia institucional da economia criativa no Brasil (1998–2026)* — the legal-history anchor for the book's institutional chapter · Atana Note #04 *A genealogia institucional*.

@@ -1,6 +1,6 @@
 # `atana.salic` — Lei Rouanet Microdata (SALIC API)
 
-> **Status (2026-06-14):** GitHub ✅ `bc1c2e6` on origin/main · MotherDuck ✅ live · 6 tables / 91,698 rows in `raw/salic/`
+> **Status (2026-06-14):** GitHub ✅ `411644f` on origin/main · MotherDuck ✅ live · 6 tables / 91,698 rows in `raw/salic/`
 
 > Methodology note. Phase 2 (foundational corpus). ETL: `etl/salic__bulk_download.py` + `etl/salic__jsonl_to_parquet.py`.
 > **Consumed by:** Análise 7 *Sondagem da API SALIC* · Análise 8 *Anatomia de R$ 35,1 bilhões — a Lei Rouanet em 9 atos* (the corpus's culture-fomento anchor) · Análise 19 (Funk e sertanejo) · Análise 25 (Design & software 4-lens).

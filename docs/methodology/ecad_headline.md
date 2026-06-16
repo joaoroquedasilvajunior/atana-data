@@ -1,6 +1,6 @@
 # Methodology — ECAD headline royalty series (DEPRECATED — v1)
 
-> **Status (2026-06-14):** GitHub ✅ `5fa9c34` on origin/main · MotherDuck ✅ live · 4 tables / 70 rows in `raw/ecad/`
+> **Status (2026-06-14):** GitHub ✅ `411644f` on origin/main · MotherDuck ✅ live · 4 tables / 70 rows in `raw/ecad/`
 
 > **⚠ Deprecated 2026-05-28.** This v1 methodology note covered the 3-row
 > headline series. It has been superseded by **`ecad_relatorio_anual.md`**,

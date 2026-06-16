@@ -1,6 +1,6 @@
 # `atana.ibge_pnadc` — IBGE PNADC Cultural Sector (SIIC Ch. 6)
 
-> **Status (2026-06-14):** GitHub ✅ `0921400` on origin/main · MotherDuck ✅ live · 18 tables / 35,596 rows in `raw/ibge_pnadc/`
+> **Status (2026-06-14):** GitHub ✅ `411644f` on origin/main · MotherDuck ✅ live · 18 tables / 35,596 rows in `raw/ibge_pnadc/`
 
 > Methodology note. Phase 1 (foundational corpus). ETL: `etl/ibge_pnadc__xlsx_to_parquet.py`.
 > **Consumed by:** Análises 1, 2, 3 (the original opening trilogy of the book) · Análise 17 (música) · Análise 18 (cinco portas) · Atana Note #06 (Funk).

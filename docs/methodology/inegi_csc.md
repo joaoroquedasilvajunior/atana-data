@@ -1,6 +1,6 @@
 # Methodology — INEGI Cuenta Satélite de la Cultura de México (CSCM)
 
-> **Status (2026-06-14):** GitHub ✅ `5fa9c34` on origin/main · MotherDuck ✅ live · 6 tables / 6,031 rows in `raw/inegi/_reference/`
+> **Status (2026-06-14):** GitHub ✅ `411644f` on origin/main · MotherDuck ✅ live · 6 tables / 6,031 rows in `raw/inegi/_reference/`
 
 Schema `atana.inegi`. Phase 3a of the Atana Data LATAM expansion.
 
