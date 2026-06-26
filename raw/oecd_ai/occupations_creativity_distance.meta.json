@@ -1,0 +1,16 @@
+{
+  "table": "occupations_creativity_distance",
+  "schema": "oecd_ai",
+  "description": "OECD No. 59 Table 6.4a Creativity column — top-10 occupations with the LARGEST Creativity capability gap (AI furthest from being able to perform). 8 of 10 are SOC group 27 cultural occupations: Music Directors and Composers, Choreographers, Special Effects Artists, Producers and Directors, Art Directors, Multimedia Artists, Set and Exhibit Designers, Fashion/Interior Designers. The occupation-weighted empirical backing for the Atana Authenticity Paradox (Note #18, Análise 6, Notes #06/#08).",
+  "source": "OECD AI Papers No. 59, May 2026, Table 6.4a (page 32, image-embedded).",
+  "source_pages": [
+    "https://www.oecd.org/en/publications/the-oecd-ai-exposure-measure_no59.html"
+  ],
+  "fetch_date": "2026-06-05",
+  "etl_script": "etl/oecd_ai__occupations_creativity_distance_to_parquet.py",
+  "etl_run_date": "2026-06-26",
+  "licence": "OECD AI Papers — CC BY 4.0.",
+  "grain": "one row per (paper_no, table_id, domain, rank)",
+  "row_count": 10,
+  "notes": "Table 6.4a was extracted by manual visual transcription from a 216-dpi PNG render of page 32 — markitdown/pdfplumber/pymupdf all failed because the OECD PDF embeds the table as an image. Numerical gap values per cell were not transcribed; the qualitative finding (SOC group 27 dominance) is the value of this table for the corpus."
+}

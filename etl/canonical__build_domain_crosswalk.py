@@ -701,17 +701,24 @@ OECD_AI = [
      "OECD AI Papers No. 59 (AI exposure measure, May 2026) + No. 60 (Benefits of AI Openness, Jun 2026) — methodological frame",
      "Intellectual property", "transversal", None, None, "approximate",
      "★ Phase 5c (2026-06-04) — methodological-frame source, NOT a cultural "
-     "classification. 2 tables, 12 rows: `papers_headline` (2 × papers; "
-     "headline findings) and `ai_capability_domains` (10 × OECD capability "
-     "domains, with `creativity` ★-flagged as the direct Atana entry-point). "
-     "Triangulation lens for Atana Index Vol. 1's AI Exposure × Readiness "
-     "framework and for the AI-IP policy frontier (the EU AI Act / Suno-Udio "
-     "axis discussed in Análise 20). Mapped to the transversal Intellectual "
-     "property domain because the AI-cultural intersection the corpus tracks "
-     "is principally a copyright / licensing frontier; the *creativity* "
-     "capability separately touches every FCS cultural domain via "
-     "occupation-level CBO mappings. ⚠️ Cross-sector by design — AI exposure "
-     "is not a cultural-only cut. See docs/methodology/oecd_ai_papers.md."),
+     "classification. Phase 5d (2026-06-26) extended to 6 tables, ~57 rows: "
+     "Tier 1 — `papers_headline` (2), `ai_capability_domains` (9), "
+     "`skill_demand_high_exposure` (6); **Tier 2 (No. 59 PDF-extracted)** — "
+     "`occupations_creativity_distance` (10 × Table 6.4a — 8 of 10 SOC-27 "
+     "cultural occupations dominate the Creativity-furthest column, the "
+     "occupation-weighted empirical anchor of the Authenticity Paradox), "
+     "`exposure_extremes_ranking` (20 × Table 6.5 — top/bottom 10 overall, "
+     "with 0 SOC-27 in either tail), `felten_oecd_correlations` (10 × Table "
+     "6.6 — Felten × OECD per-domain, Creativity diagnostic outlier 0.25, "
+     "overall correlation only 0.34). Triangulation lens for Atana Index "
+     "Vol. 1's AI Exposure × Readiness framework and for the AI-IP policy "
+     "frontier (the EU AI Act / Suno-Udio axis discussed in Análise 20). "
+     "Mapped to the transversal Intellectual property domain because the "
+     "AI-cultural intersection the corpus tracks is principally a copyright / "
+     "licensing frontier; the *creativity* capability separately touches every "
+     "FCS cultural domain via occupation-level CBO mappings. ⚠️ Cross-sector "
+     "by design — AI exposure is not a cultural-only cut. See "
+     "docs/methodology/oecd_ai_papers.md."),
 ]
 
 
