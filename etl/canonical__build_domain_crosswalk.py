@@ -850,13 +850,47 @@ def cisac_rows() -> list[dict]:
     return rows
 
 
+# ── Chile — CSC pilot first results (Phase 7a.0) ─────────────────────────────
+# The fifth LATAM country to enter the corpus (after BR, MX, CO, CR, AR).
+# Tier 1 ingest of the BCCh+MINCAP+CEPAL Cuenta Satélite de Cultura pilot
+# first results launched 2024. Adds a household-consumption indicator that
+# proxies cultural-participation demand — closest FCS bucket is the
+# Social participation transversal domain (the same proxy framing the
+# `ibge_tic` and `ibge_turismo` rows use for Brazil).
+CL_CSC = [
+    ("bcch-pilot-household-cultural-consumption",
+     "BCCh CSC pilot — household effective cultural consumption share",
+     "Social participation", "transversal", None, None, "approximate",
+     "★ Phase 7a.0 (2026-06-16) — first non-Brazilian source to reach the "
+     "Social participation domain. Tier 1: a 3-row series (2018=1.7 %, "
+     "≈2020=1.4 %, 2022=1.4 %) transcribed from MINCAP cuenta pública 2025 "
+     "verbatim prose. The full BCCh CSC underlying tables (production, "
+     "employment, ACC × VA) remain Tier 2 — to be ingested in Phase 7a.1 "
+     "from the INE *Estadísticas Culturales: Informe Anual 2024*. ⚠️ Reading "
+     "'household cultural consumption share' as a participation proxy is "
+     "looser than the IBGE TIC/turismo rows, but the FCS Social participation "
+     "domain has no consumption-share equivalent in spine — same logic as the "
+     "Phase 4b proxy claim. See docs/methodology/cl_csc.md."),
+]
+
+
+def cl_csc_rows() -> list[dict]:
+    rows = []
+    for code, label, dom, dtype, cer, ncm, conf, note in CL_CSC:
+        rows.append(dict(zip(COLUMNS, (
+            "cl_csc", "Chile Cuenta Satélite de Cultura (BCCh+MINCAP+CEPAL)",
+            code, label, dom, dtype, cer, ncm, conf, note))))
+    return rows
+
+
 def build() -> pd.DataFrame:
     rows = (spine_rows() + inegi_rows() + dane_rows() + sinca_rows()
             + cr_bccr_rows() + unctad_goods_rows() + unctad_services_rows()
             + ibge_ncm_rows() + siic_rows() + bcb_rows() + inpi_rows()
             + ecad_rows() + cisac_rows() + ifpi_rows()
             + luminate_rows() + tcu_rows() + oecd_ai_rows()
-            + anthropic_eei_rows() + pnab_rows() + lpg_rows())
+            + anthropic_eei_rows() + pnab_rows() + lpg_rows()
+            + cl_csc_rows())
     return pd.DataFrame(rows, columns=COLUMNS)
 
 
@@ -867,13 +901,13 @@ def validate(df: pd.DataFrame) -> None:
               "cr_bccr": 4, "unctad": 15, "ibge_comex": 5, "ibge_siic": 10,
               "bcb": 1, "inpi": 1, "ecad": 1, "cisac": 1, "ifpi": 1,
               "luminate": 1, "tcu": 1, "oecd_ai": 1, "anthropic_eei": 1,
-              "pnab": 1, "lpg": 1}
+              "pnab": 1, "lpg": 1, "cl_csc": 1}
     got = df["source_schema"].value_counts().to_dict()
     for schema, n in expect.items():
         assert got.get(schema) == n, (
             f"{schema}: expected {n} rows, got {got.get(schema)}")
     total = sum(expect.values())
-    assert len(df) == total == 93, f"total rows {len(df)} != 93"
+    assert len(df) == total == 94, f"total rows {len(df)} != 94"
     print(f"  ✓ {len(df)} rows — " + ", ".join(f"{k} {v}" for k, v in expect.items()))
 
     bad = set(df["mapping_confidence"]) - CONFIDENCE_VALUES

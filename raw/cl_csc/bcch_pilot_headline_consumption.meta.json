@@ -1,0 +1,16 @@
+{
+  "table": "bcch_pilot_headline_consumption",
+  "schema": "cl_csc",
+  "description": "Chile Cuenta Satélite de Cultura pilot — household effective cultural consumption share, 3-point series (2018, ≈2020, 2022) as published in the MINCAP Informe Final Cuenta Pública Participativa 2025. First results of the BCCh+MINCAP+CEPAL CSC launched 2024. Tier 1 — single headline indicator transcribed from the cuenta pública prose, not the underlying BCCh release.",
+  "source": "MINCAP — Informe Final Cuenta Pública Participativa 2025 (Chile)",
+  "source_pages": [
+    "https://www.cultura.gob.cl/cuentapublica/wp-content/uploads/sites/28/2026/01/informe-final-convencion-cuenta-publica-2025.pdf"
+  ],
+  "fetch_date": "2026-06-16",
+  "etl_script": "etl/cl_csc__bcch_pilot_headline_to_parquet.py",
+  "etl_run_date": "2026-06-26",
+  "licence": "MINCAP cuenta pública — public release.",
+  "grain": "one row per (year, indicator)",
+  "row_count": 3,
+  "notes": "Intermediate years 2019 and 2021 are not explicitly stated in the cuenta pública and are deliberately omitted. The pandemic-low year is conventionally 2020 (not explicitly nominated). The underlying BCCh CSC release (Phase 7a.1) should resolve to the full annual series 2018-2022 with 5 rows."
+}
