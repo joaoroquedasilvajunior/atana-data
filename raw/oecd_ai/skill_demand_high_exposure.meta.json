@@ -1,0 +1,18 @@
+{
+  "table": "skill_demand_high_exposure",
+  "schema": "oecd_ai",
+  "description": "OECD AI Paper No. 59 — demand-side findings. Share of vacancies in HIGH-AI-exposure occupations requiring each skill group, and the base->end shift for originality (25% -> 33%, the cognitive sub-skill rising fastest). Complements ai_capability_domains (the capability/supply side, which compresses creativity at level 5). The originality rows are the OECD/expert corner of Atana's three-corner creativity read.",
+  "source": "OECD Artificial Intelligence Papers No. 59 (May 2026), demand-side summary.",
+  "source_pages": [
+    "https://www.oecd.org/en/publications/2026/05/the-oecd-ai-exposure-measure_489cfd42.html",
+    "https://www.oecd.org/en/publications/the-oecd-ai-exposure-measure_f3da0f0a-en.html",
+    "https://dig.watch/updates/oecd-ai-exposure-measure"
+  ],
+  "fetch_date": "2026-06-22",
+  "etl_script": "etl/oecd_ai__skill_demand_to_parquet.py",
+  "etl_run_date": "2026-06-22",
+  "licence": "OECD published findings — public release.",
+  "grain": "one row per skill group x metric",
+  "row_count": 6,
+  "notes": "Tier 1 headline shares. Base/end YEARS and the full per-skill series are in the PDF body (Tier 2, Vol. 2 input). social & emotional / digital carry qualifier='floor' because OECD reports them as 'over 50%'."
+}
