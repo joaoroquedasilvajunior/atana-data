@@ -10,38 +10,60 @@ WHAT THE AEI IS
 Anthropic's open dataset of how Claude is actually used, built by classifying
 real (privacy-preserved) conversations onto O*NET tasks, collaboration
 patterns and geographies. CC-licensed, on Hugging Face
-(Anthropic/EconomicIndex). Five releases 2025-02 → 2026-03; this ingest uses:
-  · release_2026_03_24 — the geography × facet long file (week of
-    2026-02-05→12, Claude.ai Free/Pro/Max): country-level usage including
-    **Brazil-native rows** (269 O*NET tasks) — verified at probe time.
+(Anthropic/EconomicIndex). This ingest uses:
+  · release_2026_06_26 — the "Cadences" report (April and May 2026 monthly
+    aggregates, Claude.ai Free/Pro/Max/Cowork). Long-format schema:
+    `date_start`/`date_end` × `geo_id` (ISO-3) × `geo_level` × `category_name`
+    × `hierarchy_level` × `metric_id` × `value`. May window (`date_end =
+    2026-06-01`) is the primary vintage below.
   · release_2025_03_27 — the global task-share file (task_pct_v2) +
     O*NET task→occupation statements, from which a global occupation-level
-    usage table is DERIVED here.
+    usage table is DERIVED here (UNCHANGED across refreshes).
+
+PHASE 6b.2 REFRESH (2026-06-30) — path B, in-place
+--------------------------------------------------
+Anthropic rewrote the AEI schema in the June release:
+  · wide (facet, variable, cluster_name) → long (category_name, metric_id,
+    node_name, hierarchy_level)
+  · 2-letter ISO codes → 3-letter ISO alpha-3
+  · raw *_count columns were DROPPED; only percentages remain
+  · collaboration expanded from 2 buckets → 2 buckets + 6 pattern splits
+  · geography expanded from `country` → `country` + `subregion` (all 24
+    major Brazilian UFs are now in the release — the seed for Phase 6b.3)
+
+This ETL preserves the March table shape (same 4 tables, same column names,
+same geo_id encoding in ISO-2 for continuity of downstream analyses) — the
+new dimensions are deferred to Phase 6b.3. `usage_count`, `task_count`,
+`collaboration_count` columns kept for schema stability but populated with
+NULL (Anthropic no longer publishes them).
 
 TABLES (4)
 ----------
   country_usage              — all countries × usage share of global Claude.ai
   task_usage_by_country      — 7 geos (GLOBAL, US + the 5 corpus countries)
-                               × O*NET task × count/pct
+                               × O*NET task × pct  (task_count now NULL)
   collaboration_by_country   — same 7 geos × collaboration pattern
                                (automation-vs-augmentation, country-level)
   occupation_usage_global_v2 — DERIVED: SOC occupation × global usage share
                                (task shares apportioned equally across the
                                occupations sharing a task statement —
-                               documented methodological choice)
+                               documented methodological choice, unchanged)
 
 CENTRAL CAVEATS (foregrounded; full list in docs/methodology/anthropic_eei.md)
   1. Usage ≠ exposure ≠ automation risk — the AEI measures what people DO
      with Claude, a different construct from OECD No. 59's capability ratings.
   2. Selected population — Claude.ai users skew toward coding/writing/EN.
   3. Vintages differ across tables: occupation table = global v2 (Mar 2025);
-     country tables = one week of Feb 2026. Do not mix without saying so.
+     country tables = May 2026 monthly aggregate from the "Cadences" report.
+     Do not mix without saying so.
   4. The AEI updates ~quarterly — refresh is a DB-updater job (--refresh).
+  5. *_count columns are NULL for the June refresh — Anthropic dropped raw
+     counts in the schema rewrite. Do not sum NULLs.
 
-Sources cached under raw/anthropic_eei/_source/ (the 103 MB raw geography
-file is GITIGNORED — only the small derived Parquet tables are committed).
-Idempotent; byte-identical reruns. MotherDuck sync manual — NEW schema,
-João's checkpoint.
+Sources cached under raw/anthropic_eei/_source/ (the 219 MB Cadences
+geography file is GITIGNORED — only the small derived Parquet tables are
+committed). Idempotent; byte-identical reruns. MotherDuck sync manual —
+schema version bump on refresh (João's checkpoint).
 
 Usage:
     python etl/anthropic_eei__to_parquet.py            # uses cache
@@ -69,12 +91,30 @@ FILES = {
     "task_pct_v2.csv": f"{HF}/release_2025_03_27/task_pct_v2.csv",
     "onet_task_statements.csv": f"{HF}/release_2025_03_27/onet_task_statements.csv",
     "SOC_Structure.csv": f"{HF}/release_2025_03_27/SOC_Structure.csv",
-    "aei_raw_claude_ai_2026.csv":
-        f"{HF}/release_2026_03_24/data/"
-        "aei_raw_claude_ai_2026-02-05_to_2026-02-12.csv",
+    "aei_claude_ai_2026-06-26.csv":
+        f"{HF}/release_2026_06_26/data/aei_claude_ai_2026-06-26.csv",
 }
-GEOS = ["GLOBAL", "US", "BR", "MX", "CO", "AR", "CR"]
-RAW_VINTAGE = "2026-02-05_to_2026-02-12 (release_2026_03_24)"
+
+# Legacy sources kept for --refresh cross-check; not consumed by any table
+# (schema-migration audit trail — the March file must NOT be depended on).
+LEGACY_MARCH_FILE = "aei_raw_claude_ai_2026.csv"
+
+# GEOS_ISO3 — the June release publishes 3-letter ISO alpha-3. We map back to
+# 2-letter for continuity of the March-shape corpus tables (Path B).
+GEOS_ISO3 = ["GLOBAL", "USA", "BRA", "MEX", "COL", "ARG", "CRI"]
+ISO3_TO_ISO2 = {
+    "GLOBAL": "GLOBAL", "USA": "US", "BRA": "BR", "MEX": "MX",
+    "COL": "CO", "ARG": "AR", "CRI": "CR",
+    # Not currently in the 7-geo cross but supported for Phase 6b.3:
+    "CHL": "CL",
+}
+# The Path B geo set for backward-compatibility with the March corpus tables:
+GEOS = [ISO3_TO_ISO2[c] for c in GEOS_ISO3]
+
+# May 2026 window is the primary vintage; date_end is exclusive per Anthropic.
+MAY_DATE_END = "2026-06-01"
+
+RAW_VINTAGE = "2026-05-01_to_2026-06-01 (release_2026_06_26, May 2026 window)"
 V2_VINTAGE = "global v2 (release_2025_03_27)"
 
 
@@ -122,52 +162,115 @@ def write_meta(out_path, description, sources, vintage):
 def main():
     ensure_sources()
     con = duckdb.connect()
-    raw = (SRC / "aei_raw_claude_ai_2026.csv").as_posix()
-    geos_sql = "(" + ",".join(f"'{g}'" for g in GEOS) + ")"
+    raw = (SRC / "aei_claude_ai_2026-06-26.csv").as_posix()
+    geos_iso3_sql = "(" + ",".join(f"'{g}'" for g in GEOS_ISO3) + ")"
 
-    # ── 1. country_usage (all countries) ────────────────────────────────
+    # Register the ISO3→ISO2 mapping so it can be joined in SQL
+    iso_map_df = pd.DataFrame(
+        [(k, v) for k, v in ISO3_TO_ISO2.items()],
+        columns=["geo_id_iso3", "geo_id"])
+    con.register("iso_map", iso_map_df)
+
+    # For all-countries reads, we don't have a mapping for every ISO-3 in the
+    # AEI universe (only the 7 corpus geos + CHL are in ISO3_TO_ISO2). For
+    # country_usage we keep the ISO-3 code as geo_id_iso3 alongside a
+    # coalesced geo_id (ISO-2 where mapped, ISO-3 fallback where not).
+
+    # ── 1. country_usage (all countries) — May 2026 window ─────────────
+    # Filter path: geo_level='country' AND category_name='overall' AND
+    # metric_id='usage_pct'. Anthropic dropped usage_count in June — kept
+    # in schema as NULL for continuity.
     cu = con.execute(f"""
-        SELECT geo_id,
-               max(CASE WHEN variable='usage_count' THEN value END) AS usage_count,
-               max(CASE WHEN variable='usage_pct' THEN value END)  AS usage_pct
-        FROM '{raw}'
-        WHERE geography='country' AND facet='country'
-          AND variable IN ('usage_count','usage_pct')
-        GROUP BY 1 ORDER BY usage_pct DESC NULLS LAST, geo_id""").fetchdf()
+        SELECT
+            COALESCE(m.geo_id, r.geo_id) AS geo_id,
+            r.geo_id AS geo_id_iso3,
+            CAST(NULL AS DOUBLE) AS usage_count,
+            r.value AS usage_pct
+        FROM '{raw}' r
+        LEFT JOIN iso_map m ON m.geo_id_iso3 = r.geo_id
+        WHERE r.geo_level = 'country'
+          AND r.category_name = 'overall'
+          AND r.metric_id = 'usage_pct'
+          AND r.date_end = '{MAY_DATE_END}'
+        ORDER BY usage_pct DESC NULLS LAST, geo_id""").fetchdf()
     p = write_parquet(con, cu, "country_usage")
-    write_meta(p, "Share of global Claude.ai usage by country (ISO-2), one "
-               "week of Feb 2026. Selected population — see methodology.",
-               ["aei_raw_claude_ai_2026.csv"], RAW_VINTAGE)
+    write_meta(p, "Share of global Claude.ai usage by country, May 2026 "
+               "monthly aggregate. geo_id in ISO-2 for continuity where "
+               "mapped (7 Atana corpus geos + CHL); geo_id_iso3 always "
+               "present. usage_count is NULL — Anthropic dropped raw counts "
+               "in the June 2026 schema rewrite. Selected population — see "
+               "methodology.",
+               ["aei_claude_ai_2026-06-26.csv"], RAW_VINTAGE)
 
-    # ── 2. task_usage_by_country (7 geos) ───────────────────────────────
+    # ── 2. task_usage_by_country (7 geos, hierarchy_level=0 = leaf task) ─
+    # Filter: geo_level='country' (plus GLOBAL synthesized) AND
+    # category_name='onet' AND hierarchy_level=0 AND metric_id='pct'.
+    # GLOBAL row for onet is at geo_level='global' with geo_id='GLOBAL'.
     tu = con.execute(f"""
-        SELECT geo_id, cluster_name AS onet_task,
-               max(CASE WHEN variable='onet_task_count' THEN value END) AS task_count,
-               max(CASE WHEN variable='onet_task_pct' THEN value END)  AS task_pct
-        FROM '{raw}'
-        WHERE facet='onet_task' AND geo_id IN {geos_sql}
-          AND variable IN ('onet_task_count','onet_task_pct')
-        GROUP BY 1,2 ORDER BY geo_id, task_pct DESC NULLS LAST,
-                 onet_task""").fetchdf()
+        SELECT
+            COALESCE(m.geo_id, r.geo_id) AS geo_id,
+            r.node_name AS onet_task,
+            CAST(NULL AS DOUBLE) AS task_count,
+            r.value AS task_pct
+        FROM '{raw}' r
+        LEFT JOIN iso_map m ON m.geo_id_iso3 = r.geo_id
+        WHERE (
+            (r.geo_level = 'country' AND r.geo_id IN {geos_iso3_sql})
+            OR (r.geo_level = 'global' AND r.geo_id = 'GLOBAL')
+          )
+          AND r.category_name = 'onet'
+          AND r.hierarchy_level = 0
+          AND r.metric_id = 'pct'
+          AND r.date_end = '{MAY_DATE_END}'
+        ORDER BY geo_id, task_pct DESC NULLS LAST, onet_task""").fetchdf()
     p = write_parquet(con, tu, "task_usage_by_country")
-    write_meta(p, "O*NET-task usage shares for GLOBAL, US and the five Atana "
-               "corpus countries (BR/MX/CO/AR/CR), one week of Feb 2026. "
-               "Includes 'not_classified'/'none' rows as published.",
-               ["aei_raw_claude_ai_2026.csv"], RAW_VINTAGE)
+    write_meta(p, "O*NET-task (leaf-level) usage shares for GLOBAL, US and "
+               "the five Atana corpus countries (BR/MX/CO/AR/CR), May 2026 "
+               "monthly aggregate. task_count is NULL — Anthropic dropped "
+               "raw counts in the June 2026 schema rewrite. May include "
+               "unresolved tasks depending on Anthropic's classifier "
+               "coverage this vintage.",
+               ["aei_claude_ai_2026-06-26.csv"], RAW_VINTAGE)
 
-    # ── 3. collaboration_by_country (7 geos) ────────────────────────────
+    # ── 3. collaboration_by_country (7 geos × automation vs augmentation) ─
+    # Path B preserves the 2-bucket March shape. The 6 new pattern metrics
+    # (directive / feedback_loop / task_iteration / learning / validation /
+    # none) are deferred to Phase 6b.3.
+    # Filter: category_name='overall' AND metric_id in the 2 bucket columns.
     cb = con.execute(f"""
-        SELECT geo_id, cluster_name AS collaboration_pattern,
-               max(CASE WHEN variable='collaboration_count' THEN value END) AS n,
-               max(CASE WHEN variable='collaboration_pct' THEN value END)  AS pct
-        FROM '{raw}'
-        WHERE facet='collaboration' AND geo_id IN {geos_sql}
-        GROUP BY 1,2 ORDER BY geo_id, pct DESC NULLS LAST,
-                 collaboration_pattern""").fetchdf()
+        WITH bkt AS (
+            SELECT
+                COALESCE(m.geo_id, r.geo_id) AS geo_id,
+                CASE r.metric_id
+                    WHEN 'collaboration_bucket_automation_pct' THEN 'automation'
+                    WHEN 'collaboration_bucket_augmentation_pct' THEN 'augmentation'
+                END AS collaboration_pattern,
+                r.value AS pct
+            FROM '{raw}' r
+            LEFT JOIN iso_map m ON m.geo_id_iso3 = r.geo_id
+            WHERE (
+                (r.geo_level = 'country' AND r.geo_id IN {geos_iso3_sql})
+                OR (r.geo_level = 'global' AND r.geo_id = 'GLOBAL')
+              )
+              AND r.category_name = 'overall'
+              AND r.metric_id IN (
+                'collaboration_bucket_automation_pct',
+                'collaboration_bucket_augmentation_pct')
+              AND r.date_end = '{MAY_DATE_END}'
+        )
+        SELECT geo_id, collaboration_pattern,
+               CAST(NULL AS DOUBLE) AS n,
+               pct
+        FROM bkt
+        ORDER BY geo_id, pct DESC NULLS LAST, collaboration_pattern""").fetchdf()
     p = write_parquet(con, cb, "collaboration_by_country")
-    write_meta(p, "Human-AI collaboration patterns (automation vs "
-               "augmentation family) by geo, one week of Feb 2026.",
-               ["aei_raw_claude_ai_2026.csv"], RAW_VINTAGE)
+    write_meta(p, "Human-AI collaboration buckets (automation vs "
+               "augmentation) by geo, May 2026 monthly aggregate. n is NULL "
+               "— Anthropic dropped raw counts. Only the two headline "
+               "buckets are exported here; the six pattern splits published "
+               "in June 2026 (directive / feedback_loop / task_iteration / "
+               "learning / validation / none) are deferred to Phase 6b.3.",
+               ["aei_claude_ai_2026-06-26.csv"], RAW_VINTAGE)
 
     # ── 4. occupation_usage_global_v2 (derived) ─────────────────────────
     occ = con.execute(f"""
@@ -197,18 +300,52 @@ def main():
                V2_VINTAGE)
 
     # ── Validation ───────────────────────────────────────────────────────
+    # Vintage-agnostic assertions (usage patterns shift between refreshes):
+
+    # 1. Corpus geos present & mapped ISO-3 → ISO-2 correctly
+    assert set(tu.geo_id) == set(GEOS), (
+        f"expected {GEOS}, got {sorted(set(tu.geo_id))}")
+
+    # 2. BR usage_pct plausible: 0.5% floor, 10% ceiling. March was 2.55%.
     br = cu[cu.geo_id == "BR"]["usage_pct"].iloc[0]
-    assert 2.5 < br < 2.6, br                       # probe: 2.5548
-    t = tu[(tu.geo_id == "BR")].nlargest(2, "task_pct")
-    assert t.iloc[0]["onet_task"] == "not_classified"
-    assert 5.0 < t.iloc[1]["task_pct"] < 5.2        # probe: 5.0767
+    assert 0.5 < br < 10.0, f"BR usage_pct out of plausible range: {br}"
+
+    # 3. Task list per country not empty (May window must have populated pct)
+    for g in ["BR", "US", "GLOBAL"]:
+        n = len(tu[tu.geo_id == g])
+        assert n > 20, f"{g} task_usage has only {n} rows (expected > 20)"
+
+    # 4. Collaboration buckets present for every corpus geo, 2 rows each
+    for g in GEOS:
+        rows = cb[cb.geo_id == g]
+        assert len(rows) == 2, f"{g}: {len(rows)} collab rows (expected 2)"
+        pats = set(rows["collaboration_pattern"])
+        assert pats == {"automation", "augmentation"}, f"{g}: {pats}"
+
+    # 5. Occupation-usage table integrity (unchanged from March)
     assert len(occ) > 600 and occ["usage_pct_global_v2"].sum() < 100.01
-    assert set(tu.geo_id) == set(GEOS)
-    print(f"  · validation OK — country_usage {len(cu)} · task_usage "
-          f"{len(tu)} · collaboration {len(cb)} · occupations {len(occ)}; "
-          f"BR usage {br:.4f}% of global")
-    print("  · MotherDuck sync manual — NEW schema atana.anthropic_eei "
-          "(João's checkpoint).")
+
+    # 6. count columns must be NULL (June schema dropped them)
+    assert cu["usage_count"].isnull().all(), "usage_count should be NULL"
+    assert tu["task_count"].isnull().all(), "task_count should be NULL"
+    assert cb["n"].isnull().all(), "collaboration n should be NULL"
+
+    br_iso3 = cu[cu.geo_id == "BR"]["geo_id_iso3"].iloc[0]
+    assert br_iso3 == "BRA", f"expected BR→BRA mapping, got {br_iso3}"
+
+    # 7. Anthropic Usage Index (per-capita), if available, offers a Phase
+    # 6b.3 preview. Not asserted here — just log if present.
+    per_capita_present = con.execute(f"""
+        SELECT count(*) FROM '{raw}'
+        WHERE metric_id='usage_per_capita_index'
+          AND geo_level='country' AND date_end='{MAY_DATE_END}'""").fetchone()[0]
+    print(f"  · validation OK — country_usage {len(cu):,} · task_usage "
+          f"{len(tu):,} · collaboration {len(cb):,} · occupations "
+          f"{len(occ):,}; BR (BRA) usage {br:.4f}% of global (May 2026)")
+    print(f"  · Phase 6b.3 preview — usage_per_capita_index available for "
+          f"{per_capita_present:,} country rows (May 2026)")
+    print("  · MotherDuck sync manual — schema-version bump for the "
+          "release_2026_06_26 refresh (João's checkpoint).")
 
 
 if __name__ == "__main__":

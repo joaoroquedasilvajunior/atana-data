@@ -14,8 +14,8 @@
       "sha256": "82e4c418dc08475ef1263ad1e8c66ffa3357291370cd35ee1065ecea590597ec"
     }
   ],
-  "fetch_date": "2026-06-10",
+  "fetch_date": "2026-07-01",
   "etl_script": "etl/anthropic_eei__to_parquet.py",
-  "etl_run_date": "2026-06-10",
+  "etl_run_date": "2026-07-01",
   "licence": "AEI data released openly by Anthropic (see dataset card)"
 }

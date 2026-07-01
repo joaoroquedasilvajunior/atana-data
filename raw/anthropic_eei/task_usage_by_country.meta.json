@@ -1,17 +1,17 @@
 {
   "table": "task_usage_by_country",
-  "description": "O*NET-task usage shares for GLOBAL, US and the five Atana corpus countries (BR/MX/CO/AR/CR), one week of Feb 2026. Includes 'not_classified'/'none' rows as published.",
+  "description": "O*NET-task (leaf-level) usage shares for GLOBAL, US and the five Atana corpus countries (BR/MX/CO/AR/CR), May 2026 monthly aggregate. task_count is NULL — Anthropic dropped raw counts in the June 2026 schema rewrite. May include unresolved tasks depending on Anthropic's classifier coverage this vintage.",
   "source": "Anthropic Economic Index (AEI), Hugging Face Anthropic/EconomicIndex",
   "source_url": "https://huggingface.co/datasets/Anthropic/EconomicIndex",
-  "vintage": "2026-02-05_to_2026-02-12 (release_2026_03_24)",
+  "vintage": "2026-05-01_to_2026-06-01 (release_2026_06_26, May 2026 window)",
   "source_files": [
     {
-      "file": "aei_raw_claude_ai_2026.csv",
-      "sha256": "69ebf6f9afc1e3be45caab172a84ae09e78bf41b97e1c310100d81c8a35a7433"
+      "file": "aei_claude_ai_2026-06-26.csv",
+      "sha256": "f974b358bce0e5a8417510c61da4342234cd0de9d9d0b62acf4c6dbcf8ec7b68"
     }
   ],
-  "fetch_date": "2026-06-10",
+  "fetch_date": "2026-07-01",
   "etl_script": "etl/anthropic_eei__to_parquet.py",
-  "etl_run_date": "2026-06-10",
+  "etl_run_date": "2026-07-01",
   "licence": "AEI data released openly by Anthropic (see dataset card)"
 }
