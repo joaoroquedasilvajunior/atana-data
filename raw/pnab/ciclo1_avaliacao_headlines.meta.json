@@ -1,0 +1,17 @@
+{
+  "table": "ciclo1_avaliacao_headlines",
+  "schema": "pnab",
+  "description": "MinC PNAB Ciclo 1 evaluation headline stats — 15 metrics across 6 analytical dimensions (beneficiário, financeiro, execução, territorial, cobertura, metodológico). Data source: SNIIC studies presented at the I Seminário de Avaliação de Resultados da PNAB, 30 Jun – 1 Jul 2026. First atana.pnab table carrying the beneficiary-count dimension — 167,817 agentes culturais assistidos in Ciclo 1 (2023–2025), split 145,235 municipal + 22,582 state. Cross-source validation with atana.pnab.execucao_financeira (R$ 3 bi mobilized matches byte-for-byte). Complements the four existing atana.pnab tables which cover the transfer + governance sides.",
+  "source": "MinC — I Seminário de Avaliação de Resultados da Política Nacional Aldir Blanc, 30 Jun – 1 Jul 2026 (SNIIC studies)",
+  "source_pages": [
+    "https://www.gov.br/cultura/pt-br/centrais-de-conteudo/sala-de-imprensa/avisos-de-pauta/minc-apresenta-estudos-ineditos-que-revelam-resultados-do-primeiro-ciclo-da-politica-nacional-aldir-blanc",
+    "https://www.brasil247.com/cultura/estudos-ineditos-apontam-alcance-nacional-da-politica-aldir-blanc/"
+  ],
+  "fetch_date": "2026-07-05",
+  "etl_script": "etl/pnab__ciclo1_avaliacao_headlines_to_parquet.py",
+  "etl_run_date": "2026-07-13",
+  "licence": "Public release via MinC seminar + news coverage; CC BY 4.0 by editorial extension.",
+  "grain": "one row per (metric_id) — 12 metrics across 6 dimensions",
+  "row_count": 12,
+  "notes": "Underlying microdata for the 167,817 agentes is not yet published — this is aggregate-headline Tier 1. Curious Scientist watchpoints will flag when agent-level microdata is released; Phase 10a will consume it. Corpus current-state cross-source with atana.pnab.execucao_financeira validates the R$ 3 bi mobilizado and gives a 1.8 pp delta on execução (94 % corpus vs 95.8 % SNIIC — late-2025 payments)."
+}

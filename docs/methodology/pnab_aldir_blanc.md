@@ -1,10 +1,9 @@
 # `atana.pnab` — Política Nacional Aldir Blanc
 
-> **Status (2026-06-14):** GitHub ✅ `411644f` on origin/main · MotherDuck ✅ live · 4 tables / 232,928 rows in `curated/pnab/`
+> **Status (2026-07-05):** GitHub ✅ (methodology core) / ⏳ (Move A new table) · MotherDuck ✅ live · **5 tables / ~232,940 rows** in `curated/pnab/` and `raw/pnab/` (the new `ciclo1_avaliacao_headlines` sits in `raw/`).
 
-> Methodology note. Phase PNAB ingest, 2026-06-13. ETL: `etl/pnab__to_parquet.py`
-> → 4 Parquet tables in `curated/pnab/`. Accretion-criterion gate 3 (consumers:
-> Note #20 published, candidate Análise 26 / Note #11, TCU×PNAB analysis).
+> Methodology note. Phase PNAB ingest, 2026-06-13. Extended 2026-07-05 with **Phase 10 Move A** — `ciclo1_avaliacao_headlines` Tier-1 from the SNIIC seminar 30 Jun–1 Jul 2026 (see §10 below). ETLs: `etl/pnab__to_parquet.py` (core 4 tables) + `etl/pnab__ciclo1_avaliacao_headlines_to_parquet.py` (Move A).
+> Accretion-criterion gate 3 (consumers: Note #20 published, Note #21 published, candidate Análise 26 / Note #11, TCU×PNAB analysis, PNAB agent-level Note when Phase 10a microdata drops).
 
 ## §1 Origem
 
@@ -115,3 +114,42 @@ Rondônia 0,000721 ✓ · 8.2 interseção execução↔PAR(C1) on cod_ibge = 10
 
 ## §9 Citação
 > Brasil, Ministério da Cultura — *Implementação e Execução da Política Nacional Aldir Blanc* (Ciclo 1 + Ciclo 2). Portal de Dados da Cultura, CC BY 4.0. LC 195/2022; Decreto 11.453/2023. Ingerido em `atana.pnab` (`atana-data`), 2026-06-13.
+
+## §10 `ciclo1_avaliacao_headlines` — SNIIC seminar Tier 1 (2026-07-05, Phase 10 Move A)
+
+Adds the **first beneficiary/agente dimension** to `atana.pnab`. Source: MinC's *I Seminário de Avaliação de Resultados da Política Nacional Aldir Blanc*, 30 Jun – 1 Jul 2026, presenting three previously-unpublished (*"inéditos"*) studies produced by **SNIIC**.
+
+**Schema.** One row per (`metric_id`) — 12 metrics × 6 analytical dimensions:
+
+| Dimensão | # rows | Métricas |
+|---|---:|---|
+| `beneficiario` | 3 | agentes_total (167.817), agentes_municipal (145.235), agentes_estadual (22.582) |
+| `financeiro` | 2 | mobilizado_total_brl (R$ 3 bi), afirmativas_investido_brl (R$ 800 mi) |
+| `execucao` | 3 | execucao_pct_nacional (95,8 %), estados (97,1 %), municípios (94,4 %) |
+| `territorial` | 2 | interior_pct (58 %), municipios_pequenos_pct (40 % em ≤20k hab) |
+| `cobertura` | 1 | cobertura_federativa (100 % — quase-universal) |
+| `metodologico` | 1 | estudos_publicados (3) |
+
+Every row carries: `metric_id`, `metric_label`, `value`, `unit`, `subdimension`, `period_start`/`period_end` (2023-01-01 → 2025-12-31 for content rows), `verbatim_finding` (source-quoted PT), `source`, `source_urls` (news + MinC press page), `notes` (cross-source validation observations).
+
+**Cross-source validations (in the ETL, run on every build):**
+- `mobilizado_total_brl` = R$ 3 bi matches `atana.pnab.execucao_financeira` recebido byte-for-byte
+- Agente identity: 167.817 = 145.235 + 22.582 ✓
+- Execução ordering: estados 97,1 > nacional 95,8 > municípios 94,4 ✓
+- Delta on execução: **1,8 pp higher than corpus's own 94 %** — the corpus's `execucao_financeira` reflects data through the 2026-06-13 refresh; SNIIC's 95,8 % includes late-2025 payments processed after that cutoff.
+
+**⚠️ Tier 1 aggregate.** The 167,817-agent underlying microdata is **not yet public**. Three Curious Scientist watchpoints active (see `_atana_intel/sources.yaml` around SNIIC + PNAB Ciclo 1):
+
+1. `/assuntos/pnab/politica-nacional-aldir-blanc-novo/ciclo-1` — main landing
+2. `portal.cultbr.cultura.gov.br` — SNIIC's operational system
+3. `/afericao` + boletins — supplementary sub-pages
+
+When microdata drops, **Phase 10a** consumes it as `atana.pnab.ciclo1_agentes` (~167k rows, agent × município × UF × gênero × raça × faixa etária × valor). Unlocks:
+- Beneficiary distribution at agent granularity (upgrade of Note #21's territorial-reach argument)
+- Direct join with `atana.pnab.execucao_financeira` (5.425 entes) and `atana.pnab.par_planos` on `cod_ibge`
+- Load-bearing surface for the "Public Funding Architecture Review" named offer
+
+**Provenance.** MinC's press page for the seminar is **auth-gated as of the 2026-07-05 audit** (`gov.br/cultura` news content returns *Conteúdo Restrito — é necessário autenticar*). Headline stats extracted verbatim from public news coverage (Brasil 247, Mundo da Música) and the corpus's read of the seminar's release note. ETL script carries the URLs; new sources can be added when MinC re-opens the press page or when SNIIC publishes the study PDFs directly.
+
+### §10.1 Citação da tabela (Move A)
+> Ministério da Cultura / SNIIC — *I Seminário de Avaliação de Resultados da Política Nacional Aldir Blanc* (30 Jun – 1 Jul 2026). Three studies presented on Ciclo 1 (2023–2025) outcomes. Headline stats ingested as `atana.pnab.ciclo1_avaliacao_headlines` (12 rows, 6 dimensions). CC BY 4.0. LC 195/2022; Decreto 11.453/2023.
