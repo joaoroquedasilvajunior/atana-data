@@ -134,6 +134,47 @@ def build(refresh: bool = False) -> pd.DataFrame:
     return df
 
 
+def _br_float(v) -> float:
+    """Parse a Portal-style monetary field into a float.
+
+    Portal da Transparência returns money as a Brazilian-formatted STRING —
+    `"1.234.567,89"` (dot as thousands separator, comma as decimal). Numbers
+    can also come through as int/float. NULL / "" / None → 0.0. Non-parseable
+    strings return 0.0 rather than raising, so a single quirky row does not
+    kill the whole year's pull.
+    """
+    if v is None or v == "":
+        return 0.0
+    if isinstance(v, (int, float)):
+        return float(v)
+    s = str(v).strip()
+    if "," in s and "." in s:
+        s = s.replace(".", "").replace(",", ".")
+    elif "," in s:
+        s = s.replace(",", ".")
+    try:
+        return float(s)
+    except ValueError:
+        return 0.0
+
+
+# Portal da Transparência /emendas fields — the endpoint returns a list of
+# `Emenda` objects. Common monetary fields observed in the response:
+#     valorEmpenhado, valorLiquidado, valorPago, valorRestoInscrito, valorRestoPago
+# All returned as Brazilian-formatted strings. We accumulate autorizado (as
+# valorEmpenhado — the standing operational proxy for what got authorised) and
+# pago. If field naming changes upstream, add candidates here.
+_AUTORIZADO_KEYS = ("valorEmpenhado", "valorAutorizado", "valor")
+_PAGO_KEYS = ("valorPago", "valorPagoTotal")
+
+
+def _first(e: dict, keys: tuple[str, ...]):
+    for k in keys:
+        if k in e and e[k] not in (None, ""):
+            return e[k]
+    return 0
+
+
 def _fetch_cultura_from_api() -> list[dict]:
     """Populate Função 13 (Cultura) rows via Portal da Transparência API.
 
@@ -163,9 +204,10 @@ def _fetch_cultura_from_api() -> list[dict]:
         total_auth = 0.0
         total_pago = 0.0
         n_emendas = 0
+        sample_fields: list[str] = []
         page = 1
         while True:
-            q = urllib.parse.urlencode({"ano": year, "funcao": 13, "pagina": page})
+            q = urllib.parse.urlencode({"ano": year, "codigoFuncao": 13, "pagina": page})
             req = urllib.request.Request(f"{base}?{q}", headers={
                 "accept": "application/json",
                 "chave-api-dados": key,
@@ -178,9 +220,26 @@ def _fetch_cultura_from_api() -> list[dict]:
                 break
             if not data:
                 break
-            for e in data:
-                total_auth += float(e.get("valorEmpenhado", 0) or 0)
-                total_pago += float(e.get("valorPago", 0) or 0)
+            if page == 1 and not sample_fields:
+                sample_fields = list(data[0].keys()) if data else []
+                # Server-side filter can silently fall through — belt-and-
+                # suspenders: log the first emenda's função so a mismatch is
+                # visible in the row `notes` rather than inflating totals.
+                fst = data[0]
+                fst_func = fst.get("codigoFuncao") or fst.get("funcao") or "?"
+                print(f"    · {year} page 1 sample: codigoFuncao={fst_func!r}, "
+                      f"fields[:6]={sample_fields[:6]}")
+            for emenda in data:
+                # Client-side filter — only count if this emenda is Função 13.
+                # Portal returns `codigoFuncao` as the LABEL ('Cultura'), not
+                # the numeric code ('13'). Accept either. Empty = trust the
+                # server-side filter (already `codigoFuncao=13` in the query).
+                func = str(emenda.get("codigoFuncao") or
+                           emenda.get("funcao") or "").strip().lower()
+                if func and func not in ("13", "cultura"):
+                    continue
+                total_auth += _br_float(_first(emenda, _AUTORIZADO_KEYS))
+                total_pago += _br_float(_first(emenda, _PAGO_KEYS))
                 n_emendas += 1
             if len(data) < 15:  # default page size
                 break
@@ -193,7 +252,11 @@ def _fetch_cultura_from_api() -> list[dict]:
             "valor_pago_brl_mi": round(total_pago / 1e6, 2),
             "n_emendas": n_emendas,
             "source_page": f"Portal da Transparência API — /emendas?ano={year}&funcao=13",
-            "notes": f"Full pull {page} pages, ~{n_emendas} emendas.",
+            "notes": (
+                f"Full pull {page} pages, {n_emendas} emendas. "
+                f"Fields seen page 1: {', '.join(sample_fields[:8])}."
+                if sample_fields else
+                f"Full pull {page} pages, {n_emendas} emendas."),
             "fetch_date": str(date.today()),
         })
         print(f"  ✓ {year}: {n_emendas} emendas · autorizado R$ "
