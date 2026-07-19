@@ -1,6 +1,6 @@
 # Methodology — `canonical.domain_crosswalk`
 
-> **Status (2026-06-14):** GitHub ✅ `958c72b` on origin/main · MotherDuck ✅ live · 1 table / 93 rows in `curated/domain_crosswalk.parquet`
+> **Status (2026-07-19):** GitHub ⏳ Phase 7a.0 + Phase 11 Tier 1 pending push · MotherDuck ⏳ pending sync (was ✅ live at 93 as of `958c72b` 2026-06-14) · 1 table / **95 rows** in `curated/domain_crosswalk.parquet` (+`cl_csc` Phase 7a.0, +`emendas` Phase 11 Tier 1)
 
 The Atana harmonisation crosswalk. Phase 3 (Part C) of the Atana Data LATAM
 expansion — the table that turns four isolated national schemas into a genuinely

@@ -507,17 +507,35 @@ ETL: `etl/cl_csc__bcch_pilot_headline_to_parquet.py` (inline data → DuckDB COP
 
 ---
 
+## `atana.emendas` — Portal da Transparência Emendas Federais (fourth federal cultural-funding pipe) ⏳ Built locally (Tier 1 scaffold; cultura values pending API key)
+
+The **fourth federal cultural-funding pipe** in the Atana corpus, alongside `atana.salic` (Rouanet, indirect via fiscal renunciation), `atana.pnab` (Aldir Blanc, direct generalist), and `atana.lpg` (Paulo Gustavo, direct AV). Phase 11 Tier 1 — headline scope only.
+
+| Table | Rows | Vintage | Description |
+|---|---:|---|---|
+| `headlines_annual` | 10 | 2023–2024 (all-fn) · 2018–2025 (cultura scaffold) | Two scopes: `all_functions` (2 benchmark rows: 2023 R$ 20.6 bi, 2024 R$ 31.4 bi — hand-transcribed from Agência Brasil + Gazeta do Povo) + `funcao_13_cultura` (8 placeholder rows, values NULL until Portal da Transparência API key is available). |
+
+⚠️ **Tier-status caveat.** The `funcao_13_cultura` rows are structurally in place but their `valor_autorizado_brl_mi` / `valor_pago_brl_mi` / `n_emendas` columns are NULL. Downstream analytical use must filter `WHERE scope = 'funcao_13_cultura' AND valor_autorizado_brl_mi IS NOT NULL` or fall back to the all-functions benchmark. Populate via free API-key signup at [portaldatransparencia.gov.br/api-de-dados/cadastrar-email](https://portaldatransparencia.gov.br/api-de-dados/cadastrar-email), then `PORTAL_TRANSPARENCIA_API_KEY=xxx python etl/emendas__headlines_annual_to_parquet.py --refresh`.
+
+Tier 2 (contratos + inexigibilidade + cache_reference, ~800k rows) is deferred until Note #23 or Vol 2 kick-off, per `_atana_intel/phase11_emendas_scoping.md` §9. Curious Scientist watchpoint (quarterly API probe) registered in `_atana_intel/sources.yaml`; probe script at `_atana_intel/phase11_emendas_probe.py`.
+
+`canonical.domain_crosswalk` extended **94 → 95 rows** (1 new `emendas` row → `Multiple — not separable` bundle, transversal, `good`, ★ — same convention as PNAB/LPG since parlamentar discretion spans every FCS cultural domain). FCS coverage meter **13/14 unchanged** — Emendas complete the federal-funding lens quartet, not new domain coverage.
+
+ETL: `etl/emendas__headlines_annual_to_parquet.py` (inline benchmarks + `--refresh` API pull; idempotent; `ATANA_ETL_SKIP_PUSH` guard) · Methodology: `docs/methodology/emendas_portal_transparencia.md` · Scoping: `_atana_intel/phase11_emendas_scoping.md` · Probe: `_atana_intel/phase11_emendas_probe.py`
+
+---
+
 ## `atana.canonical` — Curated analytical snapshots
 
 Read-only views and tables that power published analyses. **Do not modify directly** — regenerate via build scripts and versioned datasets.
 
-### `canonical.domain_crosswalk` ✅ Live at 93 rows (`958c72b` + MotherDuck refreshed 2026-06-14)
+### `canonical.domain_crosswalk` ⏳ Rebuilt locally at 95 rows (was ✅ Live at 93; Phase 7a.0 + Phase 11 Tier 1 pending push + MotherDuck sync)
 
-The Atana harmonisation crosswalk — maps every cultural-statistics classification in the corpus onto one common spine. **93 rows**, one per classification code (Phase 3 built 72; Phase 4 added 10 `ibge_siic` rows and the `bcb` / `inpi` / `ecad` rows; Phase 5 added `cisac` / `ifpi` and `luminate` / `tcu` / `oecd_ai`; Phase 6 added `anthropic_eei`; Phases PNAB + LPG added the two Brazilian cultural-governance direct-transfer lines, and the DANE 33 row was reclassified into the `;`-bundle convention).
+The Atana harmonisation crosswalk — maps every cultural-statistics classification in the corpus onto one common spine. **95 rows**, one per classification code (Phase 3 built 72; Phase 4 added 10 `ibge_siic` rows and the `bcb` / `inpi` / `ecad` rows; Phase 5 added `cisac` / `ifpi` and `luminate` / `tcu` / `oecd_ai`; Phase 6 added `anthropic_eei`; Phases PNAB + LPG added the two Brazilian cultural-governance direct-transfer lines; Phase 7a.0 added `cl_csc`; Phase 11 Tier 1 added `emendas` — the fourth federal cultural-funding pipe).
 
 | Column | Type | Description |
 |---|---|---|
-| `source_schema` | VARCHAR | `fcs2025` / `inegi` / `dane` / `sinca` / `cr_bccr` / `unctad` / `ibge_comex` / `ibge_siic` / `bcb` / `inpi` / `ecad` / `cisac` / `ifpi` / `luminate` / `tcu` / `oecd_ai` |
+| `source_schema` | VARCHAR | `fcs2025` / `inegi` / `dane` / `sinca` / `cr_bccr` / `unctad` / `ibge_comex` / `ibge_siic` / `bcb` / `inpi` / `ecad` / `cisac` / `ifpi` / `luminate` / `tcu` / `oecd_ai` / `anthropic_eei` / `pnab` / `lpg` / `cl_csc` / `emendas` |
 | `source_system` | VARCHAR | Human-readable classification name |
 | `source_code` | VARCHAR | Code within that classification |
 | `source_label` | VARCHAR | Label within that classification |
@@ -528,7 +546,7 @@ The Atana harmonisation crosswalk — maps every cultural-statistics classificat
 | `mapping_confidence` | VARCHAR | `exact` / `good` / `approximate` / `no-equivalent` |
 | `notes` | VARCHAR | The definitional gap, stated explicitly (`★` flags a finding) |
 
-Row composition: `fcs2025` 14 (the spine — 7 cultural + 7 transversal) · `inegi` 10 · `dane` 22 · `sinca` 2 · `cr_bccr` 4 · `unctad` 15 · `ibge_comex` 5 · `ibge_siic` 10 · `bcb` 1 · `inpi` 1 · `ecad` 1 · `cisac` 1 · `ifpi` 1 · `luminate` 1 · `tcu` 1 · `oecd_ai` 1. It turns the isolated national schemas into a cross-queryable layer — a query joins any national CSC, the IBGE SIIC, the BCB account, the INPI register, the ECAD/CISAC/IFPI/Luminate music series, the TCU governance assessment or the OECD AI methodological frame to the FCS spine through this one table. Definitional gaps are kept visible (`mapping_confidence`, `notes`), never silently reconciled. The build script's coverage meter still reaches **13/14** FCS domains (only *Intangible cultural heritage* remains, out of scope by decision). Stored un-timestamped — a living reference table, not a versioned snapshot.
+Row composition: `fcs2025` 14 (the spine — 7 cultural + 7 transversal) · `inegi` 10 · `dane` 22 · `sinca` 2 · `cr_bccr` 4 · `unctad` 15 · `ibge_comex` 5 · `ibge_siic` 10 · `bcb` 1 · `inpi` 1 · `ecad` 1 · `cisac` 1 · `ifpi` 1 · `luminate` 1 · `tcu` 1 · `oecd_ai` 1 · `anthropic_eei` 1 · `pnab` 1 · `lpg` 1 · `cl_csc` 1 · `emendas` 1. It turns the isolated national schemas into a cross-queryable layer — a query joins any national CSC, the IBGE SIIC, the BCB account, the INPI register, the ECAD/CISAC/IFPI/Luminate music series, the TCU governance assessment or the OECD AI methodological frame to the FCS spine through this one table. Definitional gaps are kept visible (`mapping_confidence`, `notes`), never silently reconciled. The build script's coverage meter still reaches **13/14** FCS domains (only *Intangible cultural heritage* remains, out of scope by decision). Stored un-timestamped — a living reference table, not a versioned snapshot.
 
 ETL: `etl/canonical__build_domain_crosswalk.py` · Methodology: `docs/methodology/canonical_domain_crosswalk.md`
 

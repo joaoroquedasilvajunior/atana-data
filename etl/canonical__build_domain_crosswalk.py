@@ -890,6 +890,41 @@ def cl_csc_rows() -> list[dict]:
     return rows
 
 
+# ── Brasil — Portal da Transparência Emendas Federais (Phase 11 Tier 1) ─────
+# The FOURTH federal cultural-funding pipe registered in the corpus, alongside
+# Rouanet (indirect via SALIC), PNAB (direct generalist), and LPG (direct AV).
+# Tier 1 = headline scope; Tier 2 (full per-emenda × município × parlamentar
+# ingest) is deferred per _atana_intel/phase11_emendas_scoping.md §9.
+EMENDAS = [
+    ("funcao-13-cultura",
+     "Portal da Transparência — Emendas Parlamentares Função 13 Cultura",
+     "Multiple — not separable", "transversal", None, None, "good",
+     "★ Phase 11 Tier 1 (2026-07-19) — the fourth federal cultural-funding "
+     "pipe. Sits alongside Rouanet (indirect, `atana.salic`), PNAB (direct "
+     "generalist, `atana.pnab`), and LPG (direct AV, `atana.lpg`). "
+     "`atana.emendas.headlines_annual` (10 rows): 2 all-functions benchmark "
+     "rows (2023 R$ 20,6 bi · 2024 R$ 31,4 bi — hand-transcribed public "
+     "reporting) + 8 funcao_13_cultura placeholder rows (2018-2025) awaiting "
+     "Portal da Transparência API key (`chave-api-dados`, free at "
+     "portaldatransparencia.gov.br/api-de-dados/cadastrar-email). Populate via "
+     "`python etl/emendas__headlines_annual_to_parquet.py --refresh` when "
+     "PORTAL_TRANSPARENCIA_API_KEY is exported. Tier 2 (contratos + "
+     "inexigibilidade + cache_reference) triggers Note #23. Same "
+     "'Multiple — not separable' bundle convention as PNAB/LPG — parlamentar "
+     "discretion spans every FCS cultural domain. See "
+     "docs/methodology/emendas_portal_transparencia.md."),
+]
+
+
+def emendas_rows() -> list[dict]:
+    rows = []
+    for code, label, dom, dtype, cer, ncm, conf, note in EMENDAS:
+        rows.append(dict(zip(COLUMNS, (
+            "emendas", "Portal da Transparência — Emendas Federais Cultura",
+            code, label, dom, dtype, cer, ncm, conf, note))))
+    return rows
+
+
 def build() -> pd.DataFrame:
     rows = (spine_rows() + inegi_rows() + dane_rows() + sinca_rows()
             + cr_bccr_rows() + unctad_goods_rows() + unctad_services_rows()
@@ -897,7 +932,7 @@ def build() -> pd.DataFrame:
             + ecad_rows() + cisac_rows() + ifpi_rows()
             + luminate_rows() + tcu_rows() + oecd_ai_rows()
             + anthropic_eei_rows() + pnab_rows() + lpg_rows()
-            + cl_csc_rows())
+            + cl_csc_rows() + emendas_rows())
     return pd.DataFrame(rows, columns=COLUMNS)
 
 
@@ -908,13 +943,13 @@ def validate(df: pd.DataFrame) -> None:
               "cr_bccr": 4, "unctad": 15, "ibge_comex": 5, "ibge_siic": 10,
               "bcb": 1, "inpi": 1, "ecad": 1, "cisac": 1, "ifpi": 1,
               "luminate": 1, "tcu": 1, "oecd_ai": 1, "anthropic_eei": 1,
-              "pnab": 1, "lpg": 1, "cl_csc": 1}
+              "pnab": 1, "lpg": 1, "cl_csc": 1, "emendas": 1}
     got = df["source_schema"].value_counts().to_dict()
     for schema, n in expect.items():
         assert got.get(schema) == n, (
             f"{schema}: expected {n} rows, got {got.get(schema)}")
     total = sum(expect.values())
-    assert len(df) == total == 94, f"total rows {len(df)} != 94"
+    assert len(df) == total == 95, f"total rows {len(df)} != 95"
     print(f"  ✓ {len(df)} rows — " + ", ".join(f"{k} {v}" for k, v in expect.items()))
 
     bad = set(df["mapping_confidence"]) - CONFIDENCE_VALUES
@@ -995,8 +1030,10 @@ def write_meta(out_path: Path, df: pd.DataFrame) -> None:
         "docs/methodology/luminate_ye.md",
         "docs/methodology/tcu_pnab.md",
         "docs/methodology/oecd_ai_papers.md",
+        "docs/methodology/emendas_portal_transparencia.md",
         "_atana_intel/phase3_schema_design.md",
         "_atana_intel/phase4_scoping.md",
+        "_atana_intel/phase11_emendas_scoping.md",
     ]
     composition = df["source_schema"].value_counts().to_dict()
     meta = {

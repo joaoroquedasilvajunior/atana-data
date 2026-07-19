@@ -20,11 +20,13 @@
     "docs/methodology/luminate_ye.md",
     "docs/methodology/tcu_pnab.md",
     "docs/methodology/oecd_ai_papers.md",
+    "docs/methodology/emendas_portal_transparencia.md",
     "_atana_intel/phase3_schema_design.md",
-    "_atana_intel/phase4_scoping.md"
+    "_atana_intel/phase4_scoping.md",
+    "_atana_intel/phase11_emendas_scoping.md"
   ],
   "build_script": "etl/canonical__build_domain_crosswalk.py",
-  "build_date": "2026-06-26",
+  "build_date": "2026-07-19",
   "grain": "one row per classification code (source_schema, source_code)",
   "row_composition": {
     "dane": 22,
@@ -36,6 +38,7 @@
     "cr_bccr": 4,
     "sinca": 2,
     "tcu": 1,
+    "cl_csc": 1,
     "lpg": 1,
     "pnab": 1,
     "anthropic_eei": 1,
@@ -46,7 +49,7 @@
     "cisac": 1,
     "inpi": 1,
     "bcb": 1,
-    "cl_csc": 1
+    "emendas": 1
   },
   "fcs_spine": "2025 UNESCO Framework for Cultural Statistics — 7 cultural + 7 transversal domains",
   "licence": "CC BY 4.0 (Atana) — the underlying classifications retain their own licences",
