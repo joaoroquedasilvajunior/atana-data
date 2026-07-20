@@ -1,19 +1,20 @@
 {
   "table": "headlines_annual",
   "schema": "emendas",
-  "description": "Portal da Transparência — Emendas Parlamentares Federais headline series. Phase 11 Tier 1: registers the fourth federal cultural-funding pipe (alongside Rouanet/PNAB/LPG). Two scopes: all_functions (benchmark, R$ 20,6 bi in 2023 and R$ 31,4 bi in 2024 — hand-transcribed from public reporting) and funcao_13_cultura (subset, populated via API-key refresh).",
-  "source": "Tier 1a all_functions: Agência Brasil 2023-12 + Gazeta do Povo 2024-12. Tier 1b cultura: Portal da Transparência API (api.portaldatransparencia.gov.br/api-de-dados/emendas), gated on free API key from portaldatransparencia.gov.br/api-de-dados/cadastrar-email.",
+  "description": "Portal da Transparência — Emendas Parlamentares Federais headline series (v2, certification-driven schema). Fourth federal cultural-funding pipe. Two scopes: all_functions benchmark (2023 R$ 20,6 bi, 2024 R$ 31,4 bi) and funcao_13_cultura (2018-2025, full money breakdown incl. restos a pagar). valor_pago_total = pago_ano + resto_pago is the TRUE disbursement; in-year pago alone understates it ~5× because cultural emendas pay mostly through restos.",
+  "source": "Tier 1a: Agência Brasil 2023-12 + Gazeta do Povo 2024-12. Tier 1b: Portal da Transparência API /emendas?codigoFuncao=13, free key from portaldatransparencia.gov.br/api-de-dados/cadastrar-email.",
+  "certification": "_atana_intel/phase11_emendas_certify.py — C2/C3/C4/C5 pass; C1 drove this v2 schema (restos + honest names).",
   "source_pages": [
     "Agência Brasil (2023-12) — 'Empenho de emendas parlamentares mais que dobra em 2023'",
     "Gazeta do Povo (2024-12) — 'Emendas de parlamentares somaram R$ 31 bilhões em 2024'",
-    "Portal da Transparência API — /emendas?ano=2018&funcao=13",
-    "Portal da Transparência API — /emendas?ano=2019&funcao=13",
-    "Portal da Transparência API — /emendas?ano=2020&funcao=13",
-    "Portal da Transparência API — /emendas?ano=2021&funcao=13",
-    "Portal da Transparência API — /emendas?ano=2022&funcao=13",
-    "Portal da Transparência API — /emendas?ano=2023&funcao=13",
-    "Portal da Transparência API — /emendas?ano=2024&funcao=13",
-    "Portal da Transparência API — /emendas?ano=2025&funcao=13"
+    "Portal da Transparência API — /emendas?ano=2018&codigoFuncao=13",
+    "Portal da Transparência API — /emendas?ano=2019&codigoFuncao=13",
+    "Portal da Transparência API — /emendas?ano=2020&codigoFuncao=13",
+    "Portal da Transparência API — /emendas?ano=2021&codigoFuncao=13",
+    "Portal da Transparência API — /emendas?ano=2022&codigoFuncao=13",
+    "Portal da Transparência API — /emendas?ano=2023&codigoFuncao=13",
+    "Portal da Transparência API — /emendas?ano=2024&codigoFuncao=13",
+    "Portal da Transparência API — /emendas?ano=2025&codigoFuncao=13"
   ],
   "fetch_date": "2026-07-19",
   "etl_script": "etl/emendas__headlines_annual_to_parquet.py",
@@ -21,5 +22,9 @@
   "licence": "Portal da Transparência — Dados abertos (CGU)",
   "grain": "one row per (year × scope)",
   "row_count": 10,
-  "notes": "Tier 1 — headline scope only. Full ingest (per-emenda × município × parlamentar) is Tier 2, deferred per _atana_intel/phase11_emendas_scoping.md §9. Cultura placeholder rows are populated when PORTAL_TRANSPARENCIA_API_KEY is set and --refresh flag is used."
+  "caveats": [
+    "E2 — Função 13 is a FLOOR; cultural money in Turismo (fn 23) or transferências especiais (RP-8/9 sem função) is invisible.",
+    "n_linhas_execucao counts execution lines; RP-9 relator emendas share the sentinel code 'REL. GERAL' — n_emendas_distintas < lines.",
+    "Any execution-rate claim must use valor_pago_total, not pago_ano."
+  ]
 }

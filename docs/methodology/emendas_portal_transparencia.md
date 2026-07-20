@@ -58,18 +58,24 @@ Placeholder rows document the gap explicitly.
 Tier 2 will add: `emendas_cultura`, `emendas_por_parlamentar`,
 `contratos_shows_federal`, `inexigibilidade_cultura`, `cache_reference`.
 
-### `headlines_annual` schema
+### `headlines_annual` schema (v2 — certification-driven, 2026-07-19)
 
 | Column | Type | Notes |
 |---|---|---|
 | `year` | INT32 | 2018-2025 |
 | `scope` | VARCHAR | `all_functions` \| `funcao_13_cultura` |
-| `valor_autorizado_brl_mi` | DOUBLE | R$ mi correntes; null pre-refresh for cultura |
-| `valor_pago_brl_mi` | DOUBLE | R$ mi correntes; null pre-refresh |
-| `n_emendas` | INT32 | count; null pre-refresh |
+| `valor_empenhado_brl_mi` | DOUBLE | Committed. (v1 mis-named this `valor_autorizado` — the API has no `valorAutorizado` field.) |
+| `valor_liquidado_brl_mi` | DOUBLE | Liquidated in-year. NULL for `all_functions`. |
+| `valor_pago_ano_brl_mi` | DOUBLE | Paid **in-year** only. |
+| `valor_resto_pago_brl_mi` | DOUBLE | Paid later via *restos a pagar*. |
+| `valor_pago_total_brl_mi` | DOUBLE | **= pago_ano + resto_pago — the TRUE disbursement.** Use this for any execution-rate claim. |
+| `n_linhas_execucao` | INT32 | Execution-line count. |
+| `n_emendas_distintas` | INT32 | Distinct `codigoEmenda` (< lines: RP-9 relator emendas share the sentinel code `"REL. GERAL"`). |
 | `source_page` | VARCHAR | citation |
 | `notes` | VARCHAR | caveats |
 | `fetch_date` | VARCHAR | ISO date |
+
+**Why restos a pagar matter (certification C1 finding).** A typical cultural emenda commits in year Y and pays most of the money in Y+1/Y+2 through *restos a pagar*, not through in-year `valorPago`. Sample (2024, autor RICARDO BARROS): empenhado R$ 23.200, pago-no-ano R$ 734, restoPago R$ 22.466 — **97 % of the disbursement came via restos**. Reading in-year `valorPago` alone understates true payment roughly 5× and would produce a false "low execution" narrative. `valor_pago_total_brl_mi` is the honest disbursement figure.
 
 ## 5. Domain crosswalk mapping
 
@@ -117,6 +123,24 @@ git push
 
 Curious Scientist quarterly probe registered in `_atana_intel/sources.yaml`
 under `emendas_portal_transparencia`.
+
+## 7b. Certification record (2026-07-19)
+
+The source was certified via `_atana_intel/phase11_emendas_certify.py`, an
+independent re-derivation (does NOT import the ETL) plus
+`_atana_intel/phase11_emendas_dup_probe.py`. Five checks:
+
+| Check | Result | Detail |
+|---|---|---|
+| **C1** Field semantics | ⚠️→fixed | No `valorAutorizado` field exists → column renamed to `valor_empenhado`. Restos a pagar dominate disbursement → added `valor_liquidado`, `valor_resto_pago`, `valor_pago_total`. Schema v2. |
+| **C2** Pagination complete | ✅ PASS | Independent recount reproduced ETL `n` every year; 12-22 pages/year; loop terminates on the first short page (no hardcoded size trusted). |
+| **C3** Dedup | ✅ PASS (benign) | Only 2019 had repeated `codigoEmenda` — the sentinel `"REL. GERAL"` (RP-9 relator emendas, no individual code), appearing as 4 distinct execution lines with different subfunção/valores. Money sums across lines are correct; not a double-count. |
+| **C4** Invariants | ✅ PASS | `valorPago ≤ valorLiquidado ≤ valorEmpenhado`, all ≥ 0, per emenda, every year. |
+| **C5** ETL fidelity | ✅ PASS | Independent Σ reproduced the parquet exactly. Manual Portal-UI cross-check (Ano=2024, Função=Cultura) recommended once by eye. |
+
+**Verdict:** certified for Tier 1 headline use, with the E2 floor caveat and the
+`valor_pago_total` (not `pago_ano`) rule foregrounded. The v1 pull is superseded
+by the v2 schema.
 
 ## 8. Availability status
 
