@@ -1,0 +1,16 @@
+{
+  "table": "cultura_linhas",
+  "schema": "emendas",
+  "description": "Per-execution-line fact table for Função 13 (Cultura) parliamentary amendments, 2018-2025. Author + instrument (control-gradient) layer. tipoEmenda stored verbatim + derived rp_categoria/controle_nivel. No recipient (Tier 2b) or genre (Tier 2c).",
+  "source": "Portal da Transparência API /emendas?codigoFuncao=13.",
+  "grain": "one row per emenda execution line",
+  "row_count": 1762,
+  "etl_script": "etl/emendas__cultura_linhas_to_parquet.py",
+  "etl_run_date": "2026-07-19",
+  "caveats": [
+    "tipoEmenda→RP mapping verified against --certify distinct dump.",
+    "UF parsed from localidadeDoGasto where possible; 'Nacional'→BR.",
+    "Recipient (who got paid) NOT here — Tier 2b contratos.",
+    "Same E2 floor caveat as headlines (função 13 misses Turismo/RP-9-sem-função)."
+  ]
+}
