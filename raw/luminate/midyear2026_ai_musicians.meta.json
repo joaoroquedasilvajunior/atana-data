@@ -1,0 +1,12 @@
+{
+  "table": "midyear2026_ai_musicians",
+  "schema": "luminate",
+  "description": "Luminate 2026 Midyear — gen-AI sentiment/use among US musicians vs non-musicians + top AI-assisted song global rank (#282).",
+  "source": "Luminate 2026 Midyear Report (luminatedata.com/blog/luminate-2026-midyear-report-trends-in-music-television-film), published 2026-07-15, covering H1 2026. Verified 2026-07-20.",
+  "grain": "one row per metric",
+  "fetch_date": "2026-07-20",
+  "etl_script": "etl/luminate__midyear2026_to_parquet.py",
+  "etl_run_date": "2026-07-26",
+  "row_count": 5,
+  "tier": "Tier-1 (public report page). Full matrix = Tier-2, auth-walled."
+}

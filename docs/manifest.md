@@ -369,9 +369,9 @@ ETLs: `etl/ifpi__gmr_2026_global_headline_to_parquet.py` · `etl/ifpi__gmr_2026_
 
 ---
 
-## `atana.luminate` — Luminate Year-End Music Industry Report ✅ Live (GitHub `9f8611b` + MotherDuck)
+## `atana.luminate` — Luminate Music Industry Reports (YE2025 ✅ Live + Midyear 2026 ⏳ built locally)
 
-Source: **Luminate Year-End 2025 Music Industry Report** (released January 2026), via the public landing page; figures verified against Music Business Worldwide coverage (22 Jan 2026). Phase 5c — the *consumer / catalog-supply* lens at global scale. **Fourth music-money lens** in the corpus after `atana.ecad` (BR author payout), `atana.cisac` (global CMO collection) and `atana.ifpi` (global label revenue) — each at a different stage of the value chain.
+Source: **Luminate Year-End 2025 Music Industry Report** (released January 2026) + **Luminate 2026 Midyear Report** (released 2026-07-15, covering H1 2026), via the public report pages; figures verified against the live report page (2026-07-20 for the Midyear). Phase 5c — the *consumer / catalog-supply* lens at global scale. **Fourth music-money lens** in the corpus after `atana.ecad` (BR author payout), `atana.cisac` (global CMO collection) and `atana.ifpi` (global label revenue) — each at a different stage of the value chain.
 
 | Table | Rows | Years | Description |
 |---|---:|---|---|
@@ -382,7 +382,18 @@ Source: **Luminate Year-End 2025 Music Industry Report** (released January 2026)
 
 ⚠️ **Tier 1 — public headlines only.** Per-track and per-artist Luminate Connect data are paywalled (Tier 2 deferred). Central caveats — `docs/methodology/luminate_ye.md` §6 — (1) "local repertoire" measured by *language*, not rights-ownership country (a Brazilian Portuguese song owned by Universal Music Brasil still counts as local — that's exactly the gap that drives the Authenticity Paradox); (2) Luminate excludes some platforms (e.g., specific China-based services) — residual offset for IFPI / CISAC cross-reads; (3) free vs paid stream split partial in public summary. **The cross-lens reading is the value:** Brazil 75.2 % local consumption × +38.6 bn paid-stream growth × IFPI LATAM +17.1 % × CISAC LATAM −0.6 % = the **Authenticity Paradox in stereo** — value flows to platform + label, not to creator + CMO. Mexico is the convergence-pole (IFPI México +13.3 % × INEGI Música y conciertos +14.9 % × Luminate +50.9 bn); Brazil is the divergence-pole.
 
-ETLs: `etl/luminate__ye2025_global_headline_to_parquet.py` · `etl/luminate__ye2025_top_markets_paid_share_to_parquet.py` · `etl/luminate__ye2025_us_genre_share_to_parquet.py` · `etl/luminate__ye2025_most_local_markets_to_parquet.py` · Methodology: `docs/methodology/luminate_ye.md`
+**Midyear 2026 tables (⏳ built locally 2026-07-20, pending push + MotherDuck sync):**
+
+| Table | Rows | Period | Description |
+|---|---:|---|---|
+| `midyear2026_global_headline` | 3 | H1 2026 | Global ODA +9.8 % to 2.8 tn; ex-US +11.8 % to 2.0 tn; US +4.8 % to 732.7B (all slight acceleration vs FY2025) |
+| `midyear2026_us_language_share` | 3 | H1 2026 | **English at a historic low 87.1 %**, **Spanish 9.4 % (~1 in 10 US streams)**, Latin-genre casual listenership peak 54 % (Q1). ⚠️ **Portuguese is NOT broken out** — it never crosses into US language stats (the seam). |
+| `midyear2026_export_power` | 2 | H1 2026 | Export Power Rankings stated movers: **South Korea #3 (BTS), Brazil #8 (Alok, Anitta)** — both export via code-switching out of the home language. Full top-10 = Tier 2 (auth-walled). |
+| `midyear2026_ai_musicians` | 5 | H1 2026 | Gen-AI: 54 % musicians positive vs 35 % non-musicians; 18 % vs 6 % use AI to edit/remix; top AI-assisted song only **#282 global** |
+
+**The language seam (Análise candidate "A língua que fica e a língua que viaja"):** Luminate measures the US market, so it reports Spanish (diaspora + pan-Latin market), never Portuguese (neither). So Portuguese shows up as **export power (#8)**, never as US share — and Brazil's export vector runs through the two artists who code-switch *out* of Portuguese (Alok = non-lyrical electronic; Anitta = PT/ES/EN). The language that *stays* at home (funk/sertanejo/pagode, the 75.2 % local of YE2025) and the language that *travels* are different languages. Maps onto Análise 19 (capture geography) + Note #08 (four money lenses) + the Authenticity Paradox.
+
+ETLs: `etl/luminate__ye2025_*` (4) · `etl/luminate__midyear2026_to_parquet.py` (4 Midyear tables; validated against the live report) · Methodology: `docs/methodology/luminate_ye.md`
 
 ---
 
@@ -514,7 +525,8 @@ The **fourth federal cultural-funding pipe** in the Atana corpus, alongside `ata
 | Table | Rows | Vintage | Description |
 |---|---:|---|---|
 | `headlines_annual` | 10 | 2023–2024 (all-fn) · 2018–2025 (cultura) | Two scopes: `all_functions` (2 benchmark rows: 2023 R$ 20.6 bi, 2024 R$ 31.4 bi) + `funcao_13_cultura` (8 rows, populated from the API — empenhado + liquidado + pago_ano + resto_pago + pago_total). Certified (5-check). |
-| `cultura_linhas` | 1,762 | 2018–2025 | **Tier 2a — per-execution-line fact table** for Função 13. Author (`nome_autor`), locality (`localidade_gasto`/`uf`, 86% UF-parsed), instrument (`tipo_emenda` → `rp_categoria` → `controle_nivel`), subfunção, full money incl. restos. Serves the *control-gradient* analysis. Key finding: **78% of cultural-emenda money flows through the finalidade-definida individual instrument (more controlled), ~10% via low-control RP-9**; the uncontrolled transferência-especial-sem-finalidade carries no função and is invisible here (E2 floor). Top authors are cultural-policy left, not the right-wing/sertanejo pattern of public debate — that money, if it flows as described, is in Turismo (fn 23) or unearmarked transfers, not função 13. NO recipient (Tier 2b) or genre (Tier 2c). |
+| `cultura_linhas` | 1,762 | 2018–2025 | **Tier 2a — per-execution-line fact table** for Função 13. Author (`nome_autor`), locality (`localidade_gasto`/`uf`, 86% UF-parsed), instrument (`tipo_emenda` → `rp_categoria` → `controle_nivel`), subfunção, full money incl. restos. Serves the *control-gradient* analysis. Key finding: **78% of cultural-emenda money flows through the finalidade-definida individual instrument (more controlled), ~10% via low-control RP-9**; the uncontrolled transferência-especial-sem-finalidade carries no função and is invisible here (E2 floor). Top authors are cultural-policy left, not the right-wing/sertanejo pattern of public debate — that money is in Turismo (fn 23, see `turismo_linhas`). NO recipient (Tier 2b) or genre (Tier 2c). |
+| `turismo_linhas` | 1,030 | 2018–2025 | **Tier 2a-turismo — per-execution-line fact table** for Função 23 (Comércio/Serviços, ~98% subfunção Turismo). Certified sibling of `cultura_linhas`. **The two-function finding:** the events/tourism emenda channel is **R$ 3,847 mi empenhado — 2.7× the cultural pipe** — and its instrument profile is *inverted*: **64% flows through low-control committee (RP-8) emendas — R$ 2,442 mi in 15 lines, R$ 2,410 mi in just 7 (Com. Turismo + Com. Desenv Regional e Turismo)** — vs 78% specified-individual in Cultura. Directed by a regional/right coalition (NE bancadas + Soraya Santos/Lira/Magno Malta/Van Hattem), distinct from the função-13 cultural left. Committee money also least-realized (RP-8 executes 25.5%; Turismo overall 38% vs Cultura 84%) — censoring-vs-structural TBD (needs situação). **Same events-economy money split across two budget functions with opposite governance + opposite coalitions; cultural oversight sees only the smaller, tamer half.** ⚠️ Turismo funds infrastructure/promotion too — NO artist-cachê claim without Tier 2b contratos; authors listed as directors only, no genre/partisan attribution. |
 
 ⚠️ **Tier-status caveat.** The `funcao_13_cultura` rows are structurally in place but their `valor_autorizado_brl_mi` / `valor_pago_brl_mi` / `n_emendas` columns are NULL. Downstream analytical use must filter `WHERE scope = 'funcao_13_cultura' AND valor_autorizado_brl_mi IS NOT NULL` or fall back to the all-functions benchmark. Populate via free API-key signup at [portaldatransparencia.gov.br/api-de-dados/cadastrar-email](https://portaldatransparencia.gov.br/api-de-dados/cadastrar-email), then `PORTAL_TRANSPARENCIA_API_KEY=xxx python etl/emendas__headlines_annual_to_parquet.py --refresh`.
 

@@ -1,0 +1,12 @@
+{
+  "table": "midyear2026_us_language_share",
+  "schema": "luminate",
+  "description": "Luminate 2026 Midyear — US language share (English low 87.1%, Spanish 9.4%) + Latin-genre casual-listenership peak (54%). Portuguese NOT broken out (the language Análise's core seam).",
+  "source": "Luminate 2026 Midyear Report (luminatedata.com/blog/luminate-2026-midyear-report-trends-in-music-television-film), published 2026-07-15, covering H1 2026. Verified 2026-07-20.",
+  "grain": "one row per language/metric",
+  "fetch_date": "2026-07-20",
+  "etl_script": "etl/luminate__midyear2026_to_parquet.py",
+  "etl_run_date": "2026-07-26",
+  "row_count": 3,
+  "tier": "Tier-1 (public report page). Full matrix = Tier-2, auth-walled."
+}

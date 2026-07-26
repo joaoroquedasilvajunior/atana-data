@@ -1,0 +1,12 @@
+{
+  "table": "midyear2026_global_headline",
+  "schema": "luminate",
+  "description": "Luminate 2026 Midyear — On-Demand Audio stream growth, H1 2026, by scope.",
+  "source": "Luminate 2026 Midyear Report (luminatedata.com/blog/luminate-2026-midyear-report-trends-in-music-television-film), published 2026-07-15, covering H1 2026. Verified 2026-07-20.",
+  "grain": "one row per scope (global/ex_us/us)",
+  "fetch_date": "2026-07-20",
+  "etl_script": "etl/luminate__midyear2026_to_parquet.py",
+  "etl_run_date": "2026-07-26",
+  "row_count": 3,
+  "tier": "Tier-1 (public report page). Full matrix = Tier-2, auth-walled."
+}
