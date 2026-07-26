@@ -83,6 +83,25 @@ AI = [
 ]
 
 
+def maybe_push(name, df):
+    """CREATE OR REPLACE atana.luminate.<name> on MotherDuck if a token exists."""
+    if os.environ.get("ATANA_ETL_SKIP_PUSH"):
+        return False
+    def _jwt(t): t=(t or "").strip(); return t if (t.startswith("eyJ") and t.count(".")==2) else ""
+    token = _jwt(os.environ.get("MOTHERDUCK_TOKEN")) or _jwt(
+        (REPO/".motherduck_token").read_text() if (REPO/".motherduck_token").exists() else "")
+    if not token:
+        print(f"  · MotherDuck push skipped for {name} — no valid token.")
+        return False
+    con = duckdb.connect(f"md:atana?motherduck_token={token}")
+    con.execute("CREATE SCHEMA IF NOT EXISTS atana.luminate")
+    con.register("d", df)
+    con.execute(f"CREATE OR REPLACE TABLE atana.luminate.{name} AS SELECT * FROM d")
+    n = con.execute(f"SELECT COUNT(*) FROM atana.luminate.{name}").fetchone()[0]
+    print(f"  ✓ Synced atana.luminate.{name} ({n} rows)")
+    return True
+
+
 def build_and_write(name, df, desc, grain):
     p = OUT / f"{name}.parquet"
     con = duckdb.connect(); con.register("d", df)
@@ -94,6 +113,7 @@ def build_and_write(name, df, desc, grain):
             "tier": "Tier-1 (public report page). Full matrix = Tier-2, auth-walled."}
     p.with_suffix(".meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False))
     print(f"  ✓ {p.relative_to(REPO)} — {len(df)} rows")
+    maybe_push(name, df)
     return df
 
 
@@ -138,7 +158,7 @@ def main():
     print("  ✓ key figures match the verified report (Eng 87.1, Spa 9.4, BR #8, KR #3, AI #282)")
 
     if os.environ.get("ATANA_ETL_SKIP_PUSH"):
-        print("  · MotherDuck push skipped (ATANA_ETL_SKIP_PUSH)")
+        print("  · MotherDuck push skipped (ATANA_ETL_SKIP_PUSH) — parquet only.")
     print("Done.")
 
 
