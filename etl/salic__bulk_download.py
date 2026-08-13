@@ -528,6 +528,10 @@ def parse_args() -> argparse.Namespace:
                    help="Skip discovery; only refresh open-cycle PRONACs and exit.")
     p.add_argument("--dry-run", action="store_true",
                    help="Refresh mode only: fetch but do not UPDATE/INSERT (read-only probe).")
+    p.add_argument("--years", default=None,
+                   help="Comma-separated year subset to discover/backfill (e.g. '2025,2026'). "
+                        "Default: all of YEARS_TO_BACKFILL. Used for targeted year-slice refreshes; "
+                        "discovery stays idempotent so untouched years are unaffected.")
     return p.parse_args()
 
 
@@ -548,8 +552,12 @@ def main() -> None:
         existing = existing_pronacs(con)
         print(f"PRONACs already cached: {len(existing):,}\n")
 
+        years = ([int(y) for y in args.years.split(",") if y.strip()]
+                 if args.years else YEARS_TO_BACKFILL)
+        if args.years:
+            print(f"YEAR SLICE: {years} (targeted refresh — other years untouched)\n")
         total_new = 0
-        for year in YEARS_TO_BACKFILL:
+        for year in years:
             print(f"--- Year {year} ---")
             try:
                 new = download_year(year, existing)

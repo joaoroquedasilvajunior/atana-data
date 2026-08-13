@@ -124,13 +124,13 @@ ETL: `etl/ibge_comex__xlsx_to_parquet.py`
 
 ---
 
-## `atana.salic` — Lei Rouanet (MinC) ✅ Live (Coverage audit 2026-07-05: canonical count is 48,189, not 26,203 as previously listed)
+## `atana.salic` — Lei Rouanet (MinC) ✅ Live (Refresh 2026-08-12: canonical `projetos` = 58,532, up from 48,189 via targeted 2023–2026 year-slice, +10,343 after the ~5-week API blackout)
 
 Source: API SALIC `api.salic.cultura.gov.br/api/v1` (Cloudflare-Turnstile-gated as of Jun 2026; bypass via Bright Data + FlareSolverr documented in `docs/methodology/salic_api.md` §3).
 
 | Table | Rows | Description |
 |---|---:|---|
-| **`projetos`** *(canonical)* | **48,189** | Projetos coletados (2019–2026), ~85 % do universo. Estado atual desde commit `4e48176` (2026-06-13). |
+| **`projetos`** *(canonical)* | **58,532** | Projetos coletados (2019–2026), ~98 % do universo atual da API (59.642); janela 2019–2026 completa. Refresh 2026-08-12 (year-slice 2023–2026, +10.343). |
 | `projetos_v2` *(legacy compat)* | 26,203 (GitHub) / 48,189 (MotherDuck) | Subconjunto histórico "canonical clean" — mantido para compatibilidade com Análises 7/8 e Note #21 publicados. Ver §1.1 do methodology doc para a divergência. |
 | `edges_pronac_incent` | 8,504 | Grafo per-PRONAC × incentivador. ⚠️ Parquet ausente localmente (audit 2026-07-05); existe no MotherDuck. |
 | `edges_incentivador` | 8,504 | Agregação entity-level. |

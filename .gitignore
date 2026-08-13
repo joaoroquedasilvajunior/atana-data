@@ -28,6 +28,9 @@ etl/__cache__/
 # DB-updater / ETL --staging output — throwaway, diffed against live then discarded
 raw/*/_staging/
 
+# Pre-refresh rollback snapshots — insurance only, never committed
+raw/salic/projetos_pre_slice_*.parquet
+
 # OS
 Thumbs.db
 
@@ -41,3 +44,4 @@ raw/unctad/_placeholder.md
 *.log
 raw/*/_source/
 raw/pnab/_source/
+raw/ilo_ai/_source/
