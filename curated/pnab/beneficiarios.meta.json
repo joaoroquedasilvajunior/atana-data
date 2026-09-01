@@ -1,0 +1,11 @@
+{
+  "table": "pnab.beneficiarios",
+  "rows": 167817,
+  "value_total_brl": 2874437560.68,
+  "currency": "BRL nominal (Ciclo 1)",
+  "source": "MinC Portal de Dados da Cultura — 'PNAB dados abertos completo' (BB-Ágil × Receita CPF/CNPJ × RAIS × INSS × CNEFE × CadÚnico × BPC × IBGE)",
+  "note": "beneficiary document masked (LGPD); demographic joins cover the formal subset only (majority NULL). See docs/methodology/pnab_beneficiarios.md",
+  "etl_script": "etl/pnab__beneficiarios_to_parquet.py",
+  "etl_run_date": "2026-09-01",
+  "licence": "CC BY 4.0 (Portal de Dados da Cultura)"
+}
